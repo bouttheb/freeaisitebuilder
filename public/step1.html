@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step 1: Set Up Your Hosting — Free AI Site Builder</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card-bg: #1A1A1A;
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --gray-light: #E0E0E0;
+  --gray-mid: #999999;
+  --gray-dark: #666666;
+  --accent: #C8A46E;
+  --accent-hover: #D4B57E;
+  --green: #4CAF50;
+  --red-soft: #E57373;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--black);
+  color: var(--off-white);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  padding: 1rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(200,164,110,0.1);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 600; color: #fff;
+  text-decoration: none;
+}
+.nav-steps {
+  display: flex; gap: 0.5rem; align-items: center;
+}
+.nav-step {
+  display: flex; align-items: center; gap: 0.4rem;
+  font-size: 0.8rem; color: var(--gray-dark);
+}
+.nav-step.active { color: var(--accent); }
+.nav-step-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--gray-dark);
+}
+.nav-step.active .nav-step-dot { background: var(--accent); box-shadow: 0 0 8px rgba(200,164,110,0.4); }
+.nav-step-line {
+  width: 24px; height: 1px; background: rgba(255,255,255,0.1);
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 7rem 2rem 4rem;
+  background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%);
+}
+.step-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  border: 1px solid rgba(200,164,110,0.3);
+  padding: 0.4rem 1.2rem;
+  border-radius: 30px;
+  margin-bottom: 2rem;
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.5rem;
+  max-width: 800px;
+}
+.hero h1 span { color: var(--accent); }
+.hero-lead {
+  font-size: 1.15rem;
+  color: var(--gray-light);
+  max-width: 650px;
+  margin-bottom: 1rem;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+/* CROSSED OUT LOGOS */
+.old-way {
+  margin: 3rem 0 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+.old-way-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gray-dark);
+}
+.old-brands {
+  display: flex;
+  gap: 2.5rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.old-brand {
+  position: relative;
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--gray-dark);
+  opacity: 0.5;
+}
+.old-brand::after {
+  content: '';
+  position: absolute;
+  left: -4px; right: -4px;
+  top: 50%;
+  height: 2px;
+  background: var(--red-soft);
+  transform: rotate(-5deg);
+}
+.new-way-label {
+  font-size: 1rem;
+  color: var(--accent);
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+/* SCROLL CTA */
+.scroll-hint {
+  margin-top: 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--off-white);
+  animation: float 3s ease-in-out infinite;
+}
+.scroll-hint span {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  font-weight: 600;
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+.scroll-hint svg { opacity: 0.5; }
+
+/* SECTIONS */
+section { padding: 6rem 2rem; }
+.section-inner { max-width: 900px; margin: 0 auto; }
+
+/* THE SHIFT */
+.the-shift { background: var(--dark); }
+.shift-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+.shift-card {
+  padding: 2rem;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.shift-card.old {
+  background: rgba(229,115,115,0.05);
+  border-color: rgba(229,115,115,0.15);
+}
+.shift-card.new {
+  background: rgba(200,164,110,0.05);
+  border-color: rgba(200,164,110,0.2);
+}
+.shift-card-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+.shift-card.old .shift-card-label { color: var(--red-soft); }
+.shift-card.new .shift-card-label { color: var(--accent); }
+.shift-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+}
+.shift-card ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+.shift-card li {
+  font-size: 0.95rem;
+  color: var(--gray-mid);
+  padding-left: 1.5rem;
+  position: relative;
+  font-weight: 300;
+}
+.shift-card.old li::before {
+  content: '✕';
+  position: absolute;
+  left: 0;
+  color: var(--red-soft);
+  font-size: 0.8rem;
+}
+.shift-card.new li::before {
+  content: '✓';
+  position: absolute;
+  left: 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* WHY HOSTING */
+.why-hosting {
+  background: var(--black);
+}
+.why-hosting-text {
+  font-size: 1.1rem;
+  color: var(--gray-light);
+  line-height: 1.9;
+  font-weight: 300;
+  max-width: 750px;
+}
+.why-hosting-text strong {
+  color: var(--off-white);
+  font-weight: 600;
+}
+.callout {
+  margin-top: 2rem;
+  padding: 1.5rem 2rem;
+  background: rgba(200,164,110,0.06);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  font-size: 1rem;
+  color: var(--gray-light);
+  font-weight: 300;
+  line-height: 1.8;
+}
+.callout strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* BLUEHOST CTA SECTION */
+.bluehost-cta {
+  background: var(--dark);
+  text-align: center;
+}
+.discount-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), #D4B57E);
+  color: var(--black);
+  font-size: 1.8rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 30px rgba(200,164,110,0.25);
+}
+.bluehost-cta h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.bluehost-cta .subtitle {
+  color: var(--gray-mid);
+  font-size: 1.05rem;
+  font-weight: 300;
+  max-width: 600px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+}
+.bluehost-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), #D4B57E);
+  color: var(--black);
+  padding: 1.1rem 3.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.15rem;
+  transition: transform 0.2s, box-shadow 0.3s;
+  box-shadow: 0 4px 20px rgba(200,164,110,0.2);
+}
+.bluehost-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(200,164,110,0.35);
+}
+.bluehost-sub {
+  margin-top: 1rem;
+  font-size: 0.85rem;
+  color: var(--gray-dark);
+}
+.trust-points {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  margin-top: 2.5rem;
+  flex-wrap: wrap;
+}
+.trust-point {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+}
+.trust-point svg { flex-shrink: 0; }
+
+/* CONFIRMATION SECTION */
+.confirmation {
+  background: var(--black);
+  text-align: center;
+}
+.confirmation h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+}
+.confirmation .subtitle {
+  color: var(--gray-mid);
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2.5rem;
+}
+.confirm-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+.form-group {
+  margin-bottom: 1.2rem;
+  text-align: left;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+.form-group input {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.9rem 1.2rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.form-group input:focus {
+  border-color: rgba(200,164,110,0.5);
+}
+.form-group input::placeholder { color: var(--gray-dark); }
+.confirm-btn {
+  width: 100%;
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 1rem;
+  font-weight: 700;
+  font-size: 1.05rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.confirm-btn:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+.confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.confirm-note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  line-height: 1.6;
+}
+
+/* FOOTER */
+footer {
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .shift-grid { grid-template-columns: 1fr; }
+  .old-brands { gap: 1.5rem; }
+  .old-brand { font-size: 1.1rem; }
+  nav { padding: 0.8rem 1rem; }
+  .nav-steps { display: none; }
+  section { padding: 4rem 1.2rem; }
+  .trust-points { flex-direction: column; align-items: center; }
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 2rem 3rem;
+}
+.bottom-nav-back, .bottom-nav-forward {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--gray-mid);
+  text-decoration: none;
+  transition: color 0.3s;
+}
+.bottom-nav-back:hover, .bottom-nav-forward:hover {
+  color: var(--accent);
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html" class="nav-logo">freeaisitebuilder.com</a>
+  <div class="nav-steps">
+    <div class="nav-step active"><div class="nav-step-dot"></div> Hosting</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Content</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Build</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Launch</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="step-badge">Step 1 of 4</div>
+  <h1>Set Up <span>Hosting</span></h1>
+  <p class="hero-lead">
+    AI has done away with the need for template builders like Squarespace and WordPress, but your website still needs a place to live. The good news? Self-hosting can be had for less than $4/month.
+  </p>
+  <a href="#" onclick="event.preventDefault(); openModal();" style="display: inline-block; background: var(--accent); color: var(--black); padding: 1rem 3rem; border-radius: 4px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background 0.3s, transform 0.2s; margin-top: 0.5rem;">Set Up Hosting Now</a>
+
+  <div class="scroll-hint">
+    <span>Learn More</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
+</section>
+
+<!-- THE SHIFT -->
+<section class="the-shift">
+  <div class="section-inner">
+    <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.8rem; text-align: center;">The old way vs. the new way</p>
+    <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 600; text-align: center; margin-bottom: 1rem;">
+      You no longer need to pay for a platform.
+    </h2>
+    <p style="color: var(--gray-mid); font-size: 1.05rem; font-weight: 300; text-align: center; max-width: 600px; margin: 0 auto 3rem;">
+      Template builders charge $16–$99/month just for the privilege of using their tools. With AI, all you need is basic hosting — and it costs a fraction of the price.
+    </p>
+    <div class="shift-grid">
+      <div class="shift-card old">
+        <div class="shift-card-label">The old way</div>
+        <h3>Template Builders</h3>
+        <ul>
+          <li>$16–$99/month just for the platform</li>
+          <li>$192–$1,188/year before you even add content</li>
+          <li>Locked into their ecosystem — can't leave</li>
+          <li>Same templates everyone else uses</li>
+          <li>Hours learning their drag-and-drop tools</li>
+          <li>Extra fees for every add-on and feature</li>
+        </ul>
+      </div>
+      <div class="shift-card new">
+        <div class="shift-card-label">The new way</div>
+        <h3>Self-Hosting</h3>
+        <ul>
+          <li>Less than $4 per month</li>
+          <li>Save hundreds of dollars every single year</li>
+          <li>You own all the code — leave anytime</li>
+          <li>100% custom design, built for you</li>
+          <li>Done in minutes, not hours</li>
+          <li>No monthly platform fees — ever</li>
+        </ul>
+      </div>
+    </div>
+    <div style="text-align: center; margin-top: 3rem;">
+      <a href="#" onclick="event.preventDefault(); openModal();" class="hosting-cta" style="display: inline-block; background: var(--accent); color: var(--black); padding: 1rem 3rem; border-radius: 4px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background 0.3s, transform 0.2s;">Set Up Hosting Now →</a>
+      <p style="margin-top: 0.8rem; font-size: 1rem; color: var(--gray-mid);">Our affiliate partner will give you 60% off right now for using our link.</p>
+    </div>
+  </div>
+</section>
+
+<!-- SAVINGS HIGHLIGHT -->
+<section style="background: var(--black); padding: 4rem 2rem; text-align: center;">
+  <div class="section-inner">
+    <div style="display: inline-block; background: rgba(200,164,110,0.08); border: 1px solid rgba(200,164,110,0.2); border-radius: 12px; padding: 2.5rem 3rem; max-width: 650px;">
+      <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 1rem;">The math is simple</p>
+      <p style="font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 600; line-height: 1.5; margin-bottom: 1rem;">
+        Squarespace charges <span style="color: var(--red-soft); text-decoration: line-through;">$192–$1,188/year</span>.<br>
+        Self-hosting is <span style="color: var(--accent);">less than $4/month</span>.
+      </p>
+      <p style="color: var(--gray-mid); font-size: 0.95rem; font-weight: 300; line-height: 1.7;">
+        That's money back in your pocket every year — and you get a site that's custom-built, not a template.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- HOSTING TIPS MODAL -->
+<div id="hostingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); justify-content:center; align-items:center; padding:2rem;">
+  <div style="background:var(--dark); border:1px solid rgba(200,164,110,0.2); border-radius:12px; padding:2.5rem; max-width:550px; width:100%; text-align:center; position:relative;">
+    <button onclick="closeModal()" style="position:absolute; top:1rem; right:1.2rem; background:none; border:none; color:var(--gray-dark); font-size:1.5rem; cursor:pointer; line-height:1;">&times;</button>
+    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); margin-bottom:0.8rem;">Before you go</p>
+    <h2 style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:600; margin-bottom:1rem;">All you need is the basic plan.</h2>
+    <p style="color:var(--gray-mid); font-size:0.95rem; font-weight:300; line-height:1.7; margin-bottom:2rem;">
+      Choose the cheapest plan available. It comes with everything you need — including a free domain name. You don't need to add any extra services unless you want them.
+    </p>
+    <div style="display:flex; gap:1rem; margin-bottom:2rem; text-align:left;">
+      <div style="background:var(--card-bg); border:1px solid rgba(76,175,80,0.25); border-radius:8px; padding:1rem 1.2rem; flex:1;">
+        <div style="color:var(--green); font-weight:700; font-size:0.8rem; margin-bottom:0.4rem;">DO</div>
+        <div style="font-size:0.85rem; color:var(--gray-light); line-height:1.6;">Choose the basic plan<br>Register your free domain<br>Skip any extra add-ons</div>
+      </div>
+      <div style="background:var(--card-bg); border:1px solid rgba(229,115,115,0.25); border-radius:8px; padding:1rem 1.2rem; flex:1;">
+        <div style="color:var(--red-soft); font-weight:700; font-size:0.8rem; margin-bottom:0.4rem;">DON'T NEED</div>
+        <div style="font-size:0.85rem; color:var(--gray-light); line-height:1.6;">Premium plans or upgrades<br>SEO tools or site builders<br>Any paid add-ons</div>
+      </div>
+    </div>
+    <a href="https://bluehost.sjv.io/c/54826/2147559/11352" target="_blank" onclick="localStorage.setItem('wb_clicked_affiliate','true'); closeModal(); showConfirmation();" style="display:inline-block; background:var(--accent); color:var(--black); padding:1rem 3rem; border-radius:4px; text-decoration:none; font-weight:700; font-size:1.1rem;">Got It — Take Me to Hosting →</a>
+  </div>
+</div>
+
+<!-- WHAT'S FREE / WHAT YOU NEED -->
+<section style="background: var(--dark); padding: 5rem 2rem;">
+  <div class="section-inner" style="text-align: center;">
+    <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.8rem;">Here's the deal</p>
+    <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 600; margin-bottom: 3rem;">
+      Everything is free — <span style="color: var(--accent);">except hosting.</span>
+    </h2>
+
+    <!-- Visual breakdown -->
+    <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: start; max-width: 800px; margin: 0 auto;">
+
+      <!-- FREE column -->
+      <div style="text-align: center;">
+        <div style="background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); border-radius: 12px; padding: 2rem 1.5rem;">
+          <div style="font-size: 2rem; margin-bottom: 0.8rem;">$0</div>
+          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green); font-weight: 600; margin-bottom: 1.5rem;">We charge you</div>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--green); font-weight: 700;">✓</span> AI website builder
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--green); font-weight: 700;">✓</span> Custom design
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--green); font-weight: 700;">✓</span> Hand-coded HTML/CSS
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--green); font-weight: 700;">✓</span> Ample revisions
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--green); font-weight: 700;">✓</span> Downloadable files
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Divider -->
+      <div style="display: flex; align-items: center; justify-content: center; padding-top: 4rem;">
+        <div style="width: 1px; height: 180px; background: rgba(255,255,255,0.1); position: relative;">
+          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--dark); padding: 0.5rem; font-size: 0.75rem; color: var(--gray-dark); white-space: nowrap;">+</span>
+        </div>
+      </div>
+
+      <!-- HOSTING column -->
+      <div style="text-align: center;">
+        <div style="background: rgba(200,164,110,0.06); border: 1px solid rgba(200,164,110,0.2); border-radius: 12px; padding: 2rem 1.5rem;">
+          <div style="font-size: 2rem; margin-bottom: 0.8rem; font-family: 'Playfair Display', serif;">
+            <span style="font-size: 1rem; color: var(--gray-mid);">&lt;</span>$50<span style="font-size: 1rem; color: var(--gray-mid);">/yr</span>
+          </div>
+          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-bottom: 1.5rem;">Third-party hosting</div>
+          <div style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--accent); font-weight: 700;">→</span> Where your site lives
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--accent); font-weight: 700;">→</span> Every site needs it
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--accent); font-weight: 700;">→</span> Includes free domain
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--accent); font-weight: 700;">→</span> Not our fee — it's theirs
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
+              <span style="color: var(--accent); font-weight: 700;">→</span> 15+ years trusted
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p style="margin-top: 2.5rem; color: var(--gray-mid); font-size: 0.9rem; font-weight: 300; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7;">
+      The hosting provider gives you a discount for using our link, then pays us a commission for referring you. That's how we're able to offer this resource completely free.
+    </p>
+  </div>
+</section>
+
+<!-- BLUEHOST CTA -->
+<section class="bluehost-cta" id="get-hosting">
+  <div class="section-inner">
+    <div class="discount-badge">60% OFF</div>
+    <h2>Get Your Hosting Set Up</h2>
+    <p class="subtitle">
+      Use the link below to set up your hosting plan and get 60% off. Once you've registered your domain, come back here and enter it to continue building.
+    </p>
+    <a href="#" onclick="event.preventDefault(); openModal();" class="bluehost-btn" id="affiliateLink">
+      Set Up Hosting Now — 60% Off →
+    </a>
+    <p class="bluehost-sub">Very affordable — just a few dollars a month. Cancel anytime.</p>
+    <div class="trust-points">
+      <div class="trust-point">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Free SSL Certificate
+      </div>
+      <div class="trust-point">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        24/7 Support
+      </div>
+      <div class="trust-point">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        Free Domain Name
+      </div>
+      <div class="trust-point">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Free Business Email
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONFIRMATION (hidden until affiliate link is clicked) -->
+<section class="confirmation" id="confirm" style="display:none;">
+  <div class="section-inner">
+    <h2>Great — now enter your new domain</h2>
+    <p class="subtitle">Type in the domain you just registered so we can start building your site.</p>
+    <form class="confirm-form" onsubmit="confirmDomain(event)">
+      <div class="form-group">
+        <label>Your domain name</label>
+        <input type="text" id="domainInput" placeholder="e.g., mybusiness.com" required>
+      </div>
+      <button type="submit" class="confirm-btn" id="confirmBtn">Continue to Step 2 →</button>
+      <p class="confirm-note">
+        Make sure you've completed your hosting setup before continuing. You'll need your domain for the next steps.
+      </p>
+    </form>
+  </div>
+</section>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <a href="/" class="bottom-nav-back">&larr; Back</a>
+  <a href="/step2.html" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
+</div>
+
+<footer>
+  &copy; 2026 freeaisitebuilder.com. All rights reserved.
+</footer>
+
+<script>
+// Track if they clicked the affiliate link
+let clickedAffiliate = false;
+const confirmSection = document.getElementById('confirm');
+
+function showConfirmation() {
+  clickedAffiliate = true;
+  confirmSection.style.display = 'block';
+  setTimeout(() => {
+    confirmSection.scrollIntoView({ behavior: 'smooth' });
+  }, 300);
+}
+
+// Modal open/close
+function openModal() {
+  const modal = document.getElementById('hostingModal');
+  modal.style.display = 'flex';
+}
+
+function closeModal() {
+  const modal = document.getElementById('hostingModal');
+  modal.style.display = 'none';
+}
+
+// Close modal on backdrop click
+document.getElementById('hostingModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Close modal on Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeModal();
+});
+
+// Check on load — if they already clicked before, show confirmation
+if (localStorage.getItem('wb_clicked_affiliate') === 'true') {
+  clickedAffiliate = true;
+  confirmSection.style.display = 'block';
+}
+
+// Show Forward button if they've already completed this step
+if (localStorage.getItem('wb_completed_step1') === 'true') {
+  document.getElementById('forwardBtn').style.display = 'inline';
+}
+
+function confirmDomain(e) {
+  e.preventDefault();
+  const domain = document.getElementById('domainInput').value.trim().toLowerCase();
+
+  if (!domain) return;
+
+  // Clean up the domain (remove http/https/www)
+  const cleaned = domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/+$/, '');
+
+  // Basic validation
+  if (!cleaned.includes('.') || cleaned.length < 4) {
+    alert('Please enter a valid domain name (e.g., mybusiness.com)');
+    return;
+  }
+
+  // Store domain for the session
+  let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
+  localStorage.setItem('wb_session', sessionId);
+  localStorage.setItem('wb_domain', cleaned);
+  localStorage.setItem('wb_completed_step1', 'true');
+
+  // Register domain with backend
+  fetch('/api/register-domain', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sessionId, domain: cleaned })
+  }).then(() => {
+    window.location.href = '/step2.html';
+  }).catch(() => {
+    // Even if API fails, let them continue
+    window.location.href = '/step2.html';
+  });
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Free AI Site Builder — Let's Build Your Site</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card-bg: #1A1A1A;
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --gray-light: #E0E0E0;
+  --gray-mid: #999999;
+  --gray-dark: #666666;
+  --accent: #C8A46E;
+  --accent-hover: #D4B57E;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--black);
+  color: var(--off-white);
+  display: flex;
+  flex-direction: column;
+}
+
+/* NAV */
+nav {
+  padding: 0.8rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--dark);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem; font-weight: 600; color: #fff;
+  text-decoration: none;
+}
+.token-badge {
+  font-size: 0.75rem;
+  color: var(--gray-mid);
+  background: rgba(255,255,255,0.05);
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+}
+.token-badge span { color: var(--accent); font-weight: 600; }
+
+/* LAYOUT */
+.app {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* SIDEBAR — step tracker */
+.sidebar {
+  width: 260px;
+  background: var(--dark);
+  border-right: 1px solid rgba(255,255,255,0.05);
+  padding: 1.5rem;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+.sidebar h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+.step-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 0;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  font-size: 0.9rem;
+  color: var(--gray-dark);
+  transition: color 0.3s;
+}
+.step-item.active { color: var(--off-white); }
+.step-item.completed { color: var(--accent); }
+.step-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--gray-dark);
+  flex-shrink: 0;
+  transition: all 0.3s;
+}
+.step-item.active .step-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+  box-shadow: 0 0 8px rgba(200,164,110,0.4);
+}
+.step-item.completed .step-dot {
+  border-color: var(--accent);
+  background: var(--accent);
+}
+
+/* CHAT AREA */
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.message {
+  max-width: 75%;
+  padding: 1rem 1.2rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  animation: fadeIn 0.3s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.message.assistant {
+  align-self: flex-start;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.message.user {
+  align-self: flex-end;
+  background: rgba(200,164,110,0.15);
+  border: 1px solid rgba(200,164,110,0.2);
+}
+.message.system {
+  align-self: center;
+  background: rgba(200,164,110,0.08);
+  border: 1px solid rgba(200,164,110,0.15);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  max-width: 90%;
+}
+
+/* Typing indicator */
+.typing {
+  display: flex; gap: 4px; padding: 1rem 1.2rem;
+  align-self: flex-start;
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.typing span {
+  width: 8px; height: 8px;
+  background: var(--gray-mid);
+  border-radius: 50%;
+  animation: bounce 1.4s infinite;
+}
+.typing span:nth-child(2) { animation-delay: 0.2s; }
+.typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%, 60%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-6px); }
+}
+
+/* CODE BLOCK in messages */
+.message pre {
+  background: #0d0d0d;
+  padding: 1rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  margin: 0.8rem 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+.message code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+}
+
+/* INPUT AREA */
+.input-area {
+  padding: 1rem 1.5rem;
+  background: var(--dark);
+  border-top: 1px solid rgba(255,255,255,0.05);
+  flex-shrink: 0;
+}
+.input-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: flex-end;
+}
+.input-row textarea {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  resize: none;
+  min-height: 44px;
+  max-height: 150px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.input-row textarea:focus {
+  border-color: rgba(200,164,110,0.4);
+}
+.input-row textarea::placeholder { color: var(--gray-dark); }
+
+.btn {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  flex-shrink: 0;
+}
+.btn:hover { background: var(--accent-hover); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.btn-upload {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--gray-mid);
+  border-radius: 8px;
+  padding: 0.7rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+}
+.btn-upload:hover {
+  border-color: rgba(200,164,110,0.3);
+  color: var(--accent);
+}
+
+/* FILE UPLOAD INDICATOR */
+.uploaded-files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.file-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(200,164,110,0.1);
+  border: 1px solid rgba(200,164,110,0.2);
+  border-radius: 20px;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.8rem;
+  color: var(--accent);
+}
+.file-chip button {
+  background: none;
+  border: none;
+  color: var(--gray-mid);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* PREVIEW PANEL */
+.preview-panel {
+  display: none;
+  flex-direction: column;
+  width: 45%;
+  border-left: 1px solid rgba(255,255,255,0.05);
+}
+.preview-panel.visible { display: flex; }
+.preview-header {
+  padding: 0.8rem 1rem;
+  background: var(--dark);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+}
+.preview-header h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.9rem;
+  color: var(--off-white);
+}
+.preview-actions { display: flex; gap: 0.5rem; }
+.preview-actions button {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  color: var(--gray-mid);
+  padding: 0.3rem 0.8rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.preview-actions button:hover {
+  background: var(--accent);
+  color: var(--black);
+  border-color: var(--accent);
+}
+.preview-iframe {
+  flex: 1;
+  background: white;
+}
+.preview-iframe iframe {
+  width: 100%; height: 100%; border: none;
+}
+
+/* CAP REACHED */
+.cap-message {
+  display: none;
+  text-align: center;
+  padding: 2rem;
+  background: var(--dark);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.cap-message h3 {
+  font-family: 'Playfair Display', serif;
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+.cap-message p {
+  color: var(--gray-mid);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+.cap-message.visible { display: block; }
+
+/* LAUNCH PANEL */
+.launch-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 200;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  padding: 2rem 0;
+  animation: fadeIn 0.4s ease;
+}
+.launch-overlay.visible { display: flex; }
+
+.launch-card {
+  background: var(--dark);
+  border: 1px solid rgba(200,164,110,0.2);
+  border-radius: 16px;
+  max-width: 560px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 2.5rem;
+  position: relative;
+}
+
+.launch-confetti {
+  font-size: 2.5rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+
+.launch-card h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  color: var(--off-white);
+  text-align: center;
+  margin-bottom: 0.5rem;
+}
+.launch-card h2 span { color: var(--accent); }
+
+.launch-card .launch-subtitle {
+  text-align: center;
+  color: var(--gray-mid);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+}
+
+.launch-download-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  width: 100%;
+  padding: 1rem;
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 10px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1.5rem;
+}
+.launch-download-btn:hover { background: var(--accent-hover); transform: translateY(-1px); }
+
+.launch-steps {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+.launch-steps-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.2rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.launch-steps-header:hover { background: rgba(255,255,255,0.02); }
+.launch-steps-header h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1rem;
+  color: var(--off-white);
+}
+.launch-steps-header svg { transition: transform 0.3s; color: var(--gray-mid); }
+.launch-steps-header.open svg { transform: rotate(180deg); }
+.launch-steps-body {
+  display: none;
+  padding: 0 1.2rem 1.2rem;
+}
+.launch-steps-body.open { display: block; animation: fadeIn 0.3s ease; }
+.launch-steps-body ol {
+  padding-left: 1.2rem;
+  color: var(--gray-light);
+  font-size: 0.9rem;
+}
+.launch-steps-body ol li {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+}
+.launch-steps-body code {
+  background: rgba(200,164,110,0.1);
+  color: var(--accent);
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.85rem;
+}
+
+.launch-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+.launch-actions button {
+  background: none;
+  border: none;
+  color: var(--gray-dark);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-family: 'Source Sans 3', sans-serif;
+  transition: color 0.3s;
+}
+.launch-actions button:hover { color: var(--accent); }
+
+.launch-desktop {
+  display: none;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+.launch-desktop p {
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  margin-bottom: 0.8rem;
+}
+.launch-desktop-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.launch-desktop-link input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--off-white);
+  font-family: monospace;
+  font-size: 0.75rem;
+  outline: none;
+  min-width: 0;
+}
+.launch-desktop-link button {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 6px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.launch-desktop-link button:hover { background: var(--accent-hover); }
+.launch-desktop-copied {
+  font-size: 0.75rem;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.launch-desktop-copied.show { opacity: 1; }
+#desktopQr {
+  margin: 0 auto;
+  max-width: 160px;
+}
+#desktopQr canvas { border-radius: 8px; }
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .sidebar { display: none; }
+  .preview-panel { width: 100%; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; }
+  .launch-card { padding: 1.5rem; }
+  .launch-overlay { align-items: flex-start; -webkit-overflow-scrolling: touch; }
+  .launch-card { max-height: none; margin: 0 auto; flex-shrink: 0; }
+  .launch-confetti { font-size: 2rem; margin-bottom: 0.3rem; }
+  .launch-card h2 { font-size: 1.5rem; margin-bottom: 0.3rem; }
+  .launch-card .launch-subtitle { margin-bottom: 1rem; }
+  .launch-download-btn { margin-bottom: 1rem; }
+  .launch-steps { margin-bottom: 1rem; }
+  .launch-desktop { display: block; padding: 0.8rem; margin-bottom: 1rem; }
+  #desktopQr { max-width: 120px; }
+  #desktopQr img { width: 120px !important; height: 120px !important; }
+}
+@media (max-width: 600px) {
+  .message { max-width: 90%; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/index.html" class="nav-logo">freeaisitebuilder.com</a>
+  <div class="token-badge">Usage: <span id="tokenCount">0%</span></div>
+</nav>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Your Progress</h3>
+    <div class="step-item completed" data-step="1">
+      <div class="step-dot"></div>
+      <span>Hosting</span>
+    </div>
+    <div class="step-item completed" data-step="2">
+      <div class="step-dot"></div>
+      <span>Content</span>
+    </div>
+    <div class="step-item active" data-step="3">
+      <div class="step-dot"></div>
+      <span>Build & Refine</span>
+    </div>
+    <div class="step-item" data-step="4">
+      <div class="step-dot"></div>
+      <span>Launch</span>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-area">
+    <div class="messages" id="messages"></div>
+
+    <div class="cap-message" id="capMessage">
+      <h3>Session Limit Reached</h3>
+      <p>You've hit your token limit for this session. Download your site in its current state and finish building on the AI platform of your choice (like <a href="https://claude.ai" target="_blank" style="color:var(--accent);">claude.ai</a> — it's free).</p>
+      <button class="btn" style="background:var(--accent);color:var(--black);border:none;padding:0.8rem 2rem;border-radius:8px;font-weight:700;font-size:1rem;cursor:pointer;margin-bottom:0.8rem;display:block;width:100%;" onclick="downloadSite()">Download My Website (.zip)</button>
+      <button class="btn" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--gray-mid);padding:0.6rem 1.5rem;border-radius:8px;font-size:0.85rem;cursor:pointer;width:100%;" onclick="downloadHandoff()">Download Handoff File (to continue with AI)</button>
+    </div>
+
+    <div class="input-area" id="inputArea">
+      <div class="uploaded-files" id="uploadedFiles"></div>
+      <div class="input-row">
+        <button class="btn-upload" onclick="document.getElementById('fileInput').click()" title="Upload files">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/>
+          </svg>
+        </button>
+        <input type="file" id="fileInput" multiple accept="image/*,.svg,.pdf" style="display:none" onchange="handleFileUpload(event)">
+        <textarea id="userInput" placeholder="Type your message..." rows="1" onkeydown="handleKeydown(event)" oninput="autoResize(this)"></textarea>
+        <button class="btn" id="sendBtn" onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREVIEW -->
+  <div class="preview-panel" id="previewPanel">
+    <div class="preview-header">
+      <h4>Live Preview</h4>
+      <div class="preview-actions">
+        <button onclick="refreshPreview()">Refresh</button>
+        <button onclick="downloadSite()">Download</button>
+        <button onclick="closePreview()">Close</button>
+      </div>
+    </div>
+    <div class="preview-iframe">
+      <iframe id="previewFrame" sandbox="allow-scripts"></iframe>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav" style="display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto; padding:1rem 2rem;">
+  <a href="/step2.html" style="font-size:0.9rem; color:var(--gray-dark); text-decoration:none;">&larr; Back to Step 2</a>
+</div>
+
+<!-- LAUNCH OVERLAY -->
+<div class="launch-overlay" id="launchOverlay">
+  <div class="launch-card">
+    <div class="launch-confetti">&#127881;</div>
+    <h2>Your site is <span>ready!</span></h2>
+    <p class="launch-subtitle">Download your website and upload it to Bluehost to go live.</p>
+
+    <button class="launch-download-btn" onclick="downloadSite()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download My Website (.zip)
+    </button>
+
+    <div class="launch-steps" id="launchSteps">
+      <div class="launch-steps-header" onclick="toggleLaunchSteps()">
+        <h4>How to upload to Bluehost</h4>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div class="launch-steps-body" id="launchStepsBody">
+        <ol>
+          <li>Log in to your <strong>Bluehost</strong> account at bluehost.com</li>
+          <li>In the left sidebar, click <strong>"Advanced"</strong></li>
+          <li>Click <strong>"File Manager"</strong></li>
+          <li>Navigate to the <code>public_html</code> folder</li>
+          <li>Upload <strong>all files</strong> from the ZIP into <code>public_html</code>:
+            <br><code>index.html</code> goes directly in <code>public_html</code>
+            <br>The <code>uploads</code> folder (if any) goes inside <code>public_html</code> too
+          </li>
+          <li>Visit your domain — <strong>your site is live!</strong></li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="launch-desktop" id="launchDesktop">
+      <p>On your phone? Continue on a computer to download and upload your site.</p>
+      <div class="launch-desktop-link">
+        <input type="text" id="desktopLink" readonly>
+        <button onclick="copyDesktopLink()">Copy</button>
+      </div>
+      <span class="launch-desktop-copied" id="copiedMsg">Link copied!</span>
+      <div id="desktopQr"></div>
+    </div>
+
+    <div class="launch-actions">
+      <button onclick="closeLaunchPanel()">Keep editing</button>
+      <button onclick="downloadHandoff()">Download handoff file</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+const urlParams = new URLSearchParams(window.location.search);
+const resumeSessionId = urlParams.get('session');
+let sessionId = resumeSessionId || localStorage.getItem('wb_session') || crypto.randomUUID();
+localStorage.setItem('wb_session', sessionId);
+let inputTokens = 0;
+let outputTokens = 0;
+const TOKEN_CAP = 100000;
+let pendingFiles = [];
+let conversationHistory = [];
+let currentStep = 1;
+
+// Initialize — use wizard data to auto-start the build
+window.addEventListener('DOMContentLoaded', async () => {
+  // If resuming from another device, fetch session state from server
+  if (resumeSessionId) {
+    try {
+      const res = await fetch(`${API_BASE}/api/session/${resumeSessionId}`);
+      if (res.ok) {
+        const data = await res.json();
+        updateTokenCount(data.inputTokens || 0, data.outputTokens || 0);
+        currentStep = data.step || 3;
+        // Replay assistant messages
+        addSystemMessage('Session resumed from another device.');
+        data.history.forEach(m => {
+          addMessage(m.role, renderMarkdown(m.content));
+        });
+        // Show preview if site was generated
+        if (data.generatedHtml) {
+          showPreview(data.generatedHtml);
+        }
+        if (data.step === 4) {
+          showLaunchPanel();
+        }
+        return;
+      } else {
+        addSystemMessage('Could not resume session — it may have expired. Starting fresh.');
+      }
+    } catch {
+      addSystemMessage('Could not connect to server to resume session.');
+    }
+  }
+
+  // Redirect if they haven't completed step 2
+  if (!localStorage.getItem('wb_completed_step2')) {
+    window.location.href = '/step2.html';
+    return;
+  }
+
+  const siteData = JSON.parse(localStorage.getItem('wb_site_data') || '{}');
+  const domain = localStorage.getItem('wb_domain') || '';
+
+  // Build a context message to send to the AI
+  let intro = `Here's what I need:\n`;
+  intro += `- **Site type:** ${siteData.type || 'not specified'}\n`;
+  intro += `- **Name:** ${siteData.name || 'not specified'}\n`;
+  if (siteData.tagline) intro += `- **Tagline:** ${siteData.tagline}\n`;
+  if (siteData.description) intro += `- **Description:** ${siteData.description}\n`;
+  if (siteData.uploadedDocText) intro += `- **Uploaded document content:** ${siteData.uploadedDocText}\n`;
+  if (siteData.goals && siteData.goals.length > 0) intro += `- **Site goals:** ${siteData.goals.join(', ')}\n`;
+  if (siteData.services) intro += `- **Services/offerings:** ${siteData.services}\n`;
+  intro += `- **Domain:** ${domain}\n`;
+  if (siteData.images && siteData.images.length > 0) {
+    intro += `- **Images available on hosting:** ${siteData.images.join(', ')}\n`;
+  }
+  if (siteData.directUploads && siteData.directUploads.length > 0) {
+    intro += `- **Uploaded images:** ${siteData.directUploads.join(', ')} (available at ./uploads/${sessionId}/{filename})\n`;
+  }
+  if ((!siteData.images || siteData.images.length === 0) && (!siteData.directUploads || siteData.directUploads.length === 0)) {
+    intro += `- **Images:** None uploaded yet — use placeholders\n`;
+  }
+
+  // Build a display-friendly summary for the chat bubble
+  let displayIntro = `<strong>My project details:</strong><br>`;
+  displayIntro += `Site type: ${siteData.type || 'not specified'}<br>`;
+  displayIntro += `Name: ${siteData.name || 'not specified'}<br>`;
+  if (siteData.tagline) displayIntro += `Tagline: ${siteData.tagline}<br>`;
+  if (siteData.description) displayIntro += `Description: ${siteData.description}<br>`;
+  if (siteData.uploadedDocText) displayIntro += `Uploaded document content included<br>`;
+  if (siteData.goals && siteData.goals.length > 0) displayIntro += `Goals: ${siteData.goals.join(', ')}<br>`;
+  if (siteData.services) displayIntro += `Services: ${siteData.services}<br>`;
+  displayIntro += `Domain: ${domain}<br>`;
+  const totalImages = (siteData.images ? siteData.images.length : 0) + (siteData.directUploads ? siteData.directUploads.length : 0);
+  if (totalImages > 0) {
+    displayIntro += `Images: ${totalImages} available`;
+  } else {
+    displayIntro += `Images: None yet — AI will use placeholders`;
+  }
+
+  // Show a welcome message
+  addMessage('assistant', `Welcome! I've got your project details. Let me review what you need and start building.\n\nGive me a moment...`);
+
+  // Show display version in chat, but send the markdown version to the AI
+  addMessage('user', displayIntro);
+  sendMessageDirect(intro);
+});
+
+function addMessage(role, content) {
+  const div = document.createElement('div');
+  div.className = `message ${role}`;
+  div.innerHTML = content;
+  document.getElementById('messages').appendChild(div);
+  scrollToBottom();
+}
+
+function addSystemMessage(content) {
+  const div = document.createElement('div');
+  div.className = 'message system';
+  div.innerHTML = content;
+  document.getElementById('messages').appendChild(div);
+  scrollToBottom();
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  document.getElementById('messages').appendChild(div);
+  scrollToBottom();
+}
+
+function hideTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function scrollToBottom() {
+  const m = document.getElementById('messages');
+  m.scrollTop = m.scrollHeight;
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 150) + 'px';
+}
+
+function handleKeydown(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function updateTokenCount(inTok, outTok) {
+  inputTokens = inTok;
+  outputTokens = outTok;
+  const pct = Math.min(100, Math.round(Math.max(inTok, outTok) / TOKEN_CAP * 100));
+  document.getElementById('tokenCount').textContent = pct + '%';
+  if (inTok >= TOKEN_CAP || outTok >= TOKEN_CAP) {
+    document.getElementById('inputArea').style.display = 'none';
+    document.getElementById('capMessage').classList.add('visible');
+  }
+}
+
+function setStep(step) {
+  currentStep = step;
+  document.querySelectorAll('.step-item').forEach(el => {
+    const s = parseInt(el.dataset.step);
+    el.classList.remove('active', 'completed');
+    if (s < step) el.classList.add('completed');
+    if (s === step) el.classList.add('active');
+  });
+  if (step === 4) {
+    showLaunchPanel();
+  }
+}
+
+function showLaunchPanel() {
+  document.getElementById('launchOverlay').classList.add('visible');
+  // Populate the desktop continuation link
+  const desktopUrl = `${window.location.origin}/chat.html?session=${sessionId}`;
+  document.getElementById('desktopLink').value = desktopUrl;
+  generateQrCode(desktopUrl);
+}
+
+function closeLaunchPanel() {
+  document.getElementById('launchOverlay').classList.remove('visible');
+}
+
+function toggleLaunchSteps() {
+  const header = document.querySelector('#launchSteps .launch-steps-header');
+  const body = document.getElementById('launchStepsBody');
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function copyDesktopLink() {
+  const input = document.getElementById('desktopLink');
+  navigator.clipboard.writeText(input.value).then(() => {
+    const msg = document.getElementById('copiedMsg');
+    msg.classList.add('show');
+    setTimeout(() => msg.classList.remove('show'), 2000);
+  });
+}
+
+// Minimal QR code generator using Google Charts API (no dependency needed)
+function generateQrCode(url) {
+  const qrContainer = document.getElementById('desktopQr');
+  qrContainer.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}&bgcolor=1A1A1A&color=F5F5F5`;
+  img.alt = 'Scan to continue on desktop';
+  img.style.cssText = 'width:160px;height:160px;border-radius:8px;';
+  qrContainer.appendChild(img);
+}
+
+// Send a message directly to the API without adding to chat UI (for auto-send)
+async function sendMessageDirect(text) {
+  document.getElementById('sendBtn').disabled = true;
+  showTyping();
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, message: text })
+    });
+    const data = await res.json();
+    hideTyping();
+    if (data.error) {
+      addSystemMessage(`Error: ${data.error}`);
+      if (data.limitReached) updateTokenCount(data.inputTokens, data.outputTokens);
+    } else {
+      const rendered = renderMarkdown(data.response);
+      addMessage('assistant', rendered);
+      if (data.inputTokens != null) updateTokenCount(data.inputTokens, data.outputTokens);
+      if (data.step) setStep(data.step);
+      if (data.generatedHtml) showPreview(data.generatedHtml);
+    }
+  } catch (err) {
+    hideTyping();
+    addSystemMessage('Error: AI service error. Please try again.');
+  }
+  document.getElementById('sendBtn').disabled = false;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('userInput');
+  const text = input.value.trim();
+  if (!text && pendingFiles.length === 0) return;
+
+  // Show user message
+  if (text) {
+    addMessage('user', escapeHtml(text));
+    conversationHistory.push({ role: 'user', content: text });
+  }
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('sendBtn').disabled = true;
+
+  // Upload files if any
+  if (pendingFiles.length > 0) {
+    addSystemMessage(`Uploading ${pendingFiles.length} file(s)...`);
+    const formData = new FormData();
+    formData.append('sessionId', sessionId);
+    pendingFiles.forEach(f => formData.append('files', f));
+
+    try {
+      const uploadRes = await fetch(`${API_BASE}/api/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      const uploadData = await uploadRes.json();
+      if (uploadData.files) {
+        addSystemMessage(`Uploaded: ${uploadData.files.join(', ')}`);
+        conversationHistory.push({
+          role: 'user',
+          content: `[User uploaded files: ${uploadData.files.join(', ')}]`
+        });
+      }
+    } catch (err) {
+      addSystemMessage('File upload failed. Please try again.');
+    }
+    clearPendingFiles();
+  }
+
+  // Send to API
+  showTyping();
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sessionId,
+        message: text,
+        history: conversationHistory
+      })
+    });
+    const data = await res.json();
+    hideTyping();
+
+    if (data.error) {
+      addSystemMessage(`Error: ${data.error}`);
+      if (data.limitReached) updateTokenCount(data.inputTokens, data.outputTokens);
+    } else {
+      // Render assistant response
+      const rendered = renderMarkdown(data.response);
+      addMessage('assistant', rendered);
+      conversationHistory.push({ role: 'assistant', content: data.response });
+
+      // Update tokens
+      if (data.inputTokens != null) updateTokenCount(data.inputTokens, data.outputTokens);
+
+      // Update step
+      if (data.step) setStep(data.step);
+
+      // Show preview if code was generated
+      if (data.generatedHtml) {
+        showPreview(data.generatedHtml);
+      }
+    }
+  } catch (err) {
+    hideTyping();
+    addSystemMessage('Connection error. Please try again.');
+  }
+
+  document.getElementById('sendBtn').disabled = false;
+  input.focus();
+}
+
+function handleFileUpload(event) {
+  const files = Array.from(event.target.files);
+  files.forEach(f => {
+    if (f.size > 10 * 1024 * 1024) {
+      addSystemMessage(`${f.name} is too large (max 10MB). Skipped.`);
+      return;
+    }
+    pendingFiles.push(f);
+    const chip = document.createElement('div');
+    chip.className = 'file-chip';
+    chip.innerHTML = `${f.name} <button onclick="removeFile(this, '${f.name}')">&times;</button>`;
+    document.getElementById('uploadedFiles').appendChild(chip);
+  });
+  event.target.value = '';
+}
+
+function removeFile(btn, name) {
+  pendingFiles = pendingFiles.filter(f => f.name !== name);
+  btn.parentElement.remove();
+}
+
+function clearPendingFiles() {
+  pendingFiles = [];
+  document.getElementById('uploadedFiles').innerHTML = '';
+}
+
+function showPreview(html) {
+  const panel = document.getElementById('previewPanel');
+  panel.classList.add('visible');
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = html;
+}
+
+function closePreview() {
+  document.getElementById('previewPanel').classList.remove('visible');
+}
+
+function refreshPreview() {
+  const frame = document.getElementById('previewFrame');
+  frame.srcdoc = frame.srcdoc;
+}
+
+async function downloadSite() {
+  try {
+    const res = await fetch(`${API_BASE}/api/download/${sessionId}`);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'my-website.zip';
+    a.click();
+  } catch (err) {
+    addSystemMessage('Download failed. Please try again.');
+  }
+}
+
+async function downloadHandoff() {
+  try {
+    const res = await fetch(`${API_BASE}/api/handoff/${sessionId}`);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'website-project-handoff.zip';
+    a.click();
+  } catch (err) {
+    addSystemMessage('Download failed. Please try again.');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function renderMarkdown(text) {
+  // Basic markdown: bold, italic, code blocks, links
+  return text
+    .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" style="color:var(--accent)">$1</a>')
+    .replace(/\n/g, '<br>');
+}
+</script>
+
+</body>
+</html>

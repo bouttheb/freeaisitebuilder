@@ -1,0 +1,18 @@
+{
+  "name": "freeaisitebuilder",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "AI-powered website builder using Claude Sonnet",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "archiver": "^7.0.1",
+    "express": "^4.21.0",
+    "express-rate-limit": "^8.3.1",
+    "multer": "^1.4.5-lts.1"
+  }
+}

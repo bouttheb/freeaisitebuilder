@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Step 2: Content & Design — Free AI Site Builder</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --black: #0A0A0A; --dark: #111111; --card-bg: #1A1A1A;
+  --white: #FFFFFF; --off-white: #F5F5F5; --gray-light: #E0E0E0;
+  --gray-mid: #999999; --gray-dark: #666666;
+  --accent: #C8A46E; --accent-hover: #D4B57E; --green: #4CAF50;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--black); color: var(--off-white); overflow-x: hidden; line-height: 1.6; }
+
+nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(200,164,110,0.1); }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: #fff; text-decoration: none; }
+.nav-steps { display: flex; gap: 0.5rem; align-items: center; }
+.nav-step { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--gray-dark); }
+.nav-step.completed { color: var(--green); }
+.nav-step.active { color: var(--accent); }
+.nav-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-dark); }
+.nav-step.completed .nav-step-dot { background: var(--green); }
+.nav-step.active .nav-step-dot { background: var(--accent); box-shadow: 0 0 8px rgba(200,164,110,0.4); }
+.nav-step-line { width: 24px; height: 1px; background: rgba(255,255,255,0.1); }
+
+.wizard-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
+.step-badge { display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,164,110,0.3); padding: 0.4rem 1.2rem; border-radius: 30px; margin-bottom: 2rem; }
+.wizard-card { background: var(--dark); border: 1px solid rgba(200,164,110,0.15); border-radius: 16px; padding: 3rem; max-width: 680px; width: 100%; }
+.wizard-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+.wizard-title span { color: var(--accent); }
+.wizard-subtitle { color: var(--gray-mid); font-size: 1rem; margin-bottom: 2.5rem; line-height: 1.6; }
+
+.wizard-progress { display: flex; gap: 0.35rem; margin-bottom: 2.5rem; }
+.progress-bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.08); transition: all 0.4s ease; }
+.progress-bar.active { background: var(--accent); }
+.progress-bar.done { background: var(--green); }
+
+.wizard-step { display: none; animation: fadeIn 0.4s ease; }
+.wizard-step.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-light); margin-bottom: 0.5rem; }
+.helper-text { font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 0.8rem; line-height: 1.5; font-style: italic; }
+input[type="text"], textarea { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.9rem 1.2rem; color: var(--off-white); font-family: 'Source Sans 3', sans-serif; font-size: 1rem; transition: border-color 0.3s ease; }
+input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; min-height: 120px; }
+.form-group { margin-bottom: 1.8rem; }
+
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
+.type-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.type-card:hover { border-color: rgba(200,164,110,0.3); background: rgba(200,164,110,0.05); }
+.type-card.selected { border-color: var(--accent); background: rgba(200,164,110,0.1); }
+.type-card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.type-card-label { font-size: 0.85rem; font-weight: 500; }
+
+.section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+.section-option { display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 1rem; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+.section-option:hover { border-color: rgba(200,164,110,0.3); }
+.section-option.selected { border-color: var(--accent); background: rgba(200,164,110,0.1); }
+.section-check { width: 18px; height: 18px; border: 2px solid var(--gray-dark); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; }
+.section-option.selected .section-check { background: var(--accent); border-color: var(--accent); }
+.section-check svg { display: none; }
+.section-option.selected .section-check svg { display: block; }
+
+.wizard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+.btn-back { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--gray-mid); padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.btn-back:hover { border-color: var(--gray-mid); color: var(--off-white); }
+.btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.btn-next:hover { background: var(--accent-hover); }
+.btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+.doc-upload-area { margin-bottom: 1.2rem; padding: 1.5rem; border: 2px dashed rgba(200,164,110,0.25); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.doc-upload-area:hover { border-color: var(--accent); background: rgba(200,164,110,0.03); }
+.doc-upload-area p { color: var(--gray-mid); font-size: 0.9rem; }
+.doc-upload-area .uploaded-name { color: var(--accent); font-weight: 600; margin-top: 0.5rem; font-size: 0.95rem; }
+.or-divider { text-align: center; color: var(--gray-dark); font-size: 0.85rem; margin: 1.2rem 0; position: relative; }
+.or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(255,255,255,0.08); }
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
+
+.collapsible-header { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; padding: 0.8rem 0; color: var(--gray-mid); font-size: 0.9rem; transition: color 0.3s; }
+.collapsible-header:hover { color: var(--accent); }
+.collapsible-header svg { transition: transform 0.3s; }
+.collapsible-header.open svg { transform: rotate(90deg); }
+.collapsible-body { display: none; padding-bottom: 1rem; }
+.collapsible-body.open { display: block; animation: fadeIn 0.3s ease; }
+
+.photo-option { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.3s ease; }
+.photo-option.selected { border-color: rgba(200,164,110,0.4); }
+.photo-option-header { display: flex; align-items: flex-start; gap: 1rem; padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; }
+.photo-option-header:hover { background: rgba(255,255,255,0.02); }
+.photo-option-radio { width: 20px; height: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; flex-shrink: 0; margin-top: 2px; transition: all 0.3s ease; position: relative; }
+.photo-option.selected .photo-option-radio { border-color: var(--accent); }
+.photo-option.selected .photo-option-radio::after { content: ''; position: absolute; top: 3px; left: 3px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+.photo-option-body { padding: 0 1.5rem 1.5rem; }
+
+.image-drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.image-drop-zone:hover, .image-drop-zone.dragover { border-color: var(--accent); background: rgba(200,164,110,0.05); }
+.uploaded-images { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+.uploaded-image-card { position: relative; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.uploaded-image-card img { width: 100%; height: 100%; object-fit: cover; }
+.uploaded-image-card .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.uploaded-image-card .remove-btn:hover { background: rgba(229,115,115,0.8); }
+.upload-limit-msg { font-size: 0.85rem; color: var(--gray-mid); margin-top: 0.5rem; }
+
+.photo-instructions { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
+.photo-instructions h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--off-white); }
+.photo-instructions ol { padding-left: 1.2rem; color: var(--gray-light); font-size: 0.95rem; }
+.photo-instructions ol li { margin-bottom: 0.6rem; line-height: 1.5; }
+.photo-instructions code { background: rgba(200,164,110,0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
+.download-btn { display: inline-block; background: rgba(200,164,110,0.15); border: 1px solid rgba(200,164,110,0.3); color: var(--accent); padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 0.5rem; font-family: 'Source Sans 3', sans-serif; }
+.download-btn:hover { background: rgba(200,164,110,0.25); }
+.photo-check { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; transition: all 0.3s ease; }
+.photo-check:hover { border-color: rgba(200,164,110,0.3); }
+.photo-check.checked { border-color: var(--green); background: rgba(76,175,80,0.05); }
+.photo-check-box { width: 22px; height: 22px; border: 2px solid var(--gray-dark); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; }
+.photo-check.checked .photo-check-box { background: var(--green); border-color: var(--green); }
+.skip-link { display: block; margin-top: 1rem; font-size: 0.85rem; color: var(--gray-dark); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; background: none; border: none; font-family: 'Source Sans 3', sans-serif; }
+.skip-link:hover { color: var(--gray-mid); }
+.image-results { margin-top: 1rem; padding: 1rem; background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); border-radius: 8px; display: none; }
+.image-results.error { background: rgba(229,115,115,0.05); border-color: rgba(229,115,115,0.2); }
+.image-results p { font-size: 0.9rem; color: var(--gray-light); margin-bottom: 0.5rem; }
+.image-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.image-tag { background: rgba(200,164,110,0.1); border: 1px solid rgba(200,164,110,0.2); color: var(--accent); padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem; }
+
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+.bottom-nav a { font-size: 0.9rem; color: var(--gray-dark); text-decoration: none; transition: color 0.3s ease; }
+.bottom-nav a:hover { color: var(--accent); }
+footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray-dark); border-top: 1px solid rgba(255,255,255,0.05); }
+
+@media (max-width: 600px) { .wizard-card { padding: 2rem 1.5rem; } .type-grid { grid-template-columns: repeat(2, 1fr); } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">freeaisitebuilder.com</a>
+  <div class="nav-steps">
+    <div class="nav-step completed"><div class="nav-step-dot"></div> Hosting</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step active"><div class="nav-step-dot"></div> Content</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Build</div>
+    <div class="nav-step-line"></div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Launch</div>
+  </div>
+</nav>
+
+<div class="wizard-container">
+  <div class="step-badge">Step 2 of 4</div>
+  <div class="wizard-card">
+    <div class="wizard-progress" id="progressBars"></div>
+
+    <!-- WS0: Site Type -->
+    <div class="wizard-step active" id="ws0">
+      <h2 class="wizard-title">What kind of <span>site</span> are you building?</h2>
+      <p class="wizard-subtitle">This helps the AI understand your needs and suggest the right layout.</p>
+      <div class="type-grid">
+        <div class="type-card" data-type="business" onclick="selectType(this)"><div class="type-card-icon">🏢</div><div class="type-card-label">Business</div></div>
+        <div class="type-card" data-type="portfolio" onclick="selectType(this)"><div class="type-card-icon">🎨</div><div class="type-card-label">Portfolio</div></div>
+        <div class="type-card" data-type="restaurant" onclick="selectType(this)"><div class="type-card-icon">🍽️</div><div class="type-card-label">Restaurant</div></div>
+        <div class="type-card" data-type="church" onclick="selectType(this)"><div class="type-card-icon">⛪</div><div class="type-card-label">Church</div></div>
+        <div class="type-card" data-type="blog" onclick="selectType(this)"><div class="type-card-icon">✍️</div><div class="type-card-label">Blog</div></div>
+        <div class="type-card" data-type="nonprofit" onclick="selectType(this)"><div class="type-card-icon">💛</div><div class="type-card-label">Nonprofit</div></div>
+        <div class="type-card" data-type="personal" onclick="selectType(this)"><div class="type-card-icon">👤</div><div class="type-card-label">Personal</div></div>
+        <div class="type-card" data-type="event" onclick="selectType(this)"><div class="type-card-icon">🎉</div><div class="type-card-label">Event</div></div>
+        <div class="type-card" data-type="other" onclick="selectType(this)"><div class="type-card-icon">✨</div><div class="type-card-label">Other</div></div>
+      </div>
+      <div class="form-group" id="otherTypeGroup" style="display:none;">
+        <label>What type of site?</label>
+        <input type="text" id="otherType" placeholder="e.g., music, real estate, coaching">
+      </div>
+      <div class="wizard-nav"><div></div><button class="btn-next" id="btnNext0" disabled onclick="nextStep(1)">Next →</button></div>
+    </div>
+
+    <!-- WS1: Name -->
+    <div class="wizard-step" id="ws1">
+      <h2 class="wizard-title">What's the <span>name</span>?</h2>
+      <p class="wizard-subtitle">This will appear in the header and throughout your website.</p>
+      <div class="form-group">
+        <label>Site / Business Name</label>
+        <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="validateName()">
+      </div>
+      <div class="form-group">
+        <label>Tagline or Slogan (optional)</label>
+        <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
+        <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
+      </div>
+      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(0)">← Back</button><button class="btn-next" id="btnNext1" disabled onclick="nextStep(2)">Next →</button></div>
+    </div>
+
+    <!-- WS2: Description -->
+    <div class="wizard-step" id="ws2">
+      <h2 class="wizard-title">Tell us about your <span>project</span></h2>
+      <p class="wizard-subtitle">Give the AI as much or as little detail as you want. You can upload a document you already have, or just type a few sentences and see what the AI comes up with.</p>
+
+      <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
+        <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
+        <p>📄 Upload a document about your project</p>
+        <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
+        <div class="uploaded-name" id="docFileName" style="display:none;"></div>
+      </div>
+
+      <div class="or-divider">or type it out</div>
+
+      <div class="form-group">
+        <label id="descLabel">About your project</label>
+        <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
+        <textarea id="siteDesc" placeholder="" oninput="validateDesc()"></textarea>
+      </div>
+
+      <!-- Optional: Goals -->
+      <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add site goals (optional)
+      </div>
+      <div class="collapsible-body" id="goalsBody">
+        <p class="helper-text">What should your site help you do? Pick any that apply.</p>
+        <div class="section-grid" id="goalGrid">
+          <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Attract customers</span></div>
+          <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Showcase work</span></div>
+          <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Provide info</span></div>
+          <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Build credibility</span></div>
+          <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Get bookings</span></div>
+          <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Collect leads</span></div>
+        </div>
+      </div>
+
+      <!-- Optional: Services -->
+      <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add services / offerings (optional)
+      </div>
+      <div class="collapsible-body" id="servicesBody">
+        <div class="form-group" style="margin-bottom:0;">
+          <p class="helper-text" id="servicesHelper">List what you offer, separated by commas.</p>
+          <input type="text" id="services" placeholder="">
+        </div>
+      </div>
+
+      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(1)">← Back</button><button class="btn-next" id="btnNext2" disabled onclick="nextStep(3)">Next →</button></div>
+    </div>
+
+    <!-- WS3: Photos -->
+    <div class="wizard-step" id="ws3">
+      <h2 class="wizard-title">Add your <span>photos</span></h2>
+      <p class="wizard-subtitle">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
+
+      <!-- Option A: Direct upload (5 or fewer) -->
+      <div class="photo-option" id="photoOptionUpload">
+        <div class="photo-option-header" onclick="selectPhotoOption('upload')">
+          <div class="photo-option-radio" id="radioUpload"></div>
+          <div>
+            <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="uploadBody" style="display: none;">
+          <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
+            <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
+          </div>
+          <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
+          <div class="uploaded-images" id="uploadedImagesList"></div>
+        </div>
+      </div>
+
+      <!-- Option B: Bluehost hosting (many images) -->
+      <div class="photo-option" id="photoOptionHosting">
+        <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
+          <div class="photo-option-radio" id="radioHosting"></div>
+          <div>
+            <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="hostingBody" style="display: none;">
+          <div class="photo-instructions">
+            <h4>Three quick steps:</h4>
+            <ol>
+              <li>Log in to <strong>Bluehost</strong> → go to <strong>File Manager</strong></li>
+              <li>Inside <code>public_html</code>, create a folder called <code>images</code> and drag your photos into it</li>
+              <li>Download this helper file and upload it to <code>public_html</code> (same level as <code>images</code>):</li>
+            </ol>
+            <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Your Domain</label>
+            <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
+            <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
+              <button class="btn-next" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
+            </div>
+          </div>
+          <div class="image-results" id="imageResults"></div>
+          <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
+            <div class="photo-check-box" id="photoCheckBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>I've uploaded my photos and the helper file</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
+      <div class="wizard-nav" style="margin-top: 1.5rem;">
+        <button class="btn-back" onclick="prevStep(2)">← Back</button>
+        <button class="btn-next" id="btnNext3" disabled onclick="finishWizard()">Start Building →</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="bottom-nav">
+  <a href="/step1.html">← Back to Step 1</a>
+  <a href="/chat.html" id="forwardBtn" style="display:none;">Forward →</a>
+</div>
+<footer>&copy; 2026 freeaisitebuilder.com. All rights reserved.</footer>
+
+<script>
+const TOTAL_STEPS = 4;
+let currentStep = 0;
+let selectedType = null;
+let selectedGoals = [];
+let photosConfirmed = false;
+let photosSkipped = false;
+let foundImages = [];
+let uploadedDocText = '';
+let uploadedImageFiles = []; // direct uploads
+let selectedPhotoOption = null;
+
+const domain = localStorage.getItem('wb_domain') || '';
+document.getElementById('photoDomain').value = domain;
+
+if (!localStorage.getItem('wb_completed_step1')) window.location.href = '/step1.html';
+if (localStorage.getItem('wb_completed_step2') === 'true') document.getElementById('forwardBtn').style.display = 'inline';
+
+// Progress bars
+const pbContainer = document.getElementById('progressBars');
+for (let i = 0; i < TOTAL_STEPS; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'progress-bar' + (i === 0 ? ' active' : '');
+  bar.id = `pb${i}`;
+  pbContainer.appendChild(bar);
+}
+
+// Contextual placeholders
+const descPlaceholders = {
+  business: "e.g., We're a family-owned landscaping company in Austin, TX. We specialize in residential lawn care, garden design, and outdoor living spaces. We've been serving the community for 12 years.",
+  portfolio: "e.g., I'm a freelance graphic designer specializing in brand identity and packaging design. I've worked with startups and established brands across the food and beverage industry.",
+  restaurant: "e.g., We're a family-run Italian restaurant in downtown Nashville. We serve authentic wood-fired pizza, handmade pasta, and a curated selection of Italian wines.",
+  church: "e.g., We're a welcoming, non-denominational church in Memphis, TN. We believe in building community through worship, service, and genuine relationships.",
+  blog: "e.g., I write about personal finance for millennials — budgeting, investing, and building wealth without sacrificing your quality of life.",
+  nonprofit: "e.g., We provide free coding education to underserved youth. Our mission is to close the digital divide.",
+  personal: "e.g., I'm a photographer and traveler based in Portland. This site is a place to share my work and connect with people.",
+  event: "e.g., An annual 3-day music festival in Boulder, CO featuring 50+ local and national acts, food vendors, and art installations.",
+  other: "Describe what this site is about, who it's for, and what visitors should learn or do when they arrive.",
+};
+const servicesPlaceholders = {
+  business: "e.g., Lawn Mowing, Garden Design, Tree Trimming, Outdoor Patios",
+  portfolio: "e.g., Brand Identity, Logo Design, Packaging, Web Design",
+  restaurant: "e.g., Dine-In, Takeout, Catering, Private Events",
+  church: "e.g., Sunday Worship, Bible Study, Youth Group, Outreach",
+  nonprofit: "e.g., After-School Classes, Summer Camp, Mentorship",
+  event: "e.g., Live Music, Food Court, Art Exhibition, Workshops",
+  other: "e.g., List the main things you offer, separated by commas",
+};
+const descLabels = { business:'About your business', portfolio:'About you and your work', restaurant:'About your restaurant', church:'About your church', blog:'What do you write about?', nonprofit:'About your organization', personal:'About you', event:'About the event', other:'About your project' };
+const descHelpers = { business:'What do you do? Who do you serve? What makes you different?', portfolio:'What kind of work do you do? What are you known for?', restaurant:"What type of food? What's the vibe? Any history?", church:"What's your mission? What can visitors expect?", blog:'What topics? Who is your audience?', nonprofit:"What's your mission? Who do you help?", personal:'Who are you? What do you want people to know?', event:'What, when, where, and who is it for?', other:'What is the purpose? Who is it for?' };
+
+function selectType(card) {
+  document.querySelectorAll('#ws0 .type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedType = card.dataset.type;
+  document.getElementById('otherTypeGroup').style.display = selectedType === 'other' ? 'block' : 'none';
+  document.getElementById('btnNext0').disabled = false;
+}
+
+function validateName() {
+  document.getElementById('btnNext1').disabled = !document.getElementById('siteName').value.trim();
+}
+
+function validateDesc() {
+  const hasDesc = document.getElementById('siteDesc').value.trim();
+  document.getElementById('btnNext2').disabled = !(hasDesc || uploadedDocText);
+}
+
+function toggleGoal(el) {
+  el.classList.toggle('selected');
+  selectedGoals = Array.from(document.querySelectorAll('#goalGrid .section-option.selected')).map(s => s.dataset.goal);
+}
+
+function toggleCollapsible(header, bodyId) {
+  header.classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
+}
+
+function handleDocUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const nameEl = document.getElementById('docFileName');
+  nameEl.textContent = '📎 ' + file.name;
+  nameEl.style.display = 'block';
+
+  if (file.name.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = (e) => { uploadedDocText = e.target.result; document.getElementById('btnNext2').disabled = false; };
+    reader.readAsText(file);
+  } else {
+    const formData = new FormData();
+    formData.append('sessionId', localStorage.getItem('wb_session') || 'unknown');
+    formData.append('files', file);
+    fetch('/api/upload', { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(() => { uploadedDocText = `[Uploaded document: ${file.name}]`; document.getElementById('btnNext2').disabled = false; })
+      .catch(() => { uploadedDocText = `[Uploaded ${file.name} — ask user for details if needed]`; document.getElementById('btnNext2').disabled = false; });
+  }
+}
+
+function updateContextualFields() {
+  const t = selectedType || 'other';
+  document.getElementById('siteDesc').placeholder = descPlaceholders[t] || descPlaceholders.other;
+  document.getElementById('descLabel').textContent = descLabels[t] || descLabels.other;
+  document.getElementById('descHelper').textContent = descHelpers[t] || descHelpers.other;
+  const sp = servicesPlaceholders[t];
+  if (!sp || t === 'blog' || t === 'personal') {
+    document.getElementById('servicesCollapsible').style.display = 'none';
+  } else {
+    document.getElementById('servicesCollapsible').style.display = 'flex';
+    document.getElementById('services').placeholder = sp;
+  }
+}
+
+function selectPhotoOption(option) {
+  selectedPhotoOption = option;
+  document.getElementById('photoOptionUpload').classList.toggle('selected', option === 'upload');
+  document.getElementById('photoOptionHosting').classList.toggle('selected', option === 'hosting');
+  document.getElementById('uploadBody').style.display = option === 'upload' ? 'block' : 'none';
+  document.getElementById('hostingBody').style.display = option === 'hosting' ? 'block' : 'none';
+  updatePhotoNextBtn();
+}
+
+function updatePhotoNextBtn() {
+  const canProceed = photosSkipped
+    || (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0)
+    || (selectedPhotoOption === 'hosting' && (photosConfirmed || foundImages.length > 0));
+  document.getElementById('btnNext3').disabled = !canProceed;
+}
+
+function handleImageUpload(event) {
+  const files = Array.from(event.target.files);
+  const allowed = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
+  files.forEach(f => {
+    if (uploadedImageFiles.length >= 5) return;
+    if (!allowed.test(f.name)) return;
+    if (f.size > 10 * 1024 * 1024) return;
+    uploadedImageFiles.push(f);
+  });
+  renderUploadedImages();
+  updatePhotoNextBtn();
+  event.target.value = '';
+}
+
+function removeUploadedImage(idx) {
+  uploadedImageFiles.splice(idx, 1);
+  renderUploadedImages();
+  updatePhotoNextBtn();
+}
+
+function renderUploadedImages() {
+  const container = document.getElementById('uploadedImagesList');
+  container.innerHTML = '';
+  uploadedImageFiles.forEach((f, i) => {
+    const card = document.createElement('div');
+    card.className = 'uploaded-image-card';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    const btn = document.createElement('button');
+    btn.className = 'remove-btn';
+    btn.innerHTML = '&times;';
+    btn.onclick = () => removeUploadedImage(i);
+    card.appendChild(img);
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
+  if (uploadedImageFiles.length > 0 && uploadedImageFiles.length < 5) {
+    const msg = document.createElement('p');
+    msg.className = 'upload-limit-msg';
+    msg.textContent = `${uploadedImageFiles.length}/5 images`;
+    container.appendChild(msg);
+  } else if (uploadedImageFiles.length >= 5) {
+    const msg = document.createElement('p');
+    msg.className = 'upload-limit-msg';
+    msg.textContent = '5/5 images (max reached)';
+    container.appendChild(msg);
+  }
+}
+
+// Drag and drop for image zone
+const dropZone = document.getElementById('imageDropZone');
+if (dropZone) {
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const dt = e.dataTransfer;
+    if (dt.files.length) {
+      const input = document.getElementById('imageFileInput');
+      input.files = dt.files;
+      handleImageUpload({ target: input, preventDefault: () => {} });
+    }
+  });
+}
+
+function togglePhotoConfirm() {
+  photosConfirmed = !photosConfirmed;
+  document.getElementById('photoConfirm').classList.toggle('checked', photosConfirmed);
+  document.getElementById('photoCheckmark').style.display = photosConfirmed ? 'block' : 'none';
+  updatePhotoNextBtn();
+}
+function skipPhotos() { photosSkipped = true; document.getElementById('btnNext3').disabled = false; }
+
+function downloadPhpHelper() {
+  const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
+  const blob = new Blob([php], { type: 'application/x-php' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'list-images.php'; a.click();
+}
+
+async function checkImages() {
+  const el = document.getElementById('imageResults');
+  el.style.display = 'block'; el.className = 'image-results'; el.innerHTML = '<p>Checking...</p>';
+  try {
+    const resp = await fetch(`https://${domain}/list-images.php`);
+    if (!resp.ok) throw new Error();
+    const images = await resp.json();
+    if (images.length === 0) { el.className = 'image-results error'; el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>'; }
+    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; document.getElementById('btnNext3').disabled = false; }
+  } catch { el.className = 'image-results error'; el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`; }
+}
+
+function nextStep(n) {
+  if (n === 2) updateContextualFields();
+  document.getElementById(`ws${currentStep}`).classList.remove('active');
+  document.getElementById(`ws${n}`).classList.add('active');
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function prevStep(n) {
+  document.getElementById(`ws${currentStep}`).classList.remove('active');
+  document.getElementById(`ws${n}`).classList.add('active');
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function finishWizard() {
+  const siteType = selectedType === 'other' ? (document.getElementById('otherType').value.trim() || 'other') : selectedType;
+  const sessionId = localStorage.getItem('wb_session') || 'session-' + Date.now();
+  localStorage.setItem('wb_session', sessionId);
+
+  let directUploadNames = [];
+
+  // Upload direct images if any
+  if (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0) {
+    document.getElementById('btnNext3').disabled = true;
+    document.getElementById('btnNext3').textContent = 'Uploading images...';
+    try {
+      const formData = new FormData();
+      formData.append('sessionId', sessionId);
+      uploadedImageFiles.forEach(f => formData.append('files', f));
+      const resp = await fetch('/api/upload', { method: 'POST', body: formData });
+      const result = await resp.json();
+      directUploadNames = result.files || [];
+    } catch {
+      // Continue even if upload fails
+    }
+    document.getElementById('btnNext3').textContent = 'Start Building →';
+  }
+
+  const data = {
+    type: siteType,
+    goals: selectedGoals,
+    name: document.getElementById('siteName').value.trim(),
+    tagline: document.getElementById('tagline').value.trim(),
+    description: document.getElementById('siteDesc').value.trim(),
+    uploadedDocText: uploadedDocText,
+    services: document.getElementById('services') ? document.getElementById('services').value.trim() : '',
+    images: foundImages,
+    directUploads: directUploadNames,
+    domain: domain,
+    photosSkipped: photosSkipped
+  };
+  localStorage.setItem('wb_site_data', JSON.stringify(data));
+  localStorage.setItem('wb_completed_step2', 'true');
+  window.location.href = '/chat.html';
+}
+</script>
+</body>
+</html>

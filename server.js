@@ -1,0 +1,358 @@
+import express from 'express';
+import Anthropic from '@anthropic-ai/sdk';
+import multer from 'multer';
+import archiver from 'archiver';
+import rateLimit from 'express-rate-limit';
+import { readdir, readFile, writeFile, mkdir } from 'fs/promises';
+import { existsSync } from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+const app = express();
+app.use(express.json({ limit: '1mb' }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Rate limiting ---
+const chatLimiter = rateLimit({
+  windowMs: 60 * 1000, // 1 minute
+  max: 10, // 10 requests per minute per IP
+  message: { error: 'Too many requests. Please wait a moment and try again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const uploadLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5,
+  message: { error: 'Too many uploads. Please wait a moment.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// --- Config ---
+const PORT = process.env.PORT || 3000;
+const TOKEN_CAP = 100_000;
+
+const anthropic = new Anthropic(); // uses ANTHROPIC_API_KEY env var
+
+// --- Session store (in-memory, replace with DB for production) ---
+const sessions = new Map();
+
+function getSession(id) {
+  if (!sessions.has(id)) {
+    sessions.set(id, {
+      inputTokens: 0,
+      outputTokens: 0,
+      step: 1,
+      domain: null,
+      history: [],
+      generatedHtml: null,
+      uploadedFiles: [],
+    });
+  }
+  return sessions.get(id);
+}
+
+// --- File uploads ---
+const storage = multer.diskStorage({
+  destination: (req, _file, cb) => {
+    const dir = path.join(__dirname, 'public', 'uploads', req.body.sessionId || 'unknown');
+    if (!existsSync(dir)) {
+      mkdir(dir, { recursive: true }).then(() => cb(null, dir));
+    } else {
+      cb(null, dir);
+    }
+  },
+  filename: (_req, file, cb) => {
+    const safe = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+    cb(null, `${Date.now()}-${safe}`);
+  },
+});
+const upload = multer({
+  storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  fileFilter: (_req, file, cb) => {
+    const allowed = /\.(jpg|jpeg|png|gif|webp|svg|pdf)$/i;
+    cb(null, allowed.test(file.originalname));
+  },
+});
+
+app.post('/api/upload', uploadLimiter, upload.array('files', 20), (req, res) => {
+  const session = getSession(req.body.sessionId);
+  const files = (req.files || []).map(f => {
+    session.uploadedFiles.push(f.filename);
+    return f.originalname;
+  });
+  res.json({ files });
+});
+
+// --- Register domain ---
+app.post('/api/register-domain', (req, res) => {
+  const { sessionId, domain } = req.body;
+  const session = getSession(sessionId);
+  session.domain = domain;
+  res.json({ ok: true, domain });
+});
+
+// --- System prompt ---
+const SYSTEM_PROMPT = `You are an expert AI website builder embedded on freeaisitebuilder.com. Your job is to build a professional, beautiful website based on the user's project details.
+
+## Your personality
+- Friendly, encouraging, and patient
+- You speak plainly — no jargon unless necessary
+- You keep responses concise but thorough
+
+## Context
+The user has already completed Steps 1-2 (hosting setup and content collection) via a wizard. Their first message will contain their project details: site type, business name, description, domain, style preferences, and available images.
+
+## Your process
+When you receive their project details:
+
+1. **Review & Clarify** — Briefly confirm what you'll build. Ask 2-3 quick questions about specific content they want on the site (e.g., "What services do you offer?" or "Do you have a tagline?"). Keep it conversational and quick — don't overwhelm them.
+
+2. **Build** — Once you have enough info, generate a COMPLETE, production-ready single HTML file with inline CSS and JS. Make it genuinely beautiful.
+
+3. **Refine** — After generating, ask what they'd like to change. Make revisions as requested. Keep iterating until they're happy.
+
+4. **Launch** — When the user is happy, tell them to download their site and explain how to upload to Bluehost (File Manager → public_html).
+
+## Image handling
+- If the user has images available (listed as image paths from their domain), reference them using their full URL: https://{domain}/{imagePath}
+- If they have no images, use tasteful placeholder sections and suggest they add images later
+- You can also use CSS gradients, shapes, and icons for visual interest
+
+## Response format
+- Include a JSON metadata block at the END of every response (the frontend will parse this):
+  \`\`\`json:metadata
+  {"step": 3}
+  \`\`\`
+  Use step 3 for building/refining, step 4 when the site is ready to launch.
+- When you generate or update HTML, include it in a special block:
+  \`\`\`html:website
+  <full html here>
+  \`\`\`
+
+## Important rules
+- Always generate COMPLETE HTML files, not fragments
+- Make the websites genuinely beautiful — use Google Fonts, modern CSS, subtle animations
+- Sites must be fully responsive (mobile, tablet, desktop)
+- Be responsive to feedback and make changes quickly
+- If the user asks for something beyond a static website (e.g., e-commerce, database), explain that this tool builds static sites and suggest alternatives
+- Keep your non-code responses SHORT. Users want to see their site, not read essays.`;
+
+// --- Chat endpoint ---
+app.post('/api/chat', chatLimiter, async (req, res) => {
+  const { sessionId, message } = req.body;
+  const session = getSession(sessionId);
+
+  if (session.inputTokens >= TOKEN_CAP || session.outputTokens >= TOKEN_CAP) {
+    return res.json({
+      error: 'You\'ve hit your token limit for this session. Download your site and finish building on the AI platform of your choice.',
+      inputTokens: session.inputTokens,
+      outputTokens: session.outputTokens,
+      limitReached: true,
+    });
+  }
+
+  // Build messages array
+  session.history.push({ role: 'user', content: message });
+
+  // Include info about uploaded files
+  const fileContext = session.uploadedFiles.length > 0
+    ? `\n\n[Available uploaded files for this session: ${session.uploadedFiles.join(', ')}. Reference them as ./uploads/${sessionId}/{filename}]`
+    : '';
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-5-20250929',
+      max_tokens: Math.min(8192, TOKEN_CAP - session.outputTokens),
+      system: SYSTEM_PROMPT + fileContext,
+      messages: session.history,
+    });
+
+    const assistantText = response.content
+      .filter(b => b.type === 'text')
+      .map(b => b.text)
+      .join('');
+
+    // Track tokens separately
+    session.inputTokens += response.usage.input_tokens;
+    session.outputTokens += response.usage.output_tokens;
+
+    // Parse metadata from response
+    let step = session.step;
+    const metaMatch = assistantText.match(/```json:metadata\s*\n([\s\S]*?)\n```/);
+    if (metaMatch) {
+      try {
+        const meta = JSON.parse(metaMatch[1]);
+        if (meta.step) {
+          step = meta.step;
+          session.step = step;
+        }
+      } catch {}
+    }
+
+    // Parse generated HTML
+    let generatedHtml = null;
+    const htmlMatch = assistantText.match(/```html:website\s*\n([\s\S]*?)\n```/);
+    if (htmlMatch) {
+      generatedHtml = htmlMatch[1];
+      session.generatedHtml = generatedHtml;
+      // Save to disk
+      const genDir = path.join(__dirname, 'public', 'generated', sessionId);
+      await mkdir(genDir, { recursive: true });
+      await writeFile(path.join(genDir, 'index.html'), generatedHtml);
+    }
+
+    // Clean response text (remove metadata and html blocks for display)
+    let displayText = assistantText
+      .replace(/```json:metadata\s*\n[\s\S]*?\n```/g, '')
+      .replace(/```html:website\s*\n[\s\S]*?\n```/g, '*Your website has been generated! Check the preview panel. →*')
+      .trim();
+
+    session.history.push({ role: 'assistant', content: assistantText });
+
+    res.json({
+      response: displayText,
+      inputTokens: session.inputTokens,
+      outputTokens: session.outputTokens,
+      step,
+      generatedHtml,
+    });
+  } catch (err) {
+    console.error('Anthropic API error:', err.message);
+    res.status(500).json({ error: 'AI service error. Please try again.' });
+  }
+});
+
+// --- Resume session (for cross-device handoff) ---
+app.get('/api/session/:sessionId', (req, res) => {
+  if (!sessions.has(req.params.sessionId)) {
+    return res.status(404).json({ error: 'Session not found. It may have expired.' });
+  }
+  const session = sessions.get(req.params.sessionId);
+  // Return enough state for the client to resume
+  const displayHistory = session.history
+    .filter(m => m.role === 'assistant')
+    .map(m => {
+      let text = m.content
+        .replace(/```json:metadata\s*\n[\s\S]*?\n```/g, '')
+        .replace(/```html:website\s*\n[\s\S]*?\n```/g, '*Your website has been generated! Check the preview panel. →*')
+        .trim();
+      return { role: 'assistant', content: text };
+    });
+  res.json({
+    inputTokens: session.inputTokens,
+    outputTokens: session.outputTokens,
+    step: session.step,
+    generatedHtml: session.generatedHtml,
+    domain: session.domain,
+    history: displayHistory,
+  });
+});
+
+// --- Download site as ZIP ---
+app.get('/api/download/:sessionId', async (req, res) => {
+  const session = getSession(req.params.sessionId);
+  if (!session.generatedHtml) {
+    return res.status(404).json({ error: 'No website generated yet.' });
+  }
+
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename=my-website.zip');
+
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.pipe(res);
+
+  // Add the HTML file
+  archive.append(session.generatedHtml, { name: 'index.html' });
+
+  // Add uploaded images
+  const uploadDir = path.join(__dirname, 'public', 'uploads', req.params.sessionId);
+  if (existsSync(uploadDir)) {
+    archive.directory(uploadDir, 'uploads');
+  }
+
+  // Add a simple README
+  archive.append(
+    `HOW TO UPLOAD YOUR WEBSITE TO BLUEHOST
+=====================================
+
+1. Log in to your Bluehost account at bluehost.com
+2. Go to "Advanced" in the left sidebar
+3. Click "File Manager"
+4. Navigate to the "public_html" folder
+5. Upload ALL files from this ZIP into public_html
+   - index.html goes directly in public_html
+   - The "uploads" folder goes inside public_html too
+6. Visit your domain — your site is live!
+
+Need help? Contact support@bluehost.com
+`,
+    { name: 'README.txt' }
+  );
+
+  await archive.finalize();
+});
+
+// --- Handoff file (when token cap is reached) ---
+app.get('/api/handoff/:sessionId', async (req, res) => {
+  const session = getSession(req.params.sessionId);
+
+  res.setHeader('Content-Type', 'application/zip');
+  res.setHeader('Content-Disposition', 'attachment; filename=website-project-handoff.zip');
+
+  const archive = archiver('zip', { zlib: { level: 9 } });
+  archive.pipe(res);
+
+  // Add current HTML if exists
+  if (session.generatedHtml) {
+    archive.append(session.generatedHtml, { name: 'index.html' });
+  }
+
+  // Add uploaded images
+  const uploadDir = path.join(__dirname, 'public', 'uploads', req.params.sessionId);
+  if (existsSync(uploadDir)) {
+    archive.directory(uploadDir, 'uploads');
+  }
+
+  // Add conversation history as a handoff prompt
+  const handoff = `WEBSITE PROJECT HANDOFF
+======================
+Continue building this website using Claude (claude.ai) or another AI.
+
+DOMAIN: ${session.domain || 'Not specified'}
+
+CONVERSATION SO FAR:
+${session.history.map(m => `[${m.role.toUpperCase()}]: ${m.content}`).join('\n\n')}
+
+CURRENT WEBSITE CODE:
+${session.generatedHtml || 'No code generated yet.'}
+
+INSTRUCTIONS FOR AI:
+Please continue helping the user refine their website. The HTML should be a single self-contained file with inline CSS and JavaScript. Make it beautiful, modern, and responsive.
+`;
+
+  archive.append(handoff, { name: 'HANDOFF-PROMPT.txt' });
+
+  archive.append(
+    `HOW TO CONTINUE BUILDING YOUR WEBSITE
+======================================
+
+1. Go to claude.ai and create a free account (or use ChatGPT, etc.)
+2. Start a new conversation
+3. Upload the "HANDOFF-PROMPT.txt" file from this ZIP
+4. The AI will have full context of your project and can continue from where we left off
+5. When you're done, follow the Bluehost upload instructions in README.txt
+`,
+    { name: 'README.txt' }
+  );
+
+  await archive.finalize();
+});
+
+app.listen(PORT, () => {
+  console.log(`Website Builder running at http://localhost:${PORT}`);
+});
