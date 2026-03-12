@@ -11,8 +11,47 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+
+// Force HTTPS in production (Render sets X-Forwarded-Proto)
+app.use((req, res, next) => {
+  if (req.headers['x-forwarded-proto'] === 'http') {
+    return res.redirect(301, `https://${req.hostname}${req.url}`);
+  }
+  next();
+});
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- SEO: robots.txt ---
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /chat.html
+Disallow: /step1.html
+Disallow: /step2.html
+Disallow: /uploads/
+Disallow: /generated/
+
+Sitemap: https://freeaisitebuilder.com/sitemap.xml
+`);
+});
+
+// --- SEO: sitemap.xml ---
+app.get('/sitemap.xml', (req, res) => {
+  res.type('application/xml');
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://freeaisitebuilder.com/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+`);
+});
 
 // --- Rate limiting ---
 const chatLimiter = rateLimit({
