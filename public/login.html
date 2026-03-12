@@ -145,8 +145,8 @@ body {
 <body>
 
 <div class="login-card">
-  <h1>Save Your Progress</h1>
-  <p>Enter your email so we can save your work. If you need to step away, you can pick up right where you left off. We'll send you a magic link — no password needed.</p>
+  <h1 id="loginTitle">Welcome Back</h1>
+  <p id="loginSubtitle">Enter your email to pick up where you left off. We'll send you a magic link — no password needed.</p>
 
   <form id="loginForm" onsubmit="sendMagicLink(event)">
     <input type="email" id="emailInput" placeholder="your@email.com" required autocomplete="email" autofocus>
@@ -214,7 +214,7 @@ async function loadUserSessions() {
       const newDiv = document.createElement('div');
       newDiv.className = 'session-item';
       newDiv.innerHTML = '<div class="domain" style="color:var(--accent);">+ Start a New Project</div>';
-      newDiv.onclick = () => { window.location.href = '/step2.html'; };
+      newDiv.onclick = () => { window.location.href = '/step1.html'; };
       list.appendChild(newDiv);
     }
   } catch {}
@@ -257,11 +257,17 @@ async function sendMagicLink(e) {
   }
 }
 
-// Check URL for error param
+// Check URL params for context
 const params = new URLSearchParams(window.location.search);
 if (params.get('error') === 'expired') {
   document.getElementById('message').textContent = 'That link has expired. Please request a new one.';
   document.getElementById('message').className = 'message error';
+}
+
+// Show different messaging for first-time vs returning users
+if (params.get('next') === 'step2') {
+  document.getElementById('loginTitle').textContent = 'Save Your Progress';
+  document.getElementById('loginSubtitle').textContent = "Enter your email so we can save your work. If you need to step away, you can pick up right where you left off. We'll send you a magic link — no password needed.";
 }
 
 checkAuth();
