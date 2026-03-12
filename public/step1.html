@@ -698,7 +698,7 @@ footer {
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
   <a href="/" class="bottom-nav-back">&larr; Back</a>
-  <a href="/step2.html" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
+  <a href="#" onclick="event.preventDefault(); fetch('/api/auth/me').then(r=>r.json()).then(d=>{ window.location.href = d.authenticated ? '/step2.html' : '/login.html?next=step2'; })" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
 </div>
 
 <footer>
@@ -706,10 +706,7 @@ footer {
 </footer>
 
 <script>
-// Auth check — redirect to login if not authenticated
-fetch('/api/auth/me').then(r => r.json()).then(d => {
-  if (!d.authenticated) window.location.href = '/login.html';
-}).catch(() => {});
+// No auth required for step 1 — auth happens before step 2
 
 // Track if they clicked the affiliate link
 let clickedAffiliate = false;
@@ -804,7 +801,14 @@ async function confirmDomain(e) {
       body: JSON.stringify({ sessionId, domain: cleaned })
     });
 
-    window.location.href = '/step2.html';
+    // Check if authenticated before proceeding
+    const authRes = await fetch('/api/auth/me');
+    const authData = await authRes.json();
+    if (authData.authenticated) {
+      window.location.href = '/step2.html';
+    } else {
+      window.location.href = '/login.html?next=step2';
+    }
   } catch (err) {
     btn.disabled = false;
     btn.textContent = 'Continue to Step 2 →';

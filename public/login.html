@@ -145,8 +145,8 @@ body {
 <body>
 
 <div class="login-card">
-  <h1>Welcome</h1>
-  <p>Enter your email to log in or create an account. We'll send you a magic link — no password needed.</p>
+  <h1>Save Your Progress</h1>
+  <p>Enter your email so we can save your work. If you need to step away, you can pick up right where you left off. We'll send you a magic link — no password needed.</p>
 
   <form id="loginForm" onsubmit="sendMagicLink(event)">
     <input type="email" id="emailInput" placeholder="your@email.com" required autocomplete="email" autofocus>
@@ -174,10 +174,11 @@ async function checkAuth() {
     if (data.authenticated) {
       // Already logged in — check for existing sessions
       await loadUserSessions();
-      // If no sessions, redirect to step1
+      // If no sessions, redirect based on ?next param or default to step2
       const sessionList = document.getElementById('sessionList');
       if (!sessionList.children.length) {
-        window.location.href = '/step1.html';
+        const next = new URLSearchParams(window.location.search).get('next');
+        window.location.href = next === 'step2' ? '/step2.html' : '/step2.html';
       }
     }
   } catch {}
@@ -213,7 +214,7 @@ async function loadUserSessions() {
       const newDiv = document.createElement('div');
       newDiv.className = 'session-item';
       newDiv.innerHTML = '<div class="domain" style="color:var(--accent);">+ Start a New Project</div>';
-      newDiv.onclick = () => { window.location.href = '/step1.html'; };
+      newDiv.onclick = () => { window.location.href = '/step2.html'; };
       list.appendChild(newDiv);
     }
   } catch {}

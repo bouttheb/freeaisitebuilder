@@ -211,7 +211,7 @@ app.get('/api/auth/verify', async (req, res) => {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 
-  res.redirect('/step1.html');
+  res.redirect('/step2.html');
 });
 
 // Check auth status
@@ -471,7 +471,7 @@ app.post('/api/upload', requireOrigin, requireAuth, uploadLimiter, upload.array(
 });
 
 // --- Verify domain DNS (Bluehost check) ---
-app.post('/api/verify-domain', requireOrigin, requireAuth, verifyLimiter, async (req, res) => {
+app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) => {
   const { domain } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain required.' });
 
@@ -512,7 +512,7 @@ app.post('/api/verify-domain', requireOrigin, requireAuth, verifyLimiter, async 
 });
 
 // --- Register domain ---
-app.post('/api/register-domain', requireOrigin, requireAuth, (req, res) => {
+app.post('/api/register-domain', requireOrigin, (req, res) => {
   const { sessionId, domain } = req.body;
   const ip = req.ip;
   const session = getSession(sessionId, ip);
