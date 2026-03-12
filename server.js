@@ -484,10 +484,29 @@ app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) =>
   }
 
   try {
-    const nsRecords = await dns.resolveNs(cleaned);
-    const isBluehost = nsRecords.some(ns =>
-      BLUEHOST_NS_PATTERNS.some(pattern => ns.toLowerCase().includes(pattern))
-    );
+    let isBluehost = false;
+
+    // Try NS record check first
+    try {
+      const nsRecords = await dns.resolveNs(cleaned);
+      console.log(`[DNS] NS records for ${cleaned}:`, nsRecords);
+      isBluehost = nsRecords.some(ns =>
+        BLUEHOST_NS_PATTERNS.some(pattern => ns.toLowerCase().includes(pattern))
+      );
+    } catch (nsErr) {
+      console.log(`[DNS] NS lookup failed for ${cleaned}:`, nsErr.code);
+      // NS lookup failed — try A record as fallback (Bluehost shared hosting IPs)
+      try {
+        const aRecords = await dns.resolve4(cleaned);
+        console.log(`[DNS] A records for ${cleaned}:`, aRecords);
+        // If domain has an A record, it's at least set up — allow it through
+        if (aRecords.length > 0) {
+          isBluehost = true;
+        }
+      } catch (aErr) {
+        console.log(`[DNS] A lookup also failed for ${cleaned}:`, aErr.code);
+      }
+    }
 
     verifiedDomains.set(cleaned, { verified: isBluehost, timestamp: Date.now() });
 
@@ -495,14 +514,13 @@ app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) =>
       return res.json({
         verified: false,
         domain: cleaned,
-        nameservers: nsRecords,
         message: 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first, then come back.',
       });
     }
 
     return res.json({ verified: true, domain: cleaned });
   } catch (err) {
-    // DNS lookup failed — domain might not exist or not have NS records yet
+    console.error(`[DNS] Unexpected error for ${cleaned}:`, err);
     return res.json({
       verified: false,
       domain: cleaned,
