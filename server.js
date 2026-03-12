@@ -7,10 +7,14 @@ import { readdir, readFile, writeFile, mkdir } from 'fs/promises';
 import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dns from 'dns/promises';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
+
+// Trust proxy (Render uses reverse proxy)
+app.set('trust proxy', 1);
 
 // Force HTTPS in production (Render sets X-Forwarded-Proto)
 app.use((req, res, next) => {
@@ -20,8 +24,81 @@ app.use((req, res, next) => {
   next();
 });
 
+// --- CORS & Origin validation ---
+const ALLOWED_ORIGINS = [
+  'https://freeaisitebuilder.com',
+  'https://www.freeaisitebuilder.com',
+  'https://freeaisitebuilder.onrender.com',
+  'http://localhost:3000',
+];
+
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (origin && ALLOWED_ORIGINS.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
+
+// Block API requests from unknown origins (except same-origin which has no Origin header)
+function requireOrigin(req, res, next) {
+  const origin = req.headers.origin;
+  // Same-origin requests (from our own pages) don't have an Origin header
+  if (!origin) return next();
+  if (ALLOWED_ORIGINS.includes(origin)) return next();
+  return res.status(403).json({ error: 'Forbidden' });
+}
+
 app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// --- Global daily token budget (prevent runaway costs) ---
+const DAILY_TOKEN_BUDGET = 5_000_000; // 5M tokens/day across all users
+let dailyTokensUsed = 0;
+let dailyResetDate = new Date().toDateString();
+
+function checkDailyBudget() {
+  const today = new Date().toDateString();
+  if (today !== dailyResetDate) {
+    dailyTokensUsed = 0;
+    dailyResetDate = today;
+  }
+  return dailyTokensUsed < DAILY_TOKEN_BUDGET;
+}
+
+// --- IP-based session tracking (max 3 sessions per IP per day) ---
+const ipSessionTracker = new Map(); // ip -> { date, count }
+const MAX_SESSIONS_PER_IP = 3;
+
+function canCreateSession(ip) {
+  const today = new Date().toDateString();
+  const record = ipSessionTracker.get(ip);
+  if (!record || record.date !== today) {
+    ipSessionTracker.set(ip, { date: today, count: 1 });
+    return true;
+  }
+  if (record.count >= MAX_SESSIONS_PER_IP) return false;
+  record.count++;
+  return true;
+}
+
+// --- Session cleanup (delete sessions older than 2 hours) ---
+setInterval(() => {
+  const now = Date.now();
+  for (const [id, session] of sessions) {
+    if (now - session.createdAt > 2 * 60 * 60 * 1000) {
+      sessions.delete(id);
+    }
+  }
+  // Also clean up old IP tracking entries
+  const today = new Date().toDateString();
+  for (const [ip, record] of ipSessionTracker) {
+    if (record.date !== today) ipSessionTracker.delete(ip);
+  }
+}, 10 * 60 * 1000); // run every 10 minutes
 
 // --- SEO: robots.txt ---
 app.get('/robots.txt', (req, res) => {
@@ -76,19 +153,35 @@ const TOKEN_CAP = 100_000;
 
 const anthropic = new Anthropic(); // uses ANTHROPIC_API_KEY env var
 
+// Bluehost nameserver patterns
+const BLUEHOST_NS_PATTERNS = [
+  'bluehost.com',
+  'bluehost.com.',
+];
+
 // --- Session store (in-memory, replace with DB for production) ---
 const sessions = new Map();
 
-function getSession(id) {
+// Track which domains have been verified (cache for 24h)
+const verifiedDomains = new Map(); // domain -> { verified: bool, timestamp }
+
+function getSession(id, ip) {
   if (!sessions.has(id)) {
+    // Check IP session limit for new sessions
+    if (ip && !canCreateSession(ip)) {
+      return null; // IP has exceeded session limit
+    }
     sessions.set(id, {
       inputTokens: 0,
       outputTokens: 0,
       step: 1,
       domain: null,
+      domainVerified: false,
       history: [],
       generatedHtml: null,
       uploadedFiles: [],
+      createdAt: Date.now(),
+      ip: ip || 'unknown',
     });
   }
   return sessions.get(id);
@@ -118,8 +211,11 @@ const upload = multer({
   },
 });
 
-app.post('/api/upload', uploadLimiter, upload.array('files', 20), (req, res) => {
-  const session = getSession(req.body.sessionId);
+app.post('/api/upload', requireOrigin, uploadLimiter, upload.array('files', 20), (req, res) => {
+  const session = getSession(req.body.sessionId, req.ip);
+  if (!session) {
+    return res.status(429).json({ error: 'Too many sessions. Please try again tomorrow.' });
+  }
   const files = (req.files || []).map(f => {
     session.uploadedFiles.push(f.filename);
     return f.originalname;
@@ -127,10 +223,55 @@ app.post('/api/upload', uploadLimiter, upload.array('files', 20), (req, res) => 
   res.json({ files });
 });
 
+// --- Verify domain DNS (Bluehost check) ---
+app.post('/api/verify-domain', requireOrigin, async (req, res) => {
+  const { domain } = req.body;
+  if (!domain) return res.status(400).json({ error: 'Domain required.' });
+
+  const cleaned = domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/+$/, '');
+
+  // Check cache first
+  const cached = verifiedDomains.get(cleaned);
+  if (cached && Date.now() - cached.timestamp < 24 * 60 * 60 * 1000) {
+    return res.json({ verified: cached.verified, domain: cleaned });
+  }
+
+  try {
+    const nsRecords = await dns.resolveNs(cleaned);
+    const isBluehost = nsRecords.some(ns =>
+      BLUEHOST_NS_PATTERNS.some(pattern => ns.toLowerCase().includes(pattern))
+    );
+
+    verifiedDomains.set(cleaned, { verified: isBluehost, timestamp: Date.now() });
+
+    if (!isBluehost) {
+      return res.json({
+        verified: false,
+        domain: cleaned,
+        nameservers: nsRecords,
+        message: 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first, then come back.',
+      });
+    }
+
+    return res.json({ verified: true, domain: cleaned });
+  } catch (err) {
+    // DNS lookup failed — domain might not exist or not have NS records yet
+    return res.json({
+      verified: false,
+      domain: cleaned,
+      message: 'We couldn\'t verify this domain. Make sure your hosting is set up and the domain is registered, then try again.',
+    });
+  }
+});
+
 // --- Register domain ---
-app.post('/api/register-domain', (req, res) => {
+app.post('/api/register-domain', requireOrigin, (req, res) => {
   const { sessionId, domain } = req.body;
-  const session = getSession(sessionId);
+  const ip = req.ip;
+  const session = getSession(sessionId, ip);
+  if (!session) {
+    return res.status(429).json({ error: 'Too many sessions. Please try again tomorrow.' });
+  }
   session.domain = domain;
   res.json({ ok: true, domain });
 });
@@ -182,9 +323,29 @@ When you receive their project details:
 - Keep your non-code responses SHORT. Users want to see their site, not read essays.`;
 
 // --- Chat endpoint ---
-app.post('/api/chat', chatLimiter, async (req, res) => {
+app.post('/api/chat', requireOrigin, chatLimiter, async (req, res) => {
   const { sessionId, message } = req.body;
-  const session = getSession(sessionId);
+  const ip = req.ip;
+  const session = getSession(sessionId, ip);
+
+  if (!session) {
+    return res.status(429).json({ error: 'Too many sessions from your network today. Please try again tomorrow.' });
+  }
+
+  // Check if domain has been verified (Bluehost DNS check)
+  if (!session.domainVerified) {
+    // Check if the domain is in our verified cache
+    if (session.domain && verifiedDomains.get(session.domain)?.verified) {
+      session.domainVerified = true;
+    } else {
+      return res.status(403).json({ error: 'Please verify your domain with Bluehost hosting first.' });
+    }
+  }
+
+  // Check global daily budget
+  if (!checkDailyBudget()) {
+    return res.status(503).json({ error: 'Our AI service is at capacity for today. Please try again tomorrow.' });
+  }
 
   if (session.inputTokens >= TOKEN_CAP || session.outputTokens >= TOKEN_CAP) {
     return res.json({
@@ -219,6 +380,7 @@ app.post('/api/chat', chatLimiter, async (req, res) => {
     // Track tokens separately
     session.inputTokens += response.usage.input_tokens;
     session.outputTokens += response.usage.output_tokens;
+    dailyTokensUsed += response.usage.input_tokens + response.usage.output_tokens;
 
     // Parse metadata from response
     let step = session.step;

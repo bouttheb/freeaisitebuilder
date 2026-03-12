@@ -750,9 +750,10 @@ if (localStorage.getItem('wb_completed_step1') === 'true') {
   document.getElementById('forwardBtn').style.display = 'inline';
 }
 
-function confirmDomain(e) {
+async function confirmDomain(e) {
   e.preventDefault();
   const domain = document.getElementById('domainInput').value.trim().toLowerCase();
+  const btn = document.getElementById('confirmBtn');
 
   if (!domain) return;
 
@@ -765,23 +766,56 @@ function confirmDomain(e) {
     return;
   }
 
-  // Store domain for the session
-  let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
-  localStorage.setItem('wb_session', sessionId);
-  localStorage.setItem('wb_domain', cleaned);
-  localStorage.setItem('wb_completed_step1', 'true');
+  // Show loading state
+  btn.disabled = true;
+  btn.textContent = 'Verifying your domain...';
 
-  // Register domain with backend
-  fetch('/api/register-domain', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ sessionId, domain: cleaned })
-  }).then(() => {
+  try {
+    // Verify domain is hosted on Bluehost
+    const verifyRes = await fetch('/api/verify-domain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ domain: cleaned })
+    });
+    const verifyData = await verifyRes.json();
+
+    if (!verifyData.verified) {
+      btn.disabled = false;
+      btn.textContent = 'Continue to Step 2 →';
+      showDnsError(verifyData.message || 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first.');
+      return;
+    }
+
+    // Domain verified — proceed
+    let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
+    localStorage.setItem('wb_session', sessionId);
+    localStorage.setItem('wb_domain', cleaned);
+    localStorage.setItem('wb_completed_step1', 'true');
+
+    // Register domain with backend
+    await fetch('/api/register-domain', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId, domain: cleaned })
+    });
+
     window.location.href = '/step2.html';
-  }).catch(() => {
-    // Even if API fails, let them continue
-    window.location.href = '/step2.html';
-  });
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Continue to Step 2 →';
+    showDnsError('Could not verify your domain. Please check your internet connection and try again.');
+  }
+}
+
+function showDnsError(message) {
+  let errorEl = document.getElementById('dnsError');
+  if (!errorEl) {
+    errorEl = document.createElement('div');
+    errorEl.id = 'dnsError';
+    errorEl.style.cssText = 'margin-top:1rem; padding:1rem 1.2rem; background:rgba(229,115,115,0.1); border:1px solid rgba(229,115,115,0.3); border-radius:8px; color:#E57373; font-size:0.9rem; line-height:1.6; text-align:left;';
+    document.querySelector('.confirm-form').appendChild(errorEl);
+  }
+  errorEl.innerHTML = `<strong>Domain not verified.</strong> ${message}<br><br>If you just set up hosting, it can take up to 24 hours for DNS to update. You can try again later.`;
 }
 </script>
 
