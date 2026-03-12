@@ -606,9 +606,33 @@ app.post('/api/chat', requireOrigin, requireAuth, chatLimiter, async (req, res) 
 
   // Check if domain has been verified (Bluehost DNS check)
   if (!session.domainVerified) {
-    // Check if the domain is in our verified cache
+    // Check cache first
     if (session.domain && verifiedDomains.get(session.domain)?.verified) {
       session.domainVerified = true;
+    } else if (session.domain) {
+      // Re-verify on the fly
+      try {
+        let verified = false;
+        try {
+          const nsRecords = await dns.resolveNs(session.domain);
+          verified = nsRecords.some(ns => BLUEHOST_NS_PATTERNS.some(p => ns.toLowerCase().includes(p)));
+        } catch {
+          // NS failed, try A record fallback
+          try {
+            const aRecords = await dns.resolve4(session.domain);
+            verified = aRecords.length > 0;
+          } catch {}
+        }
+        if (verified) {
+          session.domainVerified = true;
+          verifiedDomains.set(session.domain, { verified: true, timestamp: Date.now() });
+          saveSession(req.body.sessionId || req.query.sessionId);
+        } else {
+          return res.status(403).json({ error: 'Please verify your domain with Bluehost hosting first.' });
+        }
+      } catch {
+        return res.status(403).json({ error: 'Please verify your domain with Bluehost hosting first.' });
+      }
     } else {
       return res.status(403).json({ error: 'Please verify your domain with Bluehost hosting first.' });
     }
