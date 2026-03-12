@@ -53,6 +53,26 @@ function requireOrigin(req, res, next) {
 }
 
 app.use(express.json({ limit: '1mb' }));
+
+// --- Block direct access to uploads/ and generated/ directories ---
+app.use('/uploads', (req, res, next) => {
+  // Only allow if the referrer is from our own site (i.e., loaded within our pages)
+  const referer = req.headers.referer || '';
+  const isOwnSite = ALLOWED_ORIGINS.some(o => referer.startsWith(o));
+  if (!isOwnSite && !referer.startsWith('http://localhost')) {
+    return res.status(403).send('Forbidden');
+  }
+  next();
+});
+app.use('/generated', (req, res, next) => {
+  const referer = req.headers.referer || '';
+  const isOwnSite = ALLOWED_ORIGINS.some(o => referer.startsWith(o));
+  if (!isOwnSite && !referer.startsWith('http://localhost')) {
+    return res.status(403).send('Forbidden');
+  }
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Global daily token budget (prevent runaway costs) ---
@@ -147,6 +167,14 @@ const uploadLimiter = rateLimit({
   legacyHeaders: false,
 });
 
+const verifyLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 5, // 5 domain verifications per minute per IP
+  message: { error: 'Too many verification attempts. Please wait a moment.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 // --- Config ---
 const PORT = process.env.PORT || 3000;
 const TOKEN_CAP = 100_000;
@@ -224,7 +252,7 @@ app.post('/api/upload', requireOrigin, uploadLimiter, upload.array('files', 20),
 });
 
 // --- Verify domain DNS (Bluehost check) ---
-app.post('/api/verify-domain', requireOrigin, async (req, res) => {
+app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) => {
   const { domain } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain required.' });
 
@@ -456,9 +484,9 @@ app.get('/api/session/:sessionId', (req, res) => {
 
 // --- Download site as ZIP ---
 app.get('/api/download/:sessionId', async (req, res) => {
-  const session = getSession(req.params.sessionId);
-  if (!session.generatedHtml) {
-    return res.status(404).json({ error: 'No website generated yet.' });
+  const session = sessions.get(req.params.sessionId);
+  if (!session || !session.generatedHtml) {
+    return res.status(404).json({ error: 'No website generated yet or session expired.' });
   }
 
   res.setHeader('Content-Type', 'application/zip');
@@ -500,7 +528,10 @@ Need help? Contact support@bluehost.com
 
 // --- Handoff file (when token cap is reached) ---
 app.get('/api/handoff/:sessionId', async (req, res) => {
-  const session = getSession(req.params.sessionId);
+  const session = sessions.get(req.params.sessionId);
+  if (!session) {
+    return res.status(404).json({ error: 'Session not found or expired.' });
+  }
 
   res.setHeader('Content-Type', 'application/zip');
   res.setHeader('Content-Disposition', 'attachment; filename=website-project-handoff.zip');
