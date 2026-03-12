@@ -571,8 +571,27 @@ nav {
 
 <nav>
   <a href="/index.html" class="nav-logo">freeaisitebuilder.com</a>
-  <div class="token-badge">Usage: <span id="tokenCount">0%</span></div>
+  <div style="display:flex;align-items:center;gap:1rem;">
+    <button onclick="showSaveSession()" style="background:none;border:1px solid rgba(255,255,255,0.15);color:var(--gray-mid);padding:0.4rem 0.8rem;border-radius:6px;font-size:0.8rem;cursor:pointer;font-family:inherit;">Save &amp; Continue Later</button>
+    <div class="token-badge">Usage: <span id="tokenCount">0%</span></div>
+  </div>
 </nav>
+
+<!-- Save Session Modal -->
+<div id="saveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;display:none;justify-content:center;align-items:center;">
+  <div style="background:var(--card-bg);border:1px solid rgba(255,255,255,0.1);border-radius:12px;padding:2rem;max-width:480px;width:90%;text-align:center;">
+    <h3 style="font-family:'Playfair Display',serif;margin-bottom:0.5rem;">Save Your Progress</h3>
+    <p style="color:var(--gray-mid);font-size:0.9rem;margin-bottom:1.5rem;">Bookmark or copy this link to come back and continue building your site anytime within 7 days.</p>
+    <div style="display:flex;gap:0.5rem;margin-bottom:1rem;">
+      <input type="text" id="saveLink" readonly style="flex:1;background:var(--black);border:1px solid rgba(255,255,255,0.1);color:var(--off-white);padding:0.6rem 0.8rem;border-radius:6px;font-size:0.85rem;font-family:inherit;">
+      <button onclick="copySaveLink()" style="background:var(--accent);color:var(--black);border:none;padding:0.6rem 1.2rem;border-radius:6px;font-weight:700;cursor:pointer;font-family:inherit;">Copy</button>
+    </div>
+    <p id="saveCopied" style="color:var(--accent);font-size:0.8rem;margin-bottom:1rem;opacity:0;transition:opacity 0.3s;">Link copied!</p>
+    <div id="saveQr" style="margin-bottom:1rem;"></div>
+    <p style="color:var(--gray-dark);font-size:0.75rem;margin-bottom:1rem;">Or scan the QR code to continue on another device.</p>
+    <button onclick="closeSaveModal()" style="background:none;border:1px solid rgba(255,255,255,0.1);color:var(--gray-mid);padding:0.5rem 1.5rem;border-radius:6px;cursor:pointer;font-family:inherit;">Close</button>
+  </div>
+</div>
 
 <div class="app">
   <!-- SIDEBAR -->
@@ -1054,6 +1073,32 @@ function closePreview() {
 function refreshPreview() {
   const frame = document.getElementById('previewFrame');
   frame.srcdoc = frame.srcdoc;
+}
+
+function showSaveSession() {
+  const url = `${window.location.origin}/chat.html?session=${sessionId}`;
+  document.getElementById('saveLink').value = url;
+  document.getElementById('saveModal').style.display = 'flex';
+  // Generate QR code
+  const qrContainer = document.getElementById('saveQr');
+  qrContainer.innerHTML = '';
+  const img = document.createElement('img');
+  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(url)}&bgcolor=1A1A1A&color=F5F5F5`;
+  img.alt = 'Scan to resume session';
+  img.style.cssText = 'width:160px;height:160px;border-radius:8px;';
+  qrContainer.appendChild(img);
+}
+
+function copySaveLink() {
+  const link = document.getElementById('saveLink');
+  navigator.clipboard.writeText(link.value);
+  const msg = document.getElementById('saveCopied');
+  msg.style.opacity = '1';
+  setTimeout(() => msg.style.opacity = '0', 2000);
+}
+
+function closeSaveModal() {
+  document.getElementById('saveModal').style.display = 'none';
 }
 
 async function downloadSite() {

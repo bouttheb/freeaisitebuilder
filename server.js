@@ -13,6 +13,50 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
+// --- Persistent session storage ---
+const SESSION_DIR = process.env.SESSION_DIR || path.join(__dirname, 'data', 'sessions');
+const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+async function loadSessions() {
+  if (!existsSync(SESSION_DIR)) {
+    await mkdir(SESSION_DIR, { recursive: true });
+    return;
+  }
+  const files = await readdir(SESSION_DIR);
+  let loaded = 0;
+  for (const file of files) {
+    if (!file.endsWith('.json')) continue;
+    try {
+      const data = JSON.parse(await readFile(path.join(SESSION_DIR, file), 'utf8'));
+      const id = file.replace('.json', '');
+      // Skip expired sessions
+      if (Date.now() - (data.createdAt || 0) > SESSION_MAX_AGE) continue;
+      sessions.set(id, data);
+      loaded++;
+    } catch {}
+  }
+  console.log(`Loaded ${loaded} sessions from disk`);
+}
+
+async function saveSession(id) {
+  const session = sessions.get(id);
+  if (!session) return;
+  if (!existsSync(SESSION_DIR)) await mkdir(SESSION_DIR, { recursive: true });
+  await writeFile(
+    path.join(SESSION_DIR, `${id}.json`),
+    JSON.stringify(session),
+    'utf8'
+  );
+}
+
+async function deleteSessionFile(id) {
+  const filePath = path.join(SESSION_DIR, `${id}.json`);
+  if (existsSync(filePath)) {
+    const { unlink } = await import('fs/promises');
+    await unlink(filePath).catch(() => {});
+  }
+}
+
 // Trust proxy (Render uses reverse proxy)
 app.set('trust proxy', 1);
 
@@ -105,12 +149,13 @@ function canCreateSession(ip) {
   return true;
 }
 
-// --- Session cleanup (delete sessions older than 2 hours) ---
+// --- Session cleanup (delete sessions older than 7 days) ---
 setInterval(() => {
   const now = Date.now();
   for (const [id, session] of sessions) {
-    if (now - session.createdAt > 2 * 60 * 60 * 1000) {
+    if (now - session.createdAt > SESSION_MAX_AGE) {
       sessions.delete(id);
+      deleteSessionFile(id);
     }
   }
   // Also clean up old IP tracking entries
@@ -118,7 +163,7 @@ setInterval(() => {
   for (const [ip, record] of ipSessionTracker) {
     if (record.date !== today) ipSessionTracker.delete(ip);
   }
-}, 10 * 60 * 1000); // run every 10 minutes
+}, 60 * 60 * 1000); // run every hour
 
 // --- SEO: robots.txt ---
 app.get('/robots.txt', (req, res) => {
@@ -301,6 +346,7 @@ app.post('/api/register-domain', requireOrigin, (req, res) => {
     return res.status(429).json({ error: 'Too many sessions. Please try again tomorrow.' });
   }
   session.domain = domain;
+  saveSession(sessionId);
   res.json({ ok: true, domain });
 });
 
@@ -442,6 +488,9 @@ app.post('/api/chat', requireOrigin, chatLimiter, async (req, res) => {
       .trim();
 
     session.history.push({ role: 'assistant', content: assistantText });
+
+    // Persist session to disk
+    await saveSession(sessionId);
 
     res.json({
       response: displayText,
@@ -585,6 +634,9 @@ Please continue helping the user refine their website. The HTML should be a sing
   await archive.finalize();
 });
 
-app.listen(PORT, () => {
-  console.log(`Website Builder running at http://localhost:${PORT}`);
+// Load persisted sessions, then start server
+loadSessions().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Website Builder running at http://localhost:${PORT}`);
+  });
 });
