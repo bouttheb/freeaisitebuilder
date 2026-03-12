@@ -325,6 +325,11 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 <footer>&copy; 2026 freeaisitebuilder.com. All rights reserved.</footer>
 
 <script>
+// Auth check — redirect to login if not authenticated
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+  if (!d.authenticated) window.location.href = '/login.html';
+}).catch(() => {});
+
 const TOTAL_STEPS = 4;
 let currentStep = 0;
 let selectedType = null;

@@ -8,6 +8,8 @@ import { existsSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import dns from 'dns/promises';
+import cookieParser from 'cookie-parser';
+import crypto from 'crypto';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -97,6 +99,177 @@ function requireOrigin(req, res, next) {
 }
 
 app.use(express.json({ limit: '1mb' }));
+app.use(cookieParser());
+
+// --- Magic link auth system ---
+const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString('hex');
+const AUTH_DIR = process.env.AUTH_DIR || path.join(__dirname, 'data', 'auth');
+const magicTokens = new Map(); // token -> { email, expiresAt }
+const authSessions = new Map(); // authToken (cookie) -> { email, expiresAt }
+
+async function loadAuthSessions() {
+  if (!existsSync(AUTH_DIR)) {
+    await mkdir(AUTH_DIR, { recursive: true });
+    return;
+  }
+  try {
+    const data = await readFile(path.join(AUTH_DIR, 'sessions.json'), 'utf8');
+    const entries = JSON.parse(data);
+    for (const [token, session] of Object.entries(entries)) {
+      if (session.expiresAt > Date.now()) {
+        authSessions.set(token, session);
+      }
+    }
+    console.log(`Loaded ${authSessions.size} auth sessions`);
+  } catch {}
+}
+
+async function saveAuthSessions() {
+  if (!existsSync(AUTH_DIR)) await mkdir(AUTH_DIR, { recursive: true });
+  const obj = Object.fromEntries(authSessions);
+  await writeFile(path.join(AUTH_DIR, 'sessions.json'), JSON.stringify(obj), 'utf8');
+}
+
+// Rate limit for magic link requests
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 attempts per 15 min per IP
+  message: { error: 'Too many login attempts. Please wait and try again.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Send magic link email
+app.post('/api/auth/send-magic-link', requireOrigin, authLimiter, async (req, res) => {
+  const { email } = req.body;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+
+  const token = crypto.randomBytes(32).toString('hex');
+  magicTokens.set(token, { email: email.toLowerCase(), expiresAt: Date.now() + 15 * 60 * 1000 }); // 15 min expiry
+
+  const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+  const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
+
+  // Send email via Resend
+  const resendKey = process.env.RESEND_API_KEY;
+  if (!resendKey) {
+    console.error('RESEND_API_KEY not set — magic link:', magicLink);
+    return res.json({ ok: true, message: 'Check your email for a login link.' });
+  }
+
+  try {
+    const { Resend } = await import('resend');
+    const resend = new Resend(resendKey);
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'Free AI Site Builder <noreply@freeaisitebuilder.com>',
+      to: email.toLowerCase(),
+      subject: 'Your Login Link — Free AI Site Builder',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
+          <h2 style="color:#1a1a1a;">Log in to Free AI Site Builder</h2>
+          <p style="color:#666;line-height:1.6;">Click the button below to log in and start building your website. This link expires in 15 minutes.</p>
+          <a href="${magicLink}" style="display:inline-block;background:#C8A46E;color:#0A0A0A;padding:12px 32px;border-radius:6px;text-decoration:none;font-weight:700;margin:1rem 0;">Log In</a>
+          <p style="color:#999;font-size:0.85rem;">If you didn't request this, you can safely ignore this email.</p>
+          <hr style="border:none;border-top:1px solid #eee;margin:1.5rem 0;">
+          <p style="color:#bbb;font-size:0.75rem;">freeaisitebuilder.com</p>
+        </div>
+      `,
+    });
+    res.json({ ok: true, message: 'Check your email for a login link.' });
+  } catch (err) {
+    console.error('Email send error:', err.message);
+    res.status(500).json({ error: 'Failed to send login email. Please try again.' });
+  }
+});
+
+// Verify magic link token
+app.get('/api/auth/verify', async (req, res) => {
+  const { token } = req.query;
+  const record = magicTokens.get(token);
+
+  if (!record || record.expiresAt < Date.now()) {
+    magicTokens.delete(token);
+    return res.redirect('/login.html?error=expired');
+  }
+
+  // Create auth session
+  const authToken = crypto.randomBytes(32).toString('hex');
+  authSessions.set(authToken, {
+    email: record.email,
+    expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
+  magicTokens.delete(token);
+  await saveAuthSessions();
+
+  // Set cookie
+  res.cookie('auth', authToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production' || req.headers['x-forwarded-proto'] === 'https',
+    sameSite: 'lax',
+    maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+  });
+
+  res.redirect('/step1.html');
+});
+
+// Check auth status
+app.get('/api/auth/me', (req, res) => {
+  const authToken = req.cookies?.auth;
+  if (!authToken) return res.json({ authenticated: false });
+
+  const session = authSessions.get(authToken);
+  if (!session || session.expiresAt < Date.now()) {
+    authSessions.delete(authToken);
+    return res.json({ authenticated: false });
+  }
+
+  res.json({ authenticated: true, email: session.email });
+});
+
+// Logout
+app.post('/api/auth/logout', (req, res) => {
+  const authToken = req.cookies?.auth;
+  if (authToken) {
+    authSessions.delete(authToken);
+    saveAuthSessions();
+  }
+  res.clearCookie('auth');
+  res.json({ ok: true });
+});
+
+// Auth middleware — checks cookie, returns email or null
+function getAuthEmail(req) {
+  const authToken = req.cookies?.auth;
+  if (!authToken) return null;
+  const session = authSessions.get(authToken);
+  if (!session || session.expiresAt < Date.now()) {
+    authSessions.delete(authToken);
+    return null;
+  }
+  return session.email;
+}
+
+function requireAuth(req, res, next) {
+  const email = getAuthEmail(req);
+  if (!email) {
+    return res.status(401).json({ error: 'Please log in first.', redirect: '/login.html' });
+  }
+  req.userEmail = email;
+  next();
+}
+
+// Clean up expired magic tokens periodically
+setInterval(() => {
+  const now = Date.now();
+  for (const [token, record] of magicTokens) {
+    if (record.expiresAt < now) magicTokens.delete(token);
+  }
+  for (const [token, session] of authSessions) {
+    if (session.expiresAt < now) authSessions.delete(token);
+  }
+}, 60 * 60 * 1000);
 
 // --- Block direct access to uploads/ and generated/ directories ---
 app.use('/uploads', (req, res, next) => {
@@ -238,7 +411,7 @@ const sessions = new Map();
 // Track which domains have been verified (cache for 24h)
 const verifiedDomains = new Map(); // domain -> { verified: bool, timestamp }
 
-function getSession(id, ip) {
+function getSession(id, ip, email) {
   if (!sessions.has(id)) {
     // Check IP session limit for new sessions
     if (ip && !canCreateSession(ip)) {
@@ -255,6 +428,7 @@ function getSession(id, ip) {
       uploadedFiles: [],
       createdAt: Date.now(),
       ip: ip || 'unknown',
+      email: email || null,
     });
   }
   return sessions.get(id);
@@ -284,7 +458,7 @@ const upload = multer({
   },
 });
 
-app.post('/api/upload', requireOrigin, uploadLimiter, upload.array('files', 20), (req, res) => {
+app.post('/api/upload', requireOrigin, requireAuth, uploadLimiter, upload.array('files', 20), (req, res) => {
   const session = getSession(req.body.sessionId, req.ip);
   if (!session) {
     return res.status(429).json({ error: 'Too many sessions. Please try again tomorrow.' });
@@ -297,7 +471,7 @@ app.post('/api/upload', requireOrigin, uploadLimiter, upload.array('files', 20),
 });
 
 // --- Verify domain DNS (Bluehost check) ---
-app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) => {
+app.post('/api/verify-domain', requireOrigin, requireAuth, verifyLimiter, async (req, res) => {
   const { domain } = req.body;
   if (!domain) return res.status(400).json({ error: 'Domain required.' });
 
@@ -338,7 +512,7 @@ app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) =>
 });
 
 // --- Register domain ---
-app.post('/api/register-domain', requireOrigin, (req, res) => {
+app.post('/api/register-domain', requireOrigin, requireAuth, (req, res) => {
   const { sessionId, domain } = req.body;
   const ip = req.ip;
   const session = getSession(sessionId, ip);
@@ -397,14 +571,20 @@ When you receive their project details:
 - Keep your non-code responses SHORT. Users want to see their site, not read essays.`;
 
 // --- Chat endpoint ---
-app.post('/api/chat', requireOrigin, chatLimiter, async (req, res) => {
+app.post('/api/chat', requireOrigin, requireAuth, chatLimiter, async (req, res) => {
   const { sessionId, message } = req.body;
   const ip = req.ip;
-  const session = getSession(sessionId, ip);
+  const session = getSession(sessionId, ip, req.userEmail);
 
   if (!session) {
     return res.status(429).json({ error: 'Too many sessions from your network today. Please try again tomorrow.' });
   }
+
+  // Verify session belongs to this user
+  if (session.email && session.email !== req.userEmail) {
+    return res.status(403).json({ error: 'This session belongs to another user.' });
+  }
+  if (!session.email) session.email = req.userEmail;
 
   // Check if domain has been verified (Bluehost DNS check)
   if (!session.domainVerified) {
@@ -503,6 +683,26 @@ app.post('/api/chat', requireOrigin, chatLimiter, async (req, res) => {
     console.error('Anthropic API error:', err.message);
     res.status(500).json({ error: 'AI service error. Please try again.' });
   }
+});
+
+// --- Get user's sessions (for resume) ---
+app.get('/api/my-sessions', requireAuth, (req, res) => {
+  const userSessions = [];
+  for (const [id, session] of sessions) {
+    if (session.email === req.userEmail) {
+      userSessions.push({
+        sessionId: id,
+        domain: session.domain,
+        step: session.step,
+        inputTokens: session.inputTokens,
+        outputTokens: session.outputTokens,
+        createdAt: session.createdAt,
+        hasWebsite: !!session.generatedHtml,
+      });
+    }
+  }
+  userSessions.sort((a, b) => b.createdAt - a.createdAt);
+  res.json({ sessions: userSessions });
 });
 
 // --- Resume session (for cross-device handoff) ---
@@ -634,8 +834,8 @@ Please continue helping the user refine their website. The HTML should be a sing
   await archive.finalize();
 });
 
-// Load persisted sessions, then start server
-loadSessions().then(() => {
+// Load persisted sessions and auth, then start server
+Promise.all([loadSessions(), loadAuthSessions()]).then(() => {
   app.listen(PORT, () => {
     console.log(`Website Builder running at http://localhost:${PORT}`);
   });

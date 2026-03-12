@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In — Free AI Site Builder</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card-bg: #1A1A1A;
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --gray-light: #E0E0E0;
+  --gray-mid: #999999;
+  --gray-dark: #666666;
+  --accent: #C8A46E;
+  --accent-hover: #D4B57E;
+}
+
+html, body { height: 100%; }
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--black);
+  color: var(--off-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 3rem 2.5rem;
+  max-width: 420px;
+  width: 90%;
+  text-align: center;
+}
+
+.login-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-card p {
+  color: var(--gray-mid);
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.login-card input[type="email"] {
+  width: 100%;
+  background: var(--black);
+  border: 1px solid rgba(255,255,255,0.12);
+  color: var(--off-white);
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 1rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.login-card input[type="email"]:focus {
+  border-color: var(--accent);
+}
+
+.login-card button {
+  width: 100%;
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  padding: 0.85rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.3s;
+}
+
+.login-card button:hover { background: var(--accent-hover); }
+.login-card button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  min-height: 1.5rem;
+}
+
+.message.success { color: #4ade80; }
+.message.error { color: #f87171; }
+
+.back-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: var(--gray-dark);
+  text-decoration: none;
+  font-size: 0.85rem;
+}
+.back-link:hover { color: var(--gray-mid); }
+
+/* Resume sessions list */
+.resume-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  display: none;
+}
+.resume-section h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.75rem;
+}
+.session-item {
+  background: var(--black);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.session-item:hover { border-color: var(--accent); }
+.session-item .domain { font-weight: 600; font-size: 0.95rem; }
+.session-item .meta { color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.25rem; }
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <h1>Welcome</h1>
+  <p>Enter your email to log in or create an account. We'll send you a magic link — no password needed.</p>
+
+  <form id="loginForm" onsubmit="sendMagicLink(event)">
+    <input type="email" id="emailInput" placeholder="your@email.com" required autocomplete="email" autofocus>
+    <button type="submit" id="submitBtn">Send Login Link</button>
+  </form>
+
+  <div class="message" id="message"></div>
+
+  <div class="resume-section" id="resumeSection">
+    <h3>Continue Building</h3>
+    <div id="sessionList"></div>
+  </div>
+
+  <a href="/" class="back-link">&larr; Back to home</a>
+</div>
+
+<script>
+const API_BASE = window.location.origin;
+
+// Check if already logged in
+async function checkAuth() {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/me`);
+    const data = await res.json();
+    if (data.authenticated) {
+      // Already logged in — check for existing sessions
+      await loadUserSessions();
+      // If no sessions, redirect to step1
+      const sessionList = document.getElementById('sessionList');
+      if (!sessionList.children.length) {
+        window.location.href = '/step1.html';
+      }
+    }
+  } catch {}
+}
+
+async function loadUserSessions() {
+  try {
+    const res = await fetch(`${API_BASE}/api/my-sessions`);
+    const data = await res.json();
+    if (data.sessions && data.sessions.length > 0) {
+      const section = document.getElementById('resumeSection');
+      const list = document.getElementById('sessionList');
+      section.style.display = 'block';
+
+      list.innerHTML = '';
+      for (const s of data.sessions) {
+        const div = document.createElement('div');
+        div.className = 'session-item';
+        const age = Math.round((Date.now() - s.createdAt) / (1000 * 60 * 60));
+        const ageStr = age < 1 ? 'Just now' : age < 24 ? `${age}h ago` : `${Math.round(age/24)}d ago`;
+        const stepNames = { 1: 'Hosting', 2: 'Content', 3: 'Building', 4: 'Launch' };
+        div.innerHTML = `
+          <div class="domain">${s.domain || 'New Project'}</div>
+          <div class="meta">Step: ${stepNames[s.step] || s.step} &middot; ${ageStr}${s.hasWebsite ? ' &middot; Website generated' : ''}</div>
+        `;
+        div.onclick = () => {
+          window.location.href = `/chat.html?session=${s.sessionId}`;
+        };
+        list.appendChild(div);
+      }
+
+      // Also add a "Start New Project" option
+      const newDiv = document.createElement('div');
+      newDiv.className = 'session-item';
+      newDiv.innerHTML = '<div class="domain" style="color:var(--accent);">+ Start a New Project</div>';
+      newDiv.onclick = () => { window.location.href = '/step1.html'; };
+      list.appendChild(newDiv);
+    }
+  } catch {}
+}
+
+async function sendMagicLink(e) {
+  e.preventDefault();
+  const email = document.getElementById('emailInput').value.trim();
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('message');
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  msg.textContent = '';
+  msg.className = 'message';
+
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/send-magic-link`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      msg.textContent = 'Check your email for a login link. It expires in 15 minutes.';
+      msg.className = 'message success';
+      btn.textContent = 'Link Sent!';
+    } else {
+      msg.textContent = data.error || 'Something went wrong.';
+      msg.className = 'message error';
+      btn.disabled = false;
+      btn.textContent = 'Send Login Link';
+    }
+  } catch {
+    msg.textContent = 'Network error. Please try again.';
+    msg.className = 'message error';
+    btn.disabled = false;
+    btn.textContent = 'Send Login Link';
+  }
+}
+
+// Check URL for error param
+const params = new URLSearchParams(window.location.search);
+if (params.get('error') === 'expired') {
+  document.getElementById('message').textContent = 'That link has expired. Please request a new one.';
+  document.getElementById('message').className = 'message error';
+}
+
+checkAuth();
+</script>
+</body>
+</html>

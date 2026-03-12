@@ -712,6 +712,11 @@ nav {
 </div>
 
 <script>
+// Auth check — redirect to login if not authenticated
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+  if (!d.authenticated) window.location.href = '/login.html';
+}).catch(() => {});
+
 const API_BASE = window.location.origin;
 const urlParams = new URLSearchParams(window.location.search);
 const resumeSessionId = urlParams.get('session');

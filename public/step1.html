@@ -706,6 +706,11 @@ footer {
 </footer>
 
 <script>
+// Auth check — redirect to login if not authenticated
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+  if (!d.authenticated) window.location.href = '/login.html';
+}).catch(() => {});
+
 // Track if they clicked the affiliate link
 let clickedAffiliate = false;
 const confirmSection = document.getElementById('confirm');
