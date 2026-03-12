@@ -56,7 +56,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Global daily token budget (prevent runaway costs) ---
-const DAILY_TOKEN_BUDGET = 5_000_000; // 5M tokens/day across all users
+const DAILY_TOKEN_BUDGET = 100_000_000; // 100M tokens/day — emergency brake only (~$300/day max)
 let dailyTokensUsed = 0;
 let dailyResetDate = new Date().toDateString();
 
