@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #F5F7FA; color: #1A2332; }
+
+nav { padding: 1rem 4rem; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+.logo { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem; }
+.logo-icon { width: 28px; height: 28px; background: #2563EB; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 0.8rem; }
+.nav-links { display: flex; gap: 2.5rem; font-size: 0.85rem; color: #6B7C93; font-weight: 500; }
+.nav-right { display: flex; gap: 1rem; align-items: center; }
+.nav-login { color: #6B7C93; font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+.nav-cta { background: #2563EB; color: #fff; padding: 0.55rem 1.5rem; border-radius: 6px; font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+
+.hero { padding: 5rem 4rem 4rem; display: flex; align-items: center; gap: 4rem; max-width: 1100px; margin: 0 auto; }
+.hero-text { flex: 1; }
+.hero-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: #EFF6FF; color: #2563EB; padding: 0.35rem 0.8rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1.5rem; }
+.hero-badge-dot { width: 6px; height: 6px; background: #2563EB; border-radius: 50%; }
+.hero h1 { font-size: 2.6rem; font-weight: 700; line-height: 1.15; letter-spacing: -0.02em; margin-bottom: 1rem; }
+.hero h1 span { color: #2563EB; }
+.hero p { font-size: 1rem; color: #6B7C93; line-height: 1.7; margin-bottom: 2rem; max-width: 460px; }
+.hero-btns { display: flex; gap: 1rem; }
+.hero-btn { display: inline-block; background: #2563EB; color: #fff; padding: 0.85rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.hero-btn-outline { display: inline-block; border: 1px solid #D1D9E6; color: #1A2332; padding: 0.85rem 2rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+.hero-image { flex: 1; }
+.team-photo { width: 100%; height: 350px; background: url('https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=700&h=500&fit=crop') center/cover; border-radius: 12px; position: relative; }
+.team-stats { position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%); display: flex; gap: 1rem; }
+.stat-card { background: #fff; padding: 0.8rem 1.2rem; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); text-align: center; min-width: 100px; }
+.stat-card .num { font-size: 1.2rem; font-weight: 700; color: #2563EB; }
+.stat-card .label { font-size: 0.6rem; color: #999; text-transform: uppercase; letter-spacing: 0.05em; }
+
+.services { padding: 5rem 4rem 3rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+.service { background: #fff; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+.service-icon { width: 40px; height: 40px; background: #EFF6FF; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.1rem; }
+.service h3 { font-size: 1rem; font-weight: 600; margin-bottom: 0.4rem; }
+.service p { font-size: 0.85rem; color: #6B7C93; line-height: 1.6; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><div class="logo-icon">E</div> Elevate Advisory</div>
+  <div class="nav-links"><span>Services</span><span>Industries</span><span>Case Studies</span><span>About</span></div>
+  <div class="nav-right">
+    <a href="#" class="nav-login">Client Portal</a>
+    <a href="#" class="nav-cta">Get a Proposal</a>
+  </div>
+</nav>
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge"><div class="hero-badge-dot"></div> Trusted by 200+ businesses</div>
+    <h1>Grow your business with <span>strategic clarity</span></h1>
+    <p>We help small and mid-size businesses unlock growth through operational strategy, financial advisory, and hands-on consulting.</p>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn">Schedule Consultation</a>
+      <a href="#" class="hero-btn-outline">View Case Studies</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="team-photo">
+      <div class="team-stats">
+        <div class="stat-card"><div class="num">$50M+</div><div class="label">Revenue Grown</div></div>
+        <div class="stat-card"><div class="num">200+</div><div class="label">Clients Served</div></div>
+        <div class="stat-card"><div class="num">15yr</div><div class="label">Experience</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="services">
+  <div class="service">
+    <div class="service-icon">📊</div>
+    <h3>Growth Strategy</h3>
+    <p>Data-driven roadmaps to scale revenue, enter new markets, and optimize operations.</p>
+  </div>
+  <div class="service">
+    <div class="service-icon">💰</div>
+    <h3>Financial Advisory</h3>
+    <p>Cash flow management, fundraising support, and financial modeling for smart decisions.</p>
+  </div>
+  <div class="service">
+    <div class="service-icon">⚙️</div>
+    <h3>Operations Consulting</h3>
+    <p>Streamline processes, reduce costs, and build systems that scale with your team.</p>
+  </div>
+</section>
+</body>
+</html>

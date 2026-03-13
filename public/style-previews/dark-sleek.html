@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0A0A0A; color: #fff; }
+
+nav { padding: 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.logo { font-size: 1.2rem; font-weight: 700; letter-spacing: 0.03em; }
+.logo span { color: #C8A46E; }
+.nav-links { display: flex; gap: 2.5rem; font-size: 0.85rem; color: #555; font-weight: 400; }
+.nav-cta { background: linear-gradient(135deg, #C8A46E, #D4B57E); color: #0A0A0A; padding: 0.55rem 1.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; text-decoration: none; }
+
+.hero { padding: 5rem 4rem 4rem; display: flex; align-items: center; gap: 4rem; max-width: 1100px; margin: 0 auto; }
+.hero-text { flex: 1; }
+.hero-tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; color: #C8A46E; font-weight: 500; margin-bottom: 1.5rem; }
+.hero h1 { font-size: 3rem; font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
+.hero h1 span { background: linear-gradient(135deg, #C8A46E, #D4B57E); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 1rem; color: #666; line-height: 1.7; font-weight: 300; margin-bottom: 2rem; }
+.hero-btn { display: inline-block; background: linear-gradient(135deg, #C8A46E, #D4B57E); color: #0A0A0A; padding: 0.85rem 2.2rem; border-radius: 4px; text-decoration: none; font-weight: 600; font-size: 0.9rem; }
+.hero-btn-ghost { display: inline-block; border: 1px solid rgba(255,255,255,0.15); color: #fff; padding: 0.85rem 2rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; margin-left: 1rem; }
+.hero-image { flex: 1; }
+.shop-interior { width: 100%; height: 380px; background: url('https://images.unsplash.com/photo-1585747860019-8e8ef741fba2?w=600&h=600&fit=crop') center/cover; border-radius: 8px; position: relative; }
+.shop-badge { position: absolute; bottom: 1.2rem; left: 1.2rem; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); padding: 0.8rem 1rem; border-radius: 6px; border: 1px solid rgba(200,164,110,0.2); }
+.shop-badge-stars { color: #C8A46E; font-size: 0.8rem; margin-bottom: 0.2rem; }
+.shop-badge-text { font-size: 0.7rem; color: #999; }
+
+.services { padding: 3rem 4rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1100px; margin: 0 auto; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 3rem; }
+.service { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06); border-radius: 8px; padding: 1.5rem; text-align: center; }
+.service-icon { font-size: 1.5rem; margin-bottom: 0.8rem; }
+.service h3 { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.3rem; }
+.service p { font-size: 0.75rem; color: #666; line-height: 1.5; }
+.service .price { margin-top: 0.8rem; font-size: 0.85rem; color: #C8A46E; font-weight: 600; }
+
+.hours { padding: 2.5rem 4rem; text-align: center; }
+.hours p { font-size: 0.8rem; color: #555; }
+.hours span { color: #C8A46E; font-weight: 600; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">The <span>Craft</span> Barber</div>
+  <div class="nav-links"><span>Services</span><span>Gallery</span><span>About</span><span>Location</span></div>
+  <a href="#" class="nav-cta">Book Now</a>
+</nav>
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-tag">Premium Men's Grooming</div>
+    <h1>Where every cut is a <span>craft</span></h1>
+    <p>More than a haircut — it's an experience. Walk in feeling ordinary, walk out feeling like the best version of yourself.</p>
+    <a href="#" class="hero-btn">Book Appointment</a>
+    <a href="#" class="hero-btn-ghost">View Services</a>
+  </div>
+  <div class="hero-image">
+    <div class="shop-interior">
+      <div class="shop-badge">
+        <div class="shop-badge-stars">★★★★★</div>
+        <div class="shop-badge-text">4.9 rating • 800+ reviews</div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="services">
+  <div class="service">
+    <div class="service-icon">✂️</div>
+    <h3>Classic Cut</h3>
+    <p>Precision cut with hot towel and styling</p>
+    <div class="price">$45</div>
+  </div>
+  <div class="service">
+    <div class="service-icon">🪒</div>
+    <h3>Hot Shave</h3>
+    <p>Straight razor with premium lather</p>
+    <div class="price">$35</div>
+  </div>
+  <div class="service">
+    <div class="service-icon">👑</div>
+    <h3>The Works</h3>
+    <p>Cut, shave, facial, and scalp massage</p>
+    <div class="price">$85</div>
+  </div>
+  <div class="service">
+    <div class="service-icon">🧔</div>
+    <h3>Beard Sculpt</h3>
+    <p>Shape, trim, and condition</p>
+    <div class="price">$30</div>
+  </div>
+</section>
+<section class="hours">
+  <p>Walk-ins welcome • <span>Mon–Sat 9am–7pm</span> • 1234 Main Street, Downtown</p>
+</section>
+</body>
+</html>

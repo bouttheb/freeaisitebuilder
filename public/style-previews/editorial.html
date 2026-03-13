@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'DM Sans', sans-serif; background: #FFFFFF; color: #111; }
+
+nav { padding: 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #111; }
+.logo { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+.logo span { font-family: 'DM Sans', sans-serif; font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; display: block; color: #888; font-weight: 500; }
+.nav-links { display: flex; gap: 2rem; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: #555; font-weight: 500; }
+.nav-cta { border: 2px solid #111; color: #111; padding: 0.5rem 1.5rem; font-size: 0.8rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.08em; }
+
+.hero { padding: 4rem; display: grid; grid-template-columns: 1.2fr 1fr; gap: 3rem; max-width: 1200px; margin: 0 auto; }
+.hero-main { }
+.hero-category { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; font-weight: 500; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem; }
+.hero-category::after { content: ''; flex: 1; height: 1px; background: #ddd; }
+.hero h1 { font-family: 'DM Serif Display', serif; font-size: 3rem; line-height: 1.1; margin-bottom: 1.2rem; }
+.hero-excerpt { font-size: 1.05rem; color: #666; line-height: 1.8; margin-bottom: 1.5rem; max-width: 500px; }
+.hero-btns { display: flex; gap: 1rem; align-items: center; }
+.hero-btn { display: inline-block; background: #111; color: #fff; padding: 0.8rem 2rem; text-decoration: none; font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; }
+.hero-btn-text { font-size: 0.85rem; color: #111; font-weight: 700; text-decoration: none; }
+.hero-image { background: url('https://images.unsplash.com/photo-1438232992991-995b7058bbb3?w=600&h=700&fit=crop') center/cover; min-height: 400px; position: relative; }
+.hero-overlay { position: absolute; bottom: 1.5rem; left: 1.5rem; right: 1.5rem; }
+.hero-time { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: rgba(255,255,255,0.7); }
+
+.ministries { padding: 3rem 4rem; border-top: 2px solid #111; max-width: 1200px; margin: 0 auto; }
+.ministries-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem; }
+.ministries-header h2 { font-family: 'DM Serif Display', serif; font-size: 1.4rem; }
+.ministries-header a { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; color: #999; text-decoration: none; font-weight: 500; }
+.ministries-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; }
+.ministry { }
+.ministry-img { height: 180px; margin-bottom: 1rem; }
+.ministry:nth-child(1) .ministry-img { background: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=500&h=350&fit=crop') center/cover; }
+.ministry:nth-child(2) .ministry-img { background: url('https://images.unsplash.com/photo-1593113630400-ea4288922497?w=500&h=350&fit=crop') center/cover; }
+.ministry:nth-child(3) .ministry-img { background: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=350&fit=crop') center/cover; }
+.ministry-cat { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: #999; margin-bottom: 0.5rem; font-weight: 500; }
+.ministry h3 { font-family: 'DM Serif Display', serif; font-size: 1.2rem; line-height: 1.3; margin-bottom: 0.5rem; }
+.ministry p { font-size: 0.85rem; color: #888; line-height: 1.6; }
+
+.info-bar { padding: 2.5rem 4rem; border-top: 2px solid #111; display: flex; justify-content: center; gap: 4rem; text-align: center; max-width: 1200px; margin: 0 auto; }
+.info-item { }
+.info-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; margin-bottom: 0.3rem; }
+.info-value { font-family: 'DM Serif Display', serif; font-size: 1.1rem; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Grace Community<span>Church · Est. 1987</span></div>
+  <div class="nav-links"><span>About</span><span>Ministries</span><span>Sermons</span><span>Events</span><span>Give</span></div>
+  <a href="#" class="nav-cta">Plan Your Visit</a>
+</nav>
+<section class="hero">
+  <div class="hero-main">
+    <div class="hero-category">This Sunday</div>
+    <h1>A place to belong, believe, and become</h1>
+    <p class="hero-excerpt">We're a multigenerational church rooted in faith, committed to community, and passionate about serving our neighbors. Everyone has a seat at our table.</p>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn">Visit This Sunday</a>
+      <a href="#" class="hero-btn-text">Watch Online →</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-overlay">
+      <div class="hero-time">Sundays at 9am & 11am</div>
+    </div>
+  </div>
+</section>
+<section class="ministries">
+  <div class="ministries-header">
+    <h2>Get Involved</h2>
+    <a href="#">All Ministries →</a>
+  </div>
+  <div class="ministries-grid">
+    <div class="ministry">
+      <div class="ministry-img"></div>
+      <div class="ministry-cat">Community</div>
+      <h3>Small Groups & Bible Studies</h3>
+      <p>Connect with others in weekly small groups — share life, study scripture, and grow together in faith.</p>
+    </div>
+    <div class="ministry">
+      <div class="ministry-img"></div>
+      <div class="ministry-cat">Outreach</div>
+      <h3>Local Missions & Food Pantry</h3>
+      <p>We serve 400+ families each month through our food pantry, tutoring center, and neighborhood partnerships.</p>
+    </div>
+    <div class="ministry">
+      <div class="ministry-img"></div>
+      <div class="ministry-cat">Next Generation</div>
+      <h3>Kids & Youth Ministry</h3>
+      <p>Age-specific programs for nursery through high school — where kids learn faith in a fun, safe environment.</p>
+    </div>
+  </div>
+</section>
+<section class="info-bar">
+  <div class="info-item">
+    <div class="info-label">Location</div>
+    <div class="info-value">4521 Oak Street</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Sundays</div>
+    <div class="info-value">9am & 11am</div>
+  </div>
+  <div class="info-item">
+    <div class="info-label">Community</div>
+    <div class="info-value">1,200+ Members</div>
+  </div>
+</section>
+</body>
+</html>

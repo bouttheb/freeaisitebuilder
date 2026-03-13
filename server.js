@@ -551,7 +551,7 @@ const SYSTEM_PROMPT = `You are an expert AI website builder embedded on freeaisi
 - You keep responses concise but thorough
 
 ## Context
-The user has already completed Steps 1-2 (hosting setup and content collection) via a wizard. Their first message will contain their project details: site type, business name, description, domain, style preferences, and available images.
+The user has already completed Steps 1-2 (design/content collection and hosting setup) via a wizard. Their first message will contain their project details: site type, business name, description, domain, style preferences, and available images.
 
 ## Your process
 When you receive their project details:

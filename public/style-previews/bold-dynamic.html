@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: #0A0A0A; color: #fff; }
+
+nav { padding: 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.05em; }
+.logo span { color: #E85D3A; }
+.nav-links { display: flex; gap: 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: #666; font-weight: 600; }
+.nav-cta { background: #E85D3A; color: #fff; padding: 0.6rem 1.8rem; font-size: 0.75rem; font-weight: 700; text-decoration: none; text-transform: uppercase; letter-spacing: 0.1em; }
+
+.hero { padding: 4rem 4rem 3rem; display: flex; align-items: center; gap: 3rem; }
+.hero-text { flex: 1.2; }
+.hero-tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.25em; color: #E85D3A; font-weight: 700; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.8rem; }
+.hero-tag::after { content: ''; height: 1px; width: 40px; background: #E85D3A; }
+.hero h1 { font-size: 4rem; font-weight: 900; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
+.hero h1 span { color: #E85D3A; }
+.hero p { font-size: 0.95rem; color: #666; line-height: 1.7; font-weight: 300; margin-bottom: 2rem; max-width: 400px; }
+.hero-btns { display: flex; gap: 1rem; align-items: center; }
+.hero-btn { display: inline-block; background: #E85D3A; color: #fff; padding: 0.9rem 2.5rem; text-decoration: none; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.1em; }
+.hero-btn-play { display: inline-flex; align-items: center; gap: 0.5rem; color: #999; font-size: 0.8rem; text-decoration: none; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+.play-icon { width: 36px; height: 36px; border: 2px solid #555; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; }
+.hero-image { flex: 1; position: relative; }
+.artist-photo { width: 100%; height: 420px; background: url('https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=800&fit=crop') center/cover; border-radius: 0; position: relative; }
+.artist-overlay { position: absolute; bottom: 0; left: 0; right: 0; padding: 1.5rem; background: linear-gradient(transparent, rgba(0,0,0,0.8)); }
+.artist-overlay .new-badge { display: inline-block; background: #E85D3A; font-size: 0.55rem; padding: 0.2rem 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.4rem; }
+.artist-overlay h3 { font-size: 1rem; font-weight: 700; }
+.artist-overlay p { font-size: 0.75rem; color: #aaa; }
+
+.music { padding: 2.5rem 4rem; border-top: 1px solid #1A1A1A; }
+.music-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.15em; color: #555; margin-bottom: 1.5rem; font-weight: 600; }
+.tracks { display: flex; gap: 1.5rem; }
+.track { flex: 1; background: #111; padding: 1.2rem; border-radius: 0; display: flex; align-items: center; gap: 1rem; }
+.track-art { width: 50px; height: 50px; border-radius: 0; flex-shrink: 0; }
+.track:nth-child(1) .track-art { background: url('https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=100&h=100&fit=crop') center/cover; }
+.track:nth-child(2) .track-art { background: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=100&h=100&fit=crop') center/cover; }
+.track:nth-child(3) .track-art { background: url('https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=100&h=100&fit=crop') center/cover; }
+.track-info h4 { font-size: 0.85rem; font-weight: 700; }
+.track-info p { font-size: 0.7rem; color: #666; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">K<span>.</span>NOVA</div>
+  <div class="nav-links"><span>Music</span><span>Tour</span><span>Videos</span><span>Merch</span></div>
+  <a href="#" class="nav-cta">Listen Now</a>
+</nav>
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-tag">New Album Out Now</div>
+    <h1>The Sound of <span>Tomorrow</span></h1>
+    <p>Genre-bending artist K.Nova drops the highly anticipated album "VOLTAGE" — 14 tracks of raw energy and soul.</p>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn">Stream Album</a>
+      <a href="#" class="hero-btn-play"><span class="play-icon">▶</span> Watch Video</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="artist-photo">
+      <div class="artist-overlay">
+        <div class="new-badge">New Release</div>
+        <h3>VOLTAGE — The Album</h3>
+        <p>14 Tracks • 48 Minutes</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="music">
+  <div class="music-label">Featured Tracks</div>
+  <div class="tracks">
+    <div class="track">
+      <div class="track-art"></div>
+      <div class="track-info"><h4>Electric Soul</h4><p>3:42 • feat. Lena Rose</p></div>
+    </div>
+    <div class="track">
+      <div class="track-art"></div>
+      <div class="track-info"><h4>Midnight Run</h4><p>4:15 • Single</p></div>
+    </div>
+    <div class="track">
+      <div class="track-art"></div>
+      <div class="track-info"><h4>No Looking Back</h4><p>3:58 • feat. DJX</p></div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

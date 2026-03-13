@@ -3,466 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Step 1: Set Up Your Hosting — Free AI Site Builder</title>
+<title>Step 1: Design & Content — Free AI Site Builder</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;600;700;800&family=Nunito:wght@400;600;700&family=DM+Serif+Display&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
 :root {
-  --black: #0A0A0A;
-  --dark: #111111;
-  --card-bg: #1A1A1A;
-  --white: #FFFFFF;
-  --off-white: #F5F5F5;
-  --gray-light: #E0E0E0;
-  --gray-mid: #999999;
-  --gray-dark: #666666;
-  --accent: #C8A46E;
-  --accent-hover: #D4B57E;
-  --green: #4CAF50;
-  --red-soft: #E57373;
+  --black: #0A0A0A; --dark: #111111; --card-bg: #1A1A1A;
+  --white: #FFFFFF; --off-white: #F5F5F5; --gray-light: #E0E0E0;
+  --gray-mid: #999999; --gray-dark: #666666;
+  --accent: #C8A46E; --accent-hover: #D4B57E; --green: #4CAF50;
 }
-
 html { scroll-behavior: smooth; }
+body { font-family: 'Source Sans 3', sans-serif; background: var(--black); color: var(--off-white); overflow-x: hidden; line-height: 1.6; }
 
-body {
-  font-family: 'Source Sans 3', sans-serif;
-  background: var(--black);
-  color: var(--off-white);
-  overflow-x: hidden;
-  line-height: 1.6;
-}
-
-/* NAV */
-nav {
-  position: fixed; top: 0; width: 100%; z-index: 1000;
-  padding: 1rem 2rem;
-  display: flex; justify-content: space-between; align-items: center;
-  background: rgba(10,10,10,0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(200,164,110,0.1);
-}
-.nav-logo {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.05rem; font-weight: 600; color: #fff;
-  text-decoration: none;
-}
-.nav-steps {
-  display: flex; gap: 0.5rem; align-items: center;
-}
-.nav-step {
-  display: flex; align-items: center; gap: 0.4rem;
-  font-size: 0.8rem; color: var(--gray-dark);
-}
+nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(200,164,110,0.1); }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 600; color: #fff; text-decoration: none; }
+.nav-steps { display: flex; gap: 0.5rem; align-items: center; }
+.nav-step { display: flex; align-items: center; gap: 0.4rem; font-size: 0.8rem; color: var(--gray-dark); }
+.nav-step.completed { color: var(--green); }
 .nav-step.active { color: var(--accent); }
-.nav-step-dot {
-  width: 8px; height: 8px; border-radius: 50%;
-  background: var(--gray-dark);
-}
+.nav-step-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gray-dark); }
+.nav-step.completed .nav-step-dot { background: var(--green); }
 .nav-step.active .nav-step-dot { background: var(--accent); box-shadow: 0 0 8px rgba(200,164,110,0.4); }
-.nav-step-line {
-  width: 24px; height: 1px; background: rgba(255,255,255,0.1);
-}
+.nav-step-line { width: 24px; height: 1px; background: rgba(255,255,255,0.1); }
 
-/* HERO */
-.hero {
-  min-height: 100vh;
-  display: flex; flex-direction: column;
-  justify-content: center; align-items: center;
-  text-align: center;
-  padding: 7rem 2rem 4rem;
-  background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%);
-}
-.step-badge {
-  display: inline-block;
-  font-size: 0.75rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid rgba(200,164,110,0.3);
-  padding: 0.4rem 1.2rem;
-  border-radius: 30px;
-  margin-bottom: 2rem;
-}
-.hero h1 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  font-weight: 700;
-  line-height: 1.15;
-  margin-bottom: 1.5rem;
-  max-width: 800px;
-}
-.hero h1 span { color: var(--accent); }
-.hero-lead {
-  font-size: 1.15rem;
-  color: var(--gray-light);
-  max-width: 650px;
-  margin-bottom: 1rem;
-  font-weight: 300;
-  line-height: 1.8;
-}
+.wizard-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
+.step-badge { display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,164,110,0.3); padding: 0.4rem 1.2rem; border-radius: 30px; margin-bottom: 2rem; }
+.wizard-card { background: var(--dark); border: 1px solid rgba(200,164,110,0.15); border-radius: 16px; padding: 3rem; max-width: 680px; width: 100%; }
+.wizard-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+.wizard-title span { color: var(--accent); }
+.wizard-subtitle { color: var(--gray-mid); font-size: 1rem; margin-bottom: 2.5rem; line-height: 1.6; }
 
-/* CROSSED OUT LOGOS */
-.old-way {
-  margin: 3rem 0 1rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-.old-way-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
-  color: var(--gray-dark);
-}
-.old-brands {
-  display: flex;
-  gap: 2.5rem;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: center;
-}
-.old-brand {
-  position: relative;
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--gray-dark);
-  opacity: 0.5;
-}
-.old-brand::after {
-  content: '';
-  position: absolute;
-  left: -4px; right: -4px;
-  top: 50%;
-  height: 2px;
-  background: var(--red-soft);
-  transform: rotate(-5deg);
-}
-.new-way-label {
-  font-size: 1rem;
-  color: var(--accent);
-  font-weight: 600;
-  margin-top: 0.5rem;
-}
+.wizard-progress { display: flex; gap: 0.35rem; margin-bottom: 2.5rem; }
+.progress-bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.08); transition: all 0.4s ease; }
+.progress-bar.active { background: var(--accent); }
+.progress-bar.done { background: var(--green); }
 
-/* SCROLL CTA */
-.scroll-hint {
-  margin-top: 3rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.8rem;
-  color: var(--off-white);
-  animation: float 3s ease-in-out infinite;
-}
-.scroll-hint span {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 600;
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(8px); }
-}
-.scroll-hint svg { opacity: 0.5; }
+.wizard-step { display: none; animation: fadeIn 0.4s ease; }
+.wizard-step.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-/* SECTIONS */
-section { padding: 6rem 2rem; }
-.section-inner { max-width: 900px; margin: 0 auto; }
+label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-light); margin-bottom: 0.5rem; }
+.helper-text { font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 0.8rem; line-height: 1.5; font-style: italic; }
+input[type="text"], textarea { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.9rem 1.2rem; color: var(--off-white); font-family: 'Source Sans 3', sans-serif; font-size: 1rem; transition: border-color 0.3s ease; }
+input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
+textarea { resize: vertical; min-height: 120px; }
+.form-group { margin-bottom: 1.8rem; }
 
-/* THE SHIFT */
-.the-shift { background: var(--dark); }
-.shift-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  margin-top: 2rem;
-}
-.shift-card {
-  padding: 2rem;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.05);
-}
-.shift-card.old {
-  background: rgba(229,115,115,0.05);
-  border-color: rgba(229,115,115,0.15);
-}
-.shift-card.new {
-  background: rgba(200,164,110,0.05);
-  border-color: rgba(200,164,110,0.2);
-}
-.shift-card-label {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-.shift-card.old .shift-card-label { color: var(--red-soft); }
-.shift-card.new .shift-card-label { color: var(--accent); }
-.shift-card h3 {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.3rem;
-  margin-bottom: 1rem;
-}
-.shift-card ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.7rem;
-}
-.shift-card li {
-  font-size: 0.95rem;
-  color: var(--gray-mid);
-  padding-left: 1.5rem;
-  position: relative;
-  font-weight: 300;
-}
-.shift-card.old li::before {
-  content: '✕';
-  position: absolute;
-  left: 0;
-  color: var(--red-soft);
-  font-size: 0.8rem;
-}
-.shift-card.new li::before {
-  content: '✓';
-  position: absolute;
-  left: 0;
-  color: var(--accent);
-  font-weight: 700;
-}
+.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
+.type-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.type-card:hover { border-color: rgba(200,164,110,0.3); background: rgba(200,164,110,0.05); }
+.type-card.selected { border-color: var(--accent); background: rgba(200,164,110,0.1); }
+.type-card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.type-card-label { font-size: 0.85rem; font-weight: 500; }
 
-/* WHY HOSTING */
-.why-hosting {
-  background: var(--black);
-}
-.why-hosting-text {
-  font-size: 1.1rem;
-  color: var(--gray-light);
-  line-height: 1.9;
-  font-weight: 300;
-  max-width: 750px;
-}
-.why-hosting-text strong {
-  color: var(--off-white);
-  font-weight: 600;
-}
-.callout {
-  margin-top: 2rem;
-  padding: 1.5rem 2rem;
-  background: rgba(200,164,110,0.06);
-  border-left: 3px solid var(--accent);
-  border-radius: 0 8px 8px 0;
-  font-size: 1rem;
-  color: var(--gray-light);
-  font-weight: 300;
-  line-height: 1.8;
-}
-.callout strong {
-  color: var(--accent);
-  font-weight: 600;
-}
+.section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
+.section-option { display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 1rem; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
+.section-option:hover { border-color: rgba(200,164,110,0.3); }
+.section-option.selected { border-color: var(--accent); background: rgba(200,164,110,0.1); }
+.section-check { width: 18px; height: 18px; border: 2px solid var(--gray-dark); border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; }
+.section-option.selected .section-check { background: var(--accent); border-color: var(--accent); }
+.section-check svg { display: none; }
+.section-option.selected .section-check svg { display: block; }
 
-/* BLUEHOST CTA SECTION */
-.bluehost-cta {
-  background: var(--dark);
-  text-align: center;
-}
-.discount-badge {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--accent), #D4B57E);
-  color: var(--black);
-  font-size: 1.8rem;
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  padding: 1rem 2.5rem;
-  border-radius: 12px;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 30px rgba(200,164,110,0.25);
-}
-.bluehost-cta h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
-  font-weight: 600;
-  margin-bottom: 1rem;
-}
-.bluehost-cta .subtitle {
-  color: var(--gray-mid);
-  font-size: 1.05rem;
-  font-weight: 300;
-  max-width: 600px;
-  margin: 0 auto 2.5rem;
-  line-height: 1.7;
-}
-.bluehost-btn {
-  display: inline-block;
-  background: linear-gradient(135deg, var(--accent), #D4B57E);
-  color: var(--black);
-  padding: 1.1rem 3.5rem;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 700;
-  font-size: 1.15rem;
-  transition: transform 0.2s, box-shadow 0.3s;
-  box-shadow: 0 4px 20px rgba(200,164,110,0.2);
-}
-.bluehost-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 8px 30px rgba(200,164,110,0.35);
-}
-.bluehost-sub {
-  margin-top: 1rem;
-  font-size: 0.85rem;
-  color: var(--gray-dark);
-}
-.trust-points {
-  display: flex;
-  gap: 2rem;
-  justify-content: center;
-  margin-top: 2.5rem;
-  flex-wrap: wrap;
-}
-.trust-point {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.85rem;
-  color: var(--gray-mid);
-}
-.trust-point svg { flex-shrink: 0; }
+.wizard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
+.btn-back { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--gray-mid); padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.btn-back:hover { border-color: var(--gray-mid); color: var(--off-white); }
+.btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.btn-next:hover { background: var(--accent-hover); }
+.btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* CONFIRMATION SECTION */
-.confirmation {
-  background: var(--black);
-  text-align: center;
-}
-.confirmation h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 600;
-  margin-bottom: 0.8rem;
-}
-.confirmation .subtitle {
-  color: var(--gray-mid);
-  font-size: 1rem;
-  font-weight: 300;
-  margin-bottom: 2.5rem;
-}
-.confirm-form {
-  max-width: 500px;
-  margin: 0 auto;
-}
-.form-group {
-  margin-bottom: 1.2rem;
-  text-align: left;
-}
-.form-group label {
-  display: block;
-  font-size: 0.85rem;
-  color: var(--gray-mid);
-  margin-bottom: 0.4rem;
-  font-weight: 500;
-}
-.form-group input {
-  width: 100%;
-  background: var(--card-bg);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px;
-  padding: 0.9rem 1.2rem;
-  color: var(--off-white);
-  font-family: 'Source Sans 3', sans-serif;
-  font-size: 1rem;
-  outline: none;
-  transition: border-color 0.3s;
-}
-.form-group input:focus {
-  border-color: rgba(200,164,110,0.5);
-}
-.form-group input::placeholder { color: var(--gray-dark); }
-.confirm-btn {
-  width: 100%;
-  background: var(--accent);
-  color: var(--black);
-  border: none;
-  border-radius: 8px;
-  padding: 1rem;
-  font-weight: 700;
-  font-size: 1.05rem;
-  cursor: pointer;
-  transition: background 0.3s, transform 0.2s;
-  font-family: 'Source Sans 3', sans-serif;
-}
-.confirm-btn:hover {
-  background: var(--accent-hover);
-  transform: translateY(-2px);
-}
-.confirm-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-.confirm-note {
-  margin-top: 1rem;
-  font-size: 0.8rem;
-  color: var(--gray-dark);
-  line-height: 1.6;
-}
+.doc-upload-area { margin-bottom: 1.2rem; padding: 1.5rem; border: 2px dashed rgba(200,164,110,0.25); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.doc-upload-area:hover { border-color: var(--accent); background: rgba(200,164,110,0.03); }
+.doc-upload-area p { color: var(--gray-mid); font-size: 0.9rem; }
+.doc-upload-area .uploaded-name { color: var(--accent); font-weight: 600; margin-top: 0.5rem; font-size: 0.95rem; }
+.or-divider { text-align: center; color: var(--gray-dark); font-size: 0.85rem; margin: 1.2rem 0; position: relative; }
+.or-divider::before, .or-divider::after { content: ''; position: absolute; top: 50%; width: 40%; height: 1px; background: rgba(255,255,255,0.08); }
+.or-divider::before { left: 0; }
+.or-divider::after { right: 0; }
 
-/* FOOTER */
-footer {
-  padding: 2rem;
-  text-align: center;
-  font-size: 0.8rem;
-  color: var(--gray-dark);
-  border-top: 1px solid rgba(255,255,255,0.05);
-}
+.collapsible-header { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; padding: 0.8rem 0; color: var(--gray-mid); font-size: 0.9rem; transition: color 0.3s; }
+.collapsible-header:hover { color: var(--accent); }
+.collapsible-header svg { transition: transform 0.3s; }
+.collapsible-header.open svg { transform: rotate(90deg); }
+.collapsible-body { display: none; padding-bottom: 1rem; }
+.collapsible-body.open { display: block; animation: fadeIn 0.3s ease; }
 
-/* RESPONSIVE */
-@media (max-width: 700px) {
-  .shift-grid { grid-template-columns: 1fr; }
-  .old-brands { gap: 1.5rem; }
-  .old-brand { font-size: 1.1rem; }
-  nav { padding: 0.8rem 1rem; }
-  .nav-steps { display: none; }
-  section { padding: 4rem 1.2rem; }
-  .trust-points { flex-direction: column; align-items: center; }
-}
+.photo-option { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.3s ease; }
+.photo-option.selected { border-color: rgba(200,164,110,0.4); }
+.photo-option-header { display: flex; align-items: flex-start; gap: 1rem; padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; }
+.photo-option-header:hover { background: rgba(255,255,255,0.02); }
+.photo-option-radio { width: 20px; height: 20px; border: 2px solid var(--gray-dark); border-radius: 50%; flex-shrink: 0; margin-top: 2px; transition: all 0.3s ease; position: relative; }
+.photo-option.selected .photo-option-radio { border-color: var(--accent); }
+.photo-option.selected .photo-option-radio::after { content: ''; position: absolute; top: 3px; left: 3px; width: 10px; height: 10px; background: var(--accent); border-radius: 50%; }
+.photo-option-body { padding: 0 1.5rem 1.5rem; }
 
-/* BOTTOM NAV */
-.bottom-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 2rem 2rem 3rem;
-}
-.bottom-nav-back, .bottom-nav-forward {
-  font-family: 'Source Sans 3', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--gray-mid);
-  text-decoration: none;
-  transition: color 0.3s;
-}
-.bottom-nav-back:hover, .bottom-nav-forward:hover {
-  color: var(--accent);
-}
+.image-drop-zone { border: 2px dashed rgba(255,255,255,0.15); border-radius: 10px; padding: 2rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+.image-drop-zone:hover, .image-drop-zone.dragover { border-color: var(--accent); background: rgba(200,164,110,0.05); }
+.uploaded-images { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+.uploaded-image-card { position: relative; width: 100px; height: 100px; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.uploaded-image-card img { width: 100%; height: 100%; object-fit: cover; }
+.uploaded-image-card .remove-btn { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; background: rgba(0,0,0,0.7); border: none; border-radius: 50%; color: #fff; font-size: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.uploaded-image-card .remove-btn:hover { background: rgba(229,115,115,0.8); }
+.upload-limit-msg { font-size: 0.85rem; color: var(--gray-mid); margin-top: 0.5rem; }
+
+.photo-instructions { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; }
+.photo-instructions h4 { font-family: 'Playfair Display', serif; font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--off-white); }
+.photo-instructions ol { padding-left: 1.2rem; color: var(--gray-light); font-size: 0.95rem; }
+.photo-instructions ol li { margin-bottom: 0.6rem; line-height: 1.5; }
+.photo-instructions code { background: rgba(200,164,110,0.1); color: var(--accent); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.9rem; }
+.download-btn { display: inline-block; background: rgba(200,164,110,0.15); border: 1px solid rgba(200,164,110,0.3); color: var(--accent); padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; margin-top: 0.5rem; font-family: 'Source Sans 3', sans-serif; }
+.download-btn:hover { background: rgba(200,164,110,0.25); }
+.photo-check { display: flex; align-items: center; gap: 0.8rem; margin-top: 1rem; padding: 1rem 1.2rem; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; cursor: pointer; transition: all 0.3s ease; }
+.photo-check:hover { border-color: rgba(200,164,110,0.3); }
+.photo-check.checked { border-color: var(--green); background: rgba(76,175,80,0.05); }
+.photo-check-box { width: 22px; height: 22px; border: 2px solid var(--gray-dark); border-radius: 5px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s ease; }
+.photo-check.checked .photo-check-box { background: var(--green); border-color: var(--green); }
+.skip-link { display: block; margin-top: 1rem; font-size: 0.85rem; color: var(--gray-dark); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; background: none; border: none; font-family: 'Source Sans 3', sans-serif; }
+.skip-link:hover { color: var(--gray-mid); }
+.image-results { margin-top: 1rem; padding: 1rem; background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); border-radius: 8px; display: none; }
+.image-results.error { background: rgba(229,115,115,0.05); border-color: rgba(229,115,115,0.2); }
+.image-results p { font-size: 0.9rem; color: var(--gray-light); margin-bottom: 0.5rem; }
+.image-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
+.image-tag { background: rgba(200,164,110,0.1); border: 1px solid rgba(200,164,110,0.2); color: var(--accent); padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem; }
+
+.bottom-nav { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
+.bottom-nav a { font-size: 0.9rem; color: var(--gray-dark); text-decoration: none; transition: color 0.3s ease; }
+.bottom-nav a:hover { color: var(--accent); }
+footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray-dark); border-top: 1px solid rgba(255,255,255,0.05); }
+
+/* DESIGN PICKER */
+.dp-section { margin-bottom: 2rem; }
+.dp-section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.3rem; }
+.dp-section h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; }
+.dp-section .dp-sub { color: var(--gray-mid); font-size: 0.85rem; margin-bottom: 1rem; }
+
+.palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+.palette-card { background: var(--card-bg); border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.8rem; cursor: pointer; transition: border-color 0.3s, transform 0.2s; position: relative; }
+.palette-card:hover { border-color: rgba(200,164,110,0.3); }
+.palette-card.selected { border-color: var(--accent); }
+.palette-colors { display: flex; gap: 0; border-radius: 6px; overflow: hidden; height: 36px; margin-bottom: 0.5rem; }
+.palette-colors div { flex: 1; }
+.palette-name { font-weight: 600; font-size: 0.8rem; }
+.palette-desc { font-size: 0.65rem; color: var(--gray-dark); }
+
+.font-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
+.font-card { background: var(--card-bg); border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color 0.3s, transform 0.2s; text-align: center; position: relative; }
+.font-card:hover { border-color: rgba(200,164,110,0.3); }
+.font-card.selected { border-color: var(--accent); }
+.font-preview-heading { font-size: 1.1rem; margin-bottom: 0.2rem; line-height: 1.2; }
+.font-preview-body { font-size: 0.75rem; color: var(--gray-mid); margin-bottom: 0.5rem; line-height: 1.4; }
+.font-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
+
+.style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
+.style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.3s, transform 0.2s; }
+.style-card:hover { border-color: rgba(200,164,110,0.3); }
+.style-card.selected { border-color: var(--accent); }
+.style-preview { height: 130px; position: relative; overflow: hidden; background: #111; }
+.style-preview iframe { width: 1200px; height: 900px; border: none; transform: scale(0.14); transform-origin: top left; pointer-events: none; }
+.style-info { background: var(--card-bg); padding: 0.5rem 0.7rem; }
+.style-name { font-weight: 600; font-size: 0.75rem; }
+.style-desc { font-size: 0.6rem; color: var(--gray-dark); }
+
+.dp-check { display: none; position: absolute; top: 0.4rem; right: 0.4rem; width: 20px; height: 20px; background: var(--accent); border-radius: 50%; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--black); font-weight: 700; }
+.selected .dp-check { display: flex; }
+
+@media (max-width: 600px) { .wizard-card { padding: 2rem 1.5rem; } .type-grid { grid-template-columns: repeat(2, 1fr); } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .palette-grid { grid-template-columns: repeat(2, 1fr); } .font-grid { grid-template-columns: repeat(2, 1fr); } .style-grid { grid-template-columns: repeat(2, 1fr); } }
 </style>
 </head>
 <body>
 
 <nav>
-  <a href="/index.html" class="nav-logo">freeaisitebuilder.com</a>
+  <a href="/" class="nav-logo">freeaisitebuilder.com</a>
   <div class="nav-steps">
-    <div class="nav-step active"><div class="nav-step-dot"></div> Hosting</div>
+    <div class="nav-step active"><div class="nav-step-dot"></div> Design</div>
     <div class="nav-step-line"></div>
-    <div class="nav-step"><div class="nav-step-dot"></div> Content</div>
+    <div class="nav-step"><div class="nav-step-dot"></div> Hosting</div>
     <div class="nav-step-line"></div>
     <div class="nav-step"><div class="nav-step-dot"></div> Build</div>
     <div class="nav-step-line"></div>
@@ -470,338 +188,542 @@ footer {
   </div>
 </nav>
 
-<!-- HERO -->
-<section class="hero">
+<div class="wizard-container">
   <div class="step-badge">Step 1 of 4</div>
-  <h1>Set Up <span>Hosting</span></h1>
-  <p class="hero-lead">
-    AI has done away with the need for template builders like Squarespace and WordPress, but your website still needs a place to live. The good news? Self-hosting can be had for less than $4/month.
-  </p>
-  <a href="#" onclick="event.preventDefault(); openModal();" style="display: inline-block; background: var(--accent); color: var(--black); padding: 1rem 3rem; border-radius: 4px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background 0.3s, transform 0.2s; margin-top: 0.5rem;">Set Up Hosting Now</a>
+  <div class="wizard-card">
+    <div class="wizard-progress" id="progressBars"></div>
 
-  <div class="scroll-hint">
-    <span>Learn More</span>
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-  </div>
-</section>
-
-<!-- THE SHIFT -->
-<section class="the-shift">
-  <div class="section-inner">
-    <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.8rem; text-align: center;">The old way vs. the new way</p>
-    <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 600; text-align: center; margin-bottom: 1rem;">
-      You no longer need to pay for a platform.
-    </h2>
-    <p style="color: var(--gray-mid); font-size: 1.05rem; font-weight: 300; text-align: center; max-width: 600px; margin: 0 auto 3rem;">
-      Template builders charge $16–$99/month just for the privilege of using their tools. With AI, all you need is basic hosting — and it costs a fraction of the price.
-    </p>
-    <div class="shift-grid">
-      <div class="shift-card old">
-        <div class="shift-card-label">The old way</div>
-        <h3>Template Builders</h3>
-        <ul>
-          <li>$16–$99/month just for the platform</li>
-          <li>$192–$1,188/year before you even add content</li>
-          <li>Locked into their ecosystem — can't leave</li>
-          <li>Same templates everyone else uses</li>
-          <li>Hours learning their drag-and-drop tools</li>
-          <li>Extra fees for every add-on and feature</li>
-        </ul>
+    <!-- WS0: Site Type -->
+    <div class="wizard-step active" id="ws0">
+      <h2 class="wizard-title">What kind of <span>site</span> are you building?</h2>
+      <p class="wizard-subtitle">This helps the AI understand your needs and suggest the right layout.</p>
+      <div class="type-grid">
+        <div class="type-card" data-type="business" onclick="selectType(this)"><div class="type-card-icon">🏢</div><div class="type-card-label">Business</div></div>
+        <div class="type-card" data-type="portfolio" onclick="selectType(this)"><div class="type-card-icon">🎨</div><div class="type-card-label">Portfolio</div></div>
+        <div class="type-card" data-type="restaurant" onclick="selectType(this)"><div class="type-card-icon">🍽️</div><div class="type-card-label">Restaurant</div></div>
+        <div class="type-card" data-type="church" onclick="selectType(this)"><div class="type-card-icon">⛪</div><div class="type-card-label">Church</div></div>
+        <div class="type-card" data-type="blog" onclick="selectType(this)"><div class="type-card-icon">✍️</div><div class="type-card-label">Blog</div></div>
+        <div class="type-card" data-type="nonprofit" onclick="selectType(this)"><div class="type-card-icon">💛</div><div class="type-card-label">Nonprofit</div></div>
+        <div class="type-card" data-type="personal" onclick="selectType(this)"><div class="type-card-icon">👤</div><div class="type-card-label">Personal</div></div>
+        <div class="type-card" data-type="event" onclick="selectType(this)"><div class="type-card-icon">🎉</div><div class="type-card-label">Event</div></div>
+        <div class="type-card" data-type="other" onclick="selectType(this)"><div class="type-card-icon">✨</div><div class="type-card-label">Other</div></div>
       </div>
-      <div class="shift-card new">
-        <div class="shift-card-label">The new way</div>
-        <h3>Self-Hosting</h3>
-        <ul>
-          <li>Less than $4 per month</li>
-          <li>Save hundreds of dollars every single year</li>
-          <li>You own all the code — leave anytime</li>
-          <li>100% custom design, built for you</li>
-          <li>Done in minutes, not hours</li>
-          <li>No monthly platform fees — ever</li>
-        </ul>
+      <div class="form-group" id="otherTypeGroup" style="display:none;">
+        <label>What type of site?</label>
+        <input type="text" id="otherType" placeholder="e.g., music, real estate, coaching">
       </div>
+      <div class="wizard-nav"><div></div><button class="btn-next" id="btnNext0" disabled onclick="nextStep(1)">Next →</button></div>
     </div>
-    <div style="text-align: center; margin-top: 3rem;">
-      <a href="#" onclick="event.preventDefault(); openModal();" class="hosting-cta" style="display: inline-block; background: var(--accent); color: var(--black); padding: 1rem 3rem; border-radius: 4px; text-decoration: none; font-weight: 700; font-size: 1.1rem; transition: background 0.3s, transform 0.2s;">Set Up Hosting Now →</a>
-      <p style="margin-top: 0.8rem; font-size: 1rem; color: var(--gray-mid);">Our affiliate partner will give you 60% off right now for using our link.</p>
-    </div>
-  </div>
-</section>
 
-<!-- SAVINGS HIGHLIGHT -->
-<section style="background: var(--black); padding: 4rem 2rem; text-align: center;">
-  <div class="section-inner">
-    <div style="display: inline-block; background: rgba(200,164,110,0.08); border: 1px solid rgba(200,164,110,0.2); border-radius: 12px; padding: 2.5rem 3rem; max-width: 650px;">
-      <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 1rem;">The math is simple</p>
-      <p style="font-family: 'Playfair Display', serif; font-size: clamp(1.4rem, 3vw, 1.8rem); font-weight: 600; line-height: 1.5; margin-bottom: 1rem;">
-        Squarespace charges <span style="color: var(--red-soft); text-decoration: line-through;">$192–$1,188/year</span>.<br>
-        Self-hosting is <span style="color: var(--accent);">less than $4/month</span>.
-      </p>
-      <p style="color: var(--gray-mid); font-size: 0.95rem; font-weight: 300; line-height: 1.7;">
-        That's money back in your pocket every year — and you get a site that's custom-built, not a template.
-      </p>
-    </div>
-  </div>
-</section>
+    <!-- WS1: Design Picker -->
+    <div class="wizard-step" id="ws1">
+      <h2 class="wizard-title">Choose your <span>design</span></h2>
+      <p class="wizard-subtitle">Pick a palette, fonts, and layout style so the AI builds something you'll actually love.</p>
 
-<!-- HOSTING TIPS MODAL -->
-<div id="hostingModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:9999; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); justify-content:center; align-items:center; padding:2rem;">
-  <div style="background:var(--dark); border:1px solid rgba(200,164,110,0.2); border-radius:12px; padding:2.5rem; max-width:550px; width:100%; text-align:center; position:relative;">
-    <button onclick="closeModal()" style="position:absolute; top:1rem; right:1.2rem; background:none; border:none; color:var(--gray-dark); font-size:1.5rem; cursor:pointer; line-height:1;">&times;</button>
-    <p style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.15em; color:var(--accent); margin-bottom:0.8rem;">Before you go</p>
-    <h2 style="font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:600; margin-bottom:1rem;">All you need is the basic plan.</h2>
-    <p style="color:var(--gray-mid); font-size:0.95rem; font-weight:300; line-height:1.7; margin-bottom:2rem;">
-      Choose the cheapest plan available. It comes with everything you need — including a free domain name. You don't need to add any extra services unless you want them.
-    </p>
-    <div style="display:flex; gap:1rem; margin-bottom:2rem; text-align:left;">
-      <div style="background:var(--card-bg); border:1px solid rgba(76,175,80,0.25); border-radius:8px; padding:1rem 1.2rem; flex:1;">
-        <div style="color:var(--green); font-weight:700; font-size:0.8rem; margin-bottom:0.4rem;">DO</div>
-        <div style="font-size:0.85rem; color:var(--gray-light); line-height:1.6;">Choose the basic plan<br>Register your free domain<br>Skip any extra add-ons</div>
-      </div>
-      <div style="background:var(--card-bg); border:1px solid rgba(229,115,115,0.25); border-radius:8px; padding:1rem 1.2rem; flex:1;">
-        <div style="color:var(--red-soft); font-weight:700; font-size:0.8rem; margin-bottom:0.4rem;">DON'T NEED</div>
-        <div style="font-size:0.85rem; color:var(--gray-light); line-height:1.6;">Premium plans or upgrades<br>SEO tools or site builders<br>Any paid add-ons</div>
-      </div>
-    </div>
-    <a href="https://bluehost.sjv.io/c/54826/2147559/11352" target="_blank" onclick="localStorage.setItem('wb_clicked_affiliate','true'); closeModal(); showConfirmation();" style="display:inline-block; background:var(--accent); color:var(--black); padding:1rem 3rem; border-radius:4px; text-decoration:none; font-weight:700; font-size:1.1rem;">Got It — Take Me to Hosting →</a>
-  </div>
-</div>
-
-<!-- WHAT'S FREE / WHAT YOU NEED -->
-<section style="background: var(--dark); padding: 5rem 2rem;">
-  <div class="section-inner" style="text-align: center;">
-    <p style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--accent); margin-bottom: 0.8rem;">Here's the deal</p>
-    <h2 style="font-family: 'Playfair Display', serif; font-size: clamp(1.8rem, 3.5vw, 2.5rem); font-weight: 600; margin-bottom: 3rem;">
-      Everything is free — <span style="color: var(--accent);">except hosting.</span>
-    </h2>
-
-    <!-- Visual breakdown -->
-    <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 2rem; align-items: start; max-width: 800px; margin: 0 auto;">
-
-      <!-- FREE column -->
-      <div style="text-align: center;">
-        <div style="background: rgba(76,175,80,0.1); border: 1px solid rgba(76,175,80,0.25); border-radius: 12px; padding: 2rem 1.5rem;">
-          <div style="font-size: 2rem; margin-bottom: 0.8rem;">$0</div>
-          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--green); font-weight: 600; margin-bottom: 1.5rem;">We charge you</div>
-          <div style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--green); font-weight: 700;">✓</span> AI website builder
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--green); font-weight: 700;">✓</span> Custom design
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--green); font-weight: 700;">✓</span> Hand-coded HTML/CSS
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--green); font-weight: 700;">✓</span> Ample revisions
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--green); font-weight: 700;">✓</span> Downloadable files
-            </div>
-          </div>
+      <div class="dp-section">
+        <p class="dp-section-label">Color Palette</p>
+        <div class="palette-grid" id="dpPaletteGrid">
+          <div class="palette-card" data-palette="ocean" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#0F4C75"></div><div style="background:#3282B8"></div><div style="background:#BBE1FA"></div><div style="background:#1B262C"></div><div style="background:#F0F7FA"></div></div><div class="palette-name">Ocean</div><div class="palette-desc">Cool blues, trust & professionalism</div><div class="dp-check">&#10003;</div></div>
+          <div class="palette-card" data-palette="earth" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#5C4033"></div><div style="background:#8B7355"></div><div style="background:#C4A882"></div><div style="background:#2C3E2D"></div><div style="background:#F5F0E8"></div></div><div class="palette-name">Earth</div><div class="palette-desc">Warm naturals, grounded & organic</div><div class="dp-check">&#10003;</div></div>
+          <div class="palette-card" data-palette="sunset" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#E85D3A"></div><div style="background:#F4845F"></div><div style="background:#F7B267"></div><div style="background:#2D2D2D"></div><div style="background:#FFF8F0"></div></div><div class="palette-name">Sunset</div><div class="palette-desc">Warm corals & amber, energetic</div><div class="dp-check">&#10003;</div></div>
+          <div class="palette-card" data-palette="midnight" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#0D0D0D"></div><div style="background:#1A1A2E"></div><div style="background:#C8A46E"></div><div style="background:#E0D5C0"></div><div style="background:#16213E"></div></div><div class="palette-name">Midnight</div><div class="palette-desc">Dark & luxurious with gold accents</div><div class="dp-check">&#10003;</div></div>
+          <div class="palette-card" data-palette="garden" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#2D5016"></div><div style="background:#5A8F3C"></div><div style="background:#A8D870"></div><div style="background:#3A3A3A"></div><div style="background:#F5FAF0"></div></div><div class="palette-name">Garden</div><div class="palette-desc">Fresh greens, growth & vitality</div><div class="dp-check">&#10003;</div></div>
+          <div class="palette-card" data-palette="berry" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#6B2D5B"></div><div style="background:#9B4DCA"></div><div style="background:#D4A5FF"></div><div style="background:#2A1B3D"></div><div style="background:#FAF0FF"></div></div><div class="palette-name">Berry</div><div class="palette-desc">Rich purples, creative & bold</div><div class="dp-check">&#10003;</div></div>
         </div>
       </div>
 
-      <!-- Divider -->
-      <div style="display: flex; align-items: center; justify-content: center; padding-top: 4rem;">
-        <div style="width: 1px; height: 180px; background: rgba(255,255,255,0.1); position: relative;">
-          <span style="position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--dark); padding: 0.5rem; font-size: 0.75rem; color: var(--gray-dark); white-space: nowrap;">+</span>
+      <div class="dp-section">
+        <p class="dp-section-label">Font Pairing</p>
+        <div class="font-grid" id="dpFontGrid">
+          <div class="font-card" data-font="modern-sans" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Inter',sans-serif;font-weight:700;">Clean & Modern</div><div class="font-preview-body" style="font-family:'Inter',sans-serif;font-weight:300;">Simple, sharp, readable.</div><div class="font-label">Inter</div><div class="dp-check">&#10003;</div></div>
+          <div class="font-card" data-font="classic-serif" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Playfair Display',serif;font-weight:700;">Timeless Elegance</div><div class="font-preview-body" style="font-family:'Source Sans 3',sans-serif;font-weight:300;">Refined headlines, clean body.</div><div class="font-label">Playfair + Source Sans</div><div class="dp-check">&#10003;</div></div>
+          <div class="font-card" data-font="bold-statement" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Montserrat',sans-serif;font-weight:800;">BOLD IMPACT</div><div class="font-preview-body" style="font-family:'Montserrat',sans-serif;font-weight:300;">Strong, commands attention.</div><div class="font-label">Montserrat</div><div class="dp-check">&#10003;</div></div>
+          <div class="font-card" data-font="elegant-refined" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.2rem;">Graceful & Refined</div><div class="font-preview-body" style="font-family:'Lato',sans-serif;font-weight:300;">Sophisticated serif + modern body.</div><div class="font-label">Cormorant + Lato</div><div class="dp-check">&#10003;</div></div>
+          <div class="font-card" data-font="friendly-rounded" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Nunito',sans-serif;font-weight:700;">Warm & Friendly</div><div class="font-preview-body" style="font-family:'Nunito',sans-serif;font-weight:400;">Approachable, inviting feel.</div><div class="font-label">Nunito</div><div class="dp-check">&#10003;</div></div>
+          <div class="font-card" data-font="editorial" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'DM Serif Display',serif;font-weight:400;">Editorial Style</div><div class="font-preview-body" style="font-family:'DM Sans',sans-serif;font-weight:400;">Magazine-quality typography.</div><div class="font-label">DM Serif + DM Sans</div><div class="dp-check">&#10003;</div></div>
         </div>
       </div>
 
-      <!-- HOSTING column -->
-      <div style="text-align: center;">
-        <div style="background: rgba(200,164,110,0.06); border: 1px solid rgba(200,164,110,0.2); border-radius: 12px; padding: 2rem 1.5rem;">
-          <div style="font-size: 2rem; margin-bottom: 0.8rem; font-family: 'Playfair Display', serif;">
-            <span style="font-size: 1rem; color: var(--gray-mid);">&lt;</span>$4<span style="font-size: 1rem; color: var(--gray-mid);">/mo</span>
-          </div>
-          <div style="font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); font-weight: 600; margin-bottom: 1.5rem;">Third-party hosting</div>
-          <div style="display: flex; flex-direction: column; gap: 0.8rem; text-align: left;">
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--accent); font-weight: 700;">→</span> Where your site lives
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--accent); font-weight: 700;">→</span> Every site needs it
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--accent); font-weight: 700;">→</span> Includes free domain
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--accent); font-weight: 700;">→</span> Not our fee — it's theirs
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 0.9rem; color: var(--gray-light);">
-              <span style="color: var(--accent); font-weight: 700;">→</span> 15+ years trusted
-            </div>
-          </div>
+      <div class="dp-section">
+        <p class="dp-section-label">Layout Style</p>
+        <div class="style-grid" id="dpStyleGrid">
+          <div class="style-card" data-style="modern-minimal" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/modern-minimal.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Modern Minimal</div><div class="style-desc">Photographer portfolio</div></div></div>
+          <div class="style-card" data-style="bold-dynamic" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/bold-dynamic.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Bold & Dynamic</div><div class="style-desc">Artist / musician</div></div></div>
+          <div class="style-card" data-style="elegant-classic" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/elegant-classic.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Elegant Classic</div><div class="style-desc">Luxury product</div></div></div>
+          <div class="style-card" data-style="warm-friendly" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/warm-friendly.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Warm & Friendly</div><div class="style-desc">Coach / therapist</div></div></div>
+          <div class="style-card" data-style="dark-sleek" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/dark-sleek.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Dark & Sleek</div><div class="style-desc">Premium service</div></div></div>
+          <div class="style-card" data-style="colorful-fun" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/colorful-fun.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Colorful & Fun</div><div class="style-desc">Youth / community</div></div></div>
+          <div class="style-card" data-style="corporate-pro" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/corporate-pro.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Corporate Pro</div><div class="style-desc">Consulting / professional</div></div></div>
+          <div class="style-card" data-style="editorial" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/editorial.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Editorial</div><div class="style-desc">Church / organization</div></div></div>
         </div>
       </div>
+
+      <div class="form-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
+        <label style="color: var(--gray-dark); font-size: 0.75rem;">Have a site you love? (optional)</label>
+        <p class="helper-text">Paste a URL and the AI will draw inspiration from its look and feel.</p>
+        <input type="text" id="inspirationUrl" placeholder="e.g., https://example.com">
+      </div>
+
+      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(0)">← Back</button><button class="btn-next" id="btnNext1" disabled onclick="nextStep(2)">Next →</button></div>
     </div>
 
-    <p style="margin-top: 2.5rem; color: var(--gray-mid); font-size: 0.9rem; font-weight: 300; max-width: 500px; margin-left: auto; margin-right: auto; line-height: 1.7;">
-      The hosting provider gives you a discount for using our link, then pays us a commission for referring you. That's how we're able to offer this resource completely free.
-    </p>
-  </div>
-</section>
-
-<!-- BLUEHOST CTA -->
-<section class="bluehost-cta" id="get-hosting">
-  <div class="section-inner">
-    <div class="discount-badge">60% OFF</div>
-    <h2>Get Your Hosting Set Up</h2>
-    <p class="subtitle">
-      Use the link below to set up your hosting plan and get 60% off. Once you've registered your domain, come back here and enter it to continue building.
-    </p>
-    <a href="#" onclick="event.preventDefault(); openModal();" class="bluehost-btn" id="affiliateLink">
-      Set Up Hosting Now — 60% Off →
-    </a>
-    <p class="bluehost-sub">Very affordable — just a few dollars a month. Cancel anytime.</p>
-    <div class="trust-points">
-      <div class="trust-point">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        Free SSL Certificate
-      </div>
-      <div class="trust-point">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        24/7 Support
-      </div>
-      <div class="trust-point">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
-        Free Domain Name
-      </div>
-      <div class="trust-point">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        Free Business Email
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONFIRMATION (hidden until affiliate link is clicked) -->
-<section class="confirmation" id="confirm" style="display:none;">
-  <div class="section-inner">
-    <h2>Great — now enter your new domain</h2>
-    <p class="subtitle">Type in the domain you just registered so we can start building your site.</p>
-    <form class="confirm-form" onsubmit="confirmDomain(event)">
+    <!-- WS2: Name -->
+    <div class="wizard-step" id="ws2">
+      <h2 class="wizard-title">What's the <span>name</span>?</h2>
+      <p class="wizard-subtitle">This will appear in the header and throughout your website.</p>
       <div class="form-group">
-        <label>Your domain name</label>
-        <input type="text" id="domainInput" placeholder="e.g., mybusiness.com" required>
+        <label>Site / Business Name</label>
+        <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="validateName()">
       </div>
-      <button type="submit" class="confirm-btn" id="confirmBtn">Continue to Step 2 →</button>
-      <p class="confirm-note">
-        Make sure you've completed your hosting setup before continuing. You'll need your domain for the next steps.
-      </p>
-    </form>
-  </div>
-</section>
+      <div class="form-group">
+        <label>Tagline or Slogan (optional)</label>
+        <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
+        <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
+      </div>
+      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(1)">← Back</button><button class="btn-next" id="btnNext2" disabled onclick="nextStep(3)">Next →</button></div>
+    </div>
 
-<!-- BOTTOM NAV -->
-<div class="bottom-nav">
-  <a href="/" class="bottom-nav-back">&larr; Back</a>
-  <a href="#" onclick="event.preventDefault(); fetch('/api/auth/me').then(r=>r.json()).then(d=>{ window.location.href = d.authenticated ? '/step2.html' : '/login.html?next=step2'; })" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
+    <!-- WS3: Description -->
+    <div class="wizard-step" id="ws3">
+      <h2 class="wizard-title">Tell us about your <span>project</span></h2>
+      <p class="wizard-subtitle">Give the AI as much or as little detail as you want. You can upload a document you already have, or just type a few sentences and see what the AI comes up with.</p>
+
+      <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
+        <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
+        <p>📄 Upload a document about your project</p>
+        <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
+        <div class="uploaded-name" id="docFileName" style="display:none;"></div>
+      </div>
+
+      <div class="or-divider">or type it out</div>
+
+      <div class="form-group">
+        <label id="descLabel">About your project</label>
+        <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
+        <textarea id="siteDesc" placeholder="" oninput="validateDesc()"></textarea>
+      </div>
+
+      <!-- Optional: Goals -->
+      <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add site goals (optional)
+      </div>
+      <div class="collapsible-body" id="goalsBody">
+        <p class="helper-text">What should your site help you do? Pick any that apply.</p>
+        <div class="section-grid" id="goalGrid">
+          <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Attract customers</span></div>
+          <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Showcase work</span></div>
+          <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Provide info</span></div>
+          <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Build credibility</span></div>
+          <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Get bookings</span></div>
+          <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Collect leads</span></div>
+        </div>
+      </div>
+
+      <!-- Optional: Services -->
+      <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add services / offerings (optional)
+      </div>
+      <div class="collapsible-body" id="servicesBody">
+        <div class="form-group" style="margin-bottom:0;">
+          <p class="helper-text" id="servicesHelper">List what you offer, separated by commas.</p>
+          <input type="text" id="services" placeholder="">
+        </div>
+      </div>
+
+      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(2)">← Back</button><button class="btn-next" id="btnNext3" disabled onclick="nextStep(4)">Next →</button></div>
+    </div>
+
+    <!-- WS4: Photos -->
+    <div class="wizard-step" id="ws4">
+      <h2 class="wizard-title">Add your <span>photos</span></h2>
+      <p class="wizard-subtitle">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
+
+      <!-- Option A: Direct upload (5 or fewer) -->
+      <div class="photo-option" id="photoOptionUpload">
+        <div class="photo-option-header" onclick="selectPhotoOption('upload')">
+          <div class="photo-option-radio" id="radioUpload"></div>
+          <div>
+            <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="uploadBody" style="display: none;">
+          <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
+            <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
+          </div>
+          <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
+          <div class="uploaded-images" id="uploadedImagesList"></div>
+        </div>
+      </div>
+
+      <!-- Option B: Bluehost hosting (many images) — hidden until hosting is set up in step 2 -->
+      <div class="photo-option" id="photoOptionHosting" style="display:none;">
+        <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
+          <div class="photo-option-radio" id="radioHosting"></div>
+          <div>
+            <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="hostingBody" style="display: none;">
+          <div class="photo-instructions">
+            <h4>Three quick steps:</h4>
+            <ol>
+              <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
+              <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong> in the top toolbar. Select all your photos in Finder/Explorer and <strong>drag and drop them all at once</strong> into the upload area.</li>
+              <li>Go back to <code>public_html</code>, then download this helper file and upload it there (same level as <code>images</code>):</li>
+            </ol>
+            <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Your Domain</label>
+            <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
+            <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
+              <button class="btn-next" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
+            </div>
+          </div>
+          <div class="image-results" id="imageResults"></div>
+          <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
+            <div class="photo-check-box" id="photoCheckBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>I've uploaded my photos and the helper file</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
+      <div class="wizard-nav" style="margin-top: 1.5rem;">
+        <button class="btn-back" onclick="prevStep(3)">← Back</button>
+        <button class="btn-next" id="btnNext4" disabled onclick="finishWizard()">Start Building →</button>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<footer>
-  &copy; 2026 freeaisitebuilder.com. All rights reserved.
-</footer>
+<div class="bottom-nav">
+  <a href="/">← Back to Home</a>
+  <a href="/step2.html" id="forwardBtn" style="display:none;">Forward →</a>
+</div>
+<footer>&copy; 2026 freeaisitebuilder.com. All rights reserved.</footer>
 
 <script>
 // No auth required for step 1 — auth happens before step 2
 
-// Track if they clicked the affiliate link
-let clickedAffiliate = false;
-const confirmSection = document.getElementById('confirm');
+const TOTAL_STEPS = 5;
+let currentStep = 0;
+let selectedType = null;
+let selectedGoals = [];
+let photosConfirmed = false;
+let photosSkipped = false;
+let foundImages = [];
+let uploadedDocText = '';
+let uploadedImageFiles = []; // direct uploads
+let selectedPhotoOption = null;
+let dpPalette = null;
+let dpFont = null;
+let dpStyle = null;
 
-function showConfirmation() {
-  clickedAffiliate = true;
-  confirmSection.style.display = 'block';
-  setTimeout(() => {
-    confirmSection.scrollIntoView({ behavior: 'smooth' });
-  }, 300);
+if (localStorage.getItem('wb_completed_step1') === 'true') document.getElementById('forwardBtn').style.display = 'inline';
+
+// Progress bars
+const pbContainer = document.getElementById('progressBars');
+for (let i = 0; i < TOTAL_STEPS; i++) {
+  const bar = document.createElement('div');
+  bar.className = 'progress-bar' + (i === 0 ? ' active' : '');
+  bar.id = `pb${i}`;
+  pbContainer.appendChild(bar);
 }
 
-// Modal open/close
-function openModal() {
-  const modal = document.getElementById('hostingModal');
-  modal.style.display = 'flex';
+// Contextual placeholders
+const descPlaceholders = {
+  business: "e.g., We're a family-owned landscaping company in Austin, TX. We specialize in residential lawn care, garden design, and outdoor living spaces. We've been serving the community for 12 years.",
+  portfolio: "e.g., I'm a freelance graphic designer specializing in brand identity and packaging design. I've worked with startups and established brands across the food and beverage industry.",
+  restaurant: "e.g., We're a family-run Italian restaurant in downtown Nashville. We serve authentic wood-fired pizza, handmade pasta, and a curated selection of Italian wines.",
+  church: "e.g., We're a welcoming, non-denominational church in Memphis, TN. We believe in building community through worship, service, and genuine relationships.",
+  blog: "e.g., I write about personal finance for millennials — budgeting, investing, and building wealth without sacrificing your quality of life.",
+  nonprofit: "e.g., We provide free coding education to underserved youth. Our mission is to close the digital divide.",
+  personal: "e.g., I'm a photographer and traveler based in Portland. This site is a place to share my work and connect with people.",
+  event: "e.g., An annual 3-day music festival in Boulder, CO featuring 50+ local and national acts, food vendors, and art installations.",
+  other: "Describe what this site is about, who it's for, and what visitors should learn or do when they arrive.",
+};
+const servicesPlaceholders = {
+  business: "e.g., Lawn Mowing, Garden Design, Tree Trimming, Outdoor Patios",
+  portfolio: "e.g., Brand Identity, Logo Design, Packaging, Web Design",
+  restaurant: "e.g., Dine-In, Takeout, Catering, Private Events",
+  church: "e.g., Sunday Worship, Bible Study, Youth Group, Outreach",
+  nonprofit: "e.g., After-School Classes, Summer Camp, Mentorship",
+  event: "e.g., Live Music, Food Court, Art Exhibition, Workshops",
+  other: "e.g., List the main things you offer, separated by commas",
+};
+const descLabels = { business:'About your business', portfolio:'About you and your work', restaurant:'About your restaurant', church:'About your church', blog:'What do you write about?', nonprofit:'About your organization', personal:'About you', event:'About the event', other:'About your project' };
+const descHelpers = { business:'What do you do? Who do you serve? What makes you different?', portfolio:'What kind of work do you do? What are you known for?', restaurant:"What type of food? What's the vibe? Any history?", church:"What's your mission? What can visitors expect?", blog:'What topics? Who is your audience?', nonprofit:"What's your mission? Who do you help?", personal:'Who are you? What do you want people to know?', event:'What, when, where, and who is it for?', other:'What is the purpose? Who is it for?' };
+
+// Design picker functions
+function selectDpPalette(el) {
+  document.querySelectorAll('#dpPaletteGrid .palette-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  dpPalette = el.dataset.palette;
+  checkDesignReady();
+}
+function selectDpFont(el) {
+  document.querySelectorAll('#dpFontGrid .font-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  dpFont = el.dataset.font;
+  checkDesignReady();
+}
+function selectDpStyle(el) {
+  document.querySelectorAll('#dpStyleGrid .style-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  dpStyle = el.dataset.style;
+  checkDesignReady();
+}
+function checkDesignReady() {
+  document.getElementById('btnNext1').disabled = !(dpPalette && dpFont && dpStyle);
 }
 
-function closeModal() {
-  const modal = document.getElementById('hostingModal');
-  modal.style.display = 'none';
+function selectType(card) {
+  document.querySelectorAll('#ws0 .type-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  selectedType = card.dataset.type;
+  document.getElementById('otherTypeGroup').style.display = selectedType === 'other' ? 'block' : 'none';
+  document.getElementById('btnNext0').disabled = false;
 }
 
-// Close modal on backdrop click
-document.getElementById('hostingModal').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
-
-// Close modal on Escape key
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') closeModal();
-});
-
-// Check on load — if they already clicked before, show confirmation
-if (localStorage.getItem('wb_clicked_affiliate') === 'true') {
-  clickedAffiliate = true;
-  confirmSection.style.display = 'block';
+function validateName() {
+  document.getElementById('btnNext2').disabled = !document.getElementById('siteName').value.trim();
 }
 
-// Show Forward button if they've already completed this step
-if (localStorage.getItem('wb_completed_step1') === 'true') {
-  document.getElementById('forwardBtn').style.display = 'inline';
+function validateDesc() {
+  const hasDesc = document.getElementById('siteDesc').value.trim();
+  document.getElementById('btnNext3').disabled = !(hasDesc || uploadedDocText);
 }
 
-async function confirmDomain(e) {
-  e.preventDefault();
-  const domain = document.getElementById('domainInput').value.trim().toLowerCase();
-  const btn = document.getElementById('confirmBtn');
+function toggleGoal(el) {
+  el.classList.toggle('selected');
+  selectedGoals = Array.from(document.querySelectorAll('#goalGrid .section-option.selected')).map(s => s.dataset.goal);
+}
 
-  if (!domain) return;
+function toggleCollapsible(header, bodyId) {
+  header.classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
+}
 
-  // Clean up the domain (remove http/https/www)
-  const cleaned = domain.replace(/^(https?:\/\/)?(www\.)?/, '').replace(/\/+$/, '');
+function handleDocUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const nameEl = document.getElementById('docFileName');
+  nameEl.textContent = '📎 ' + file.name;
+  nameEl.style.display = 'block';
 
-  // Basic validation
-  if (!cleaned.includes('.') || cleaned.length < 4) {
-    alert('Please enter a valid domain name (e.g., mybusiness.com)');
-    return;
+  if (file.name.endsWith('.txt')) {
+    const reader = new FileReader();
+    reader.onload = (e) => { uploadedDocText = e.target.result; document.getElementById('btnNext3').disabled = false; };
+    reader.readAsText(file);
+  } else {
+    // For non-text files, just note the filename — actual upload happens after auth in the build step
+    uploadedDocText = `[User has a document: ${file.name} — ask them to describe its contents]`;
+    document.getElementById('btnNext3').disabled = false;
+  }
+}
+
+function updateContextualFields() {
+  const t = selectedType || 'other';
+  document.getElementById('siteDesc').placeholder = descPlaceholders[t] || descPlaceholders.other;
+  document.getElementById('descLabel').textContent = descLabels[t] || descLabels.other;
+  document.getElementById('descHelper').textContent = descHelpers[t] || descHelpers.other;
+  const sp = servicesPlaceholders[t];
+  if (!sp || t === 'blog' || t === 'personal') {
+    document.getElementById('servicesCollapsible').style.display = 'none';
+  } else {
+    document.getElementById('servicesCollapsible').style.display = 'flex';
+    document.getElementById('services').placeholder = sp;
+  }
+}
+
+function selectPhotoOption(option) {
+  selectedPhotoOption = option;
+  document.getElementById('photoOptionUpload').classList.toggle('selected', option === 'upload');
+  document.getElementById('photoOptionHosting').classList.toggle('selected', option === 'hosting');
+  document.getElementById('uploadBody').style.display = option === 'upload' ? 'block' : 'none';
+  document.getElementById('hostingBody').style.display = option === 'hosting' ? 'block' : 'none';
+  updatePhotoNextBtn();
+}
+
+function updatePhotoNextBtn() {
+  const canProceed = photosSkipped
+    || (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0)
+    || (selectedPhotoOption === 'hosting' && (photosConfirmed || foundImages.length > 0));
+  document.getElementById('btnNext4').disabled = !canProceed;
+}
+
+function handleImageUpload(event) {
+  const files = Array.from(event.target.files);
+  const allowed = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
+  files.forEach(f => {
+    if (uploadedImageFiles.length >= 5) return;
+    if (!allowed.test(f.name)) return;
+    if (f.size > 10 * 1024 * 1024) return;
+    uploadedImageFiles.push(f);
+  });
+  renderUploadedImages();
+  updatePhotoNextBtn();
+  event.target.value = '';
+}
+
+function removeUploadedImage(idx) {
+  uploadedImageFiles.splice(idx, 1);
+  renderUploadedImages();
+  updatePhotoNextBtn();
+}
+
+function renderUploadedImages() {
+  const container = document.getElementById('uploadedImagesList');
+  container.innerHTML = '';
+  uploadedImageFiles.forEach((f, i) => {
+    const card = document.createElement('div');
+    card.className = 'uploaded-image-card';
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(f);
+    const btn = document.createElement('button');
+    btn.className = 'remove-btn';
+    btn.innerHTML = '&times;';
+    btn.onclick = () => removeUploadedImage(i);
+    card.appendChild(img);
+    card.appendChild(btn);
+    container.appendChild(card);
+  });
+  if (uploadedImageFiles.length > 0 && uploadedImageFiles.length < 5) {
+    const msg = document.createElement('p');
+    msg.className = 'upload-limit-msg';
+    msg.textContent = `${uploadedImageFiles.length}/5 images`;
+    container.appendChild(msg);
+  } else if (uploadedImageFiles.length >= 5) {
+    const msg = document.createElement('p');
+    msg.className = 'upload-limit-msg';
+    msg.textContent = '5/5 images (max reached)';
+    container.appendChild(msg);
+  }
+}
+
+// Drag and drop for image zone
+const dropZone = document.getElementById('imageDropZone');
+if (dropZone) {
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault(); dropZone.classList.remove('dragover');
+    const dt = e.dataTransfer;
+    if (dt.files.length) {
+      const input = document.getElementById('imageFileInput');
+      input.files = dt.files;
+      handleImageUpload({ target: input, preventDefault: () => {} });
+    }
+  });
+}
+
+function togglePhotoConfirm() {
+  photosConfirmed = !photosConfirmed;
+  document.getElementById('photoConfirm').classList.toggle('checked', photosConfirmed);
+  document.getElementById('photoCheckmark').style.display = photosConfirmed ? 'block' : 'none';
+  updatePhotoNextBtn();
+}
+function skipPhotos() { photosSkipped = true; document.getElementById('btnNext4').disabled = false; }
+
+function downloadPhpHelper() {
+  const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
+  const blob = new Blob([php], { type: 'application/x-php' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'list-images.php'; a.click();
+}
+
+async function checkImages() {
+  const el = document.getElementById('imageResults');
+  el.style.display = 'block'; el.className = 'image-results'; el.innerHTML = '<p>Checking...</p>';
+  try {
+    const resp = await fetch(`https://${domain}/list-images.php`);
+    if (!resp.ok) throw new Error();
+    const images = await resp.json();
+    if (images.length === 0) { el.className = 'image-results error'; el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>'; }
+    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; document.getElementById('btnNext4').disabled = false; }
+  } catch { el.className = 'image-results error'; el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`; }
+}
+
+function nextStep(n) {
+  if (n === 3) updateContextualFields();
+  document.getElementById(`ws${currentStep}`).classList.remove('active');
+  document.getElementById(`ws${n}`).classList.add('active');
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function prevStep(n) {
+  document.getElementById(`ws${currentStep}`).classList.remove('active');
+  document.getElementById(`ws${n}`).classList.add('active');
+  for (let i = 0; i < TOTAL_STEPS; i++) {
+    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
+  }
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+async function finishWizard() {
+  const siteType = selectedType === 'other' ? (document.getElementById('otherType').value.trim() || 'other') : selectedType;
+  const sessionId = localStorage.getItem('wb_session') || 'session-' + Date.now();
+  localStorage.setItem('wb_session', sessionId);
+
+  let directUploadNames = [];
+
+  // Store image file names — actual upload happens after auth in the build step
+  if (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0) {
+    directUploadNames = uploadedImageFiles.map(f => f.name);
+    // Store files in memory for upload after auth
+    try {
+      const imageDataArr = [];
+      for (const f of uploadedImageFiles) {
+        const reader = new FileReader();
+        const dataUrl = await new Promise((resolve) => {
+          reader.onload = (e) => resolve(e.target.result);
+          reader.readAsDataURL(f);
+        });
+        imageDataArr.push({ name: f.name, data: dataUrl });
+      }
+      localStorage.setItem('wb_pending_images', JSON.stringify(imageDataArr));
+    } catch {
+      // Continue even if storage fails
+    }
   }
 
-  // Show loading state
-  btn.disabled = true;
-  btn.textContent = 'Verifying your domain...';
-
-  try {
-    // Verify domain is hosted on Bluehost
-    const verifyRes = await fetch('/api/verify-domain', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ domain: cleaned })
-    });
-    const verifyData = await verifyRes.json();
-
-    if (!verifyData.verified) {
-      btn.disabled = false;
-      btn.textContent = 'Continue to Step 2 →';
-      showDnsError(verifyData.message || 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first.');
-      return;
+  const data = {
+    type: siteType,
+    goals: selectedGoals,
+    name: document.getElementById('siteName').value.trim(),
+    tagline: document.getElementById('tagline').value.trim(),
+    description: document.getElementById('siteDesc').value.trim(),
+    uploadedDocText: uploadedDocText,
+    services: document.getElementById('services') ? document.getElementById('services').value.trim() : '',
+    images: foundImages,
+    directUploads: directUploadNames,
+    domain: localStorage.getItem('wb_domain') || '',
+    photosSkipped: photosSkipped,
+    design: {
+      palette: dpPalette,
+      font: dpFont,
+      layoutStyle: dpStyle,
+      inspirationUrl: document.getElementById('inspirationUrl') ? document.getElementById('inspirationUrl').value.trim() : ''
     }
+  };
+  localStorage.setItem('wb_site_data', JSON.stringify(data));
+  localStorage.setItem('wb_completed_step1', 'true');
 
-    // Domain verified — proceed
-    let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
-    localStorage.setItem('wb_session', sessionId);
-    localStorage.setItem('wb_domain', cleaned);
-    localStorage.setItem('wb_completed_step1', 'true');
-
-    // Register domain with backend
-    await fetch('/api/register-domain', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, domain: cleaned })
-    });
-
-    // Check if authenticated before proceeding
+  // Check if authenticated before proceeding to step 2
+  try {
     const authRes = await fetch('/api/auth/me');
     const authData = await authRes.json();
     if (authData.authenticated) {
@@ -809,24 +731,10 @@ async function confirmDomain(e) {
     } else {
       window.location.href = '/login.html?next=step2';
     }
-  } catch (err) {
-    btn.disabled = false;
-    btn.textContent = 'Continue to Step 2 →';
-    showDnsError('Could not verify your domain. Please check your internet connection and try again.');
+  } catch {
+    window.location.href = '/login.html?next=step2';
   }
-}
-
-function showDnsError(message) {
-  let errorEl = document.getElementById('dnsError');
-  if (!errorEl) {
-    errorEl = document.createElement('div');
-    errorEl.id = 'dnsError';
-    errorEl.style.cssText = 'margin-top:1rem; padding:1rem 1.2rem; background:rgba(229,115,115,0.1); border:1px solid rgba(229,115,115,0.3); border-radius:8px; color:#E57373; font-size:0.9rem; line-height:1.6; text-align:left;';
-    document.querySelector('.confirm-form').appendChild(errorEl);
-  }
-  errorEl.innerHTML = `<strong>Domain not verified.</strong> ${message}<br><br>If you just set up hosting, it can take up to 24 hours for DNS to update. You can try again later.`;
 }
 </script>
-
 </body>
 </html>

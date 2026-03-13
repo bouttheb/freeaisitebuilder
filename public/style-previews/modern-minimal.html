@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #FAFAFA; color: #111; }
+
+nav { padding: 1.5rem 4rem; display: flex; justify-content: space-between; align-items: center; background: #fff; border-bottom: 1px solid #eee; }
+.logo { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; }
+.nav-links { display: flex; gap: 2.5rem; font-size: 0.85rem; color: #666; font-weight: 400; }
+.nav-cta { background: #111; color: #fff; padding: 0.5rem 1.5rem; border-radius: 4px; font-size: 0.85rem; font-weight: 500; text-decoration: none; }
+
+.hero { padding: 5rem 4rem 4rem; display: flex; align-items: center; gap: 4rem; max-width: 1100px; margin: 0 auto; }
+.hero-text { flex: 1; }
+.hero-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.2em; color: #999; margin-bottom: 1.5rem; }
+.hero h1 { font-size: 3rem; font-weight: 700; line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 1.2rem; }
+.hero p { font-size: 1.05rem; color: #666; line-height: 1.7; font-weight: 300; margin-bottom: 2rem; max-width: 420px; }
+.hero-btn { display: inline-block; background: #111; color: #fff; padding: 0.85rem 2.2rem; border-radius: 4px; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+.hero-btn-ghost { display: inline-block; color: #111; padding: 0.85rem 1.5rem; text-decoration: none; font-weight: 500; font-size: 0.9rem; }
+.hero-images { flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+.hero-img { border-radius: 6px; }
+.hero-img.tall { grid-row: span 2; height: 320px; }
+.hero-img.short { height: 154px; }
+.hero-img:nth-child(1) { background: url('https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&h=600&fit=crop') center/cover; }
+.hero-img:nth-child(2) { background: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop') center/cover; }
+.hero-img:nth-child(3) { background: url('https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=400&h=300&fit=crop') center/cover; }
+
+.work { padding: 4rem; border-top: 1px solid #eee; max-width: 1100px; margin: 0 auto; }
+.work-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+.work-header h2 { font-size: 1.3rem; font-weight: 600; letter-spacing: -0.01em; }
+.work-header a { font-size: 0.85rem; color: #999; text-decoration: none; }
+.work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; }
+.work-item { height: 200px; border-radius: 6px; position: relative; overflow: hidden; }
+.work-item:nth-child(1) { background: url('https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=500&h=350&fit=crop') center/cover; }
+.work-item:nth-child(2) { background: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=500&h=350&fit=crop') center/cover; }
+.work-item:nth-child(3) { background: url('https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=500&h=350&fit=crop') center/cover; }
+.work-label { position: absolute; bottom: 1rem; left: 1rem; }
+.work-label span { font-size: 0.75rem; color: rgba(255,255,255,0.7); }
+.work-label h3 { font-size: 0.95rem; color: #fff; font-weight: 600; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Ava Chen</div>
+  <div class="nav-links"><span>Portfolio</span><span>About</span><span>Prints</span><span>Contact</span></div>
+  <a href="#" class="nav-cta">Book a Session</a>
+</nav>
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-tag">Photographer &amp; Visual Storyteller</div>
+    <h1>Moments that matter, beautifully captured.</h1>
+    <p>I specialize in portraits, weddings, and lifestyle photography that feels natural, intimate, and true to who you are.</p>
+    <a href="#" class="hero-btn">View Portfolio</a>
+    <a href="#" class="hero-btn-ghost">About Me →</a>
+  </div>
+  <div class="hero-images">
+    <div class="hero-img tall"></div>
+    <div class="hero-img short"></div>
+    <div class="hero-img short"></div>
+  </div>
+</section>
+<section class="work">
+  <div class="work-header">
+    <h2>Recent Work</h2>
+    <a href="#">View All →</a>
+  </div>
+  <div class="work-grid">
+    <div class="work-item"><div class="work-label"><span>Wedding</span><h3>James &amp; Priya</h3></div></div>
+    <div class="work-item"><div class="work-label"><span>Portrait</span><h3>Studio Session</h3></div></div>
+    <div class="work-item"><div class="work-label"><span>Lifestyle</span><h3>Golden Hour</h3></div></div>
+  </div>
+</section>
+</body>
+</html>

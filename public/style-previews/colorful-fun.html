@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Nunito', sans-serif; background: #FFFBF5; color: #2D2D2D; }
+
+nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align-items: center; background: #fff; }
+.logo { font-size: 1.3rem; font-weight: 800; display: flex; align-items: center; gap: 0.4rem; }
+.logo-dots { display: flex; gap: 3px; }
+.logo-dots span { width: 8px; height: 8px; border-radius: 50%; }
+.logo-dots span:nth-child(1) { background: #FF6B6B; }
+.logo-dots span:nth-child(2) { background: #4ECDC4; }
+.logo-dots span:nth-child(3) { background: #FFE66D; }
+.nav-links { display: flex; gap: 2rem; font-size: 0.9rem; color: #888; font-weight: 600; }
+.nav-cta { background: #FF6B6B; color: #fff; padding: 0.6rem 1.8rem; border-radius: 50px; font-size: 0.85rem; font-weight: 700; text-decoration: none; }
+
+.hero { padding: 4rem 4rem 3rem; text-align: center; position: relative; overflow: hidden; }
+.hero-shapes { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.shape { position: absolute; border-radius: 50%; }
+.shape.one { width: 200px; height: 200px; background: rgba(78,205,196,0.08); top: 5%; left: 5%; }
+.shape.two { width: 150px; height: 150px; background: rgba(255,107,107,0.06); top: 15%; right: 8%; }
+.shape.three { width: 120px; height: 120px; background: rgba(255,230,109,0.12); bottom: 10%; left: 12%; }
+.shape.four { width: 180px; height: 180px; background: rgba(167,139,250,0.06); bottom: 5%; right: 5%; }
+
+.hero h1 { font-size: 3rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; position: relative; }
+.hero h1 .highlight { position: relative; }
+.hero h1 .highlight::after { content: ''; position: absolute; bottom: 2px; left: 0; right: 0; height: 12px; background: rgba(255,230,109,0.5); z-index: -1; }
+.hero p { font-size: 1.05rem; color: #888; line-height: 1.7; margin-bottom: 2rem; max-width: 550px; margin-left: auto; margin-right: auto; position: relative; }
+.hero-btns { display: flex; gap: 1rem; justify-content: center; position: relative; }
+.hero-btn { display: inline-block; color: #fff; padding: 0.85rem 2.2rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.95rem; }
+.hero-btn.red { background: #FF6B6B; }
+.hero-btn.teal { background: #4ECDC4; }
+
+.events { padding: 2rem 4rem 3rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1000px; margin: 0 auto; }
+.event-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+.event-img { height: 120px; }
+.event-card:nth-child(1) .event-img { background: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=300&fit=crop') center/cover; }
+.event-card:nth-child(2) .event-img { background: url('https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=500&h=300&fit=crop') center/cover; }
+.event-card:nth-child(3) .event-img { background: url('https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=500&h=300&fit=crop') center/cover; }
+.event-content { padding: 1.2rem; }
+.event-date { font-size: 0.7rem; font-weight: 700; color: #FF6B6B; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.3rem; }
+.event-card:nth-child(2) .event-date { color: #4ECDC4; }
+.event-card:nth-child(3) .event-date { color: #A78BFA; }
+.event-content h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.3rem; }
+.event-content p { font-size: 0.8rem; color: #999; line-height: 1.5; }
+
+.impact { padding: 2rem 4rem; display: flex; justify-content: center; gap: 4rem; text-align: center; }
+.impact-stat { }
+.impact-num { font-size: 2.2rem; font-weight: 800; }
+.impact-num.red { color: #FF6B6B; }
+.impact-num.teal { color: #4ECDC4; }
+.impact-num.yellow { color: #E8C840; }
+.impact-label { font-size: 0.8rem; color: #999; font-weight: 600; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo"><div class="logo-dots"><span></span><span></span><span></span></div> IGNITE Youth</div>
+  <div class="nav-links"><span>About</span><span>Events</span><span>Get Involved</span><span>Donate</span></div>
+  <a href="#" class="nav-cta">Join Us</a>
+</nav>
+<section class="hero">
+  <div class="hero-shapes">
+    <div class="shape one"></div>
+    <div class="shape two"></div>
+    <div class="shape three"></div>
+    <div class="shape four"></div>
+  </div>
+  <h1>Empowering the next generation to <span class="highlight">dream bigger</span></h1>
+  <p>IGNITE Youth Ministry provides mentorship, creative programs, and a safe community for teens ages 12–18. Every kid deserves to know they belong.</p>
+  <div class="hero-btns">
+    <a href="#" class="hero-btn red">Upcoming Events</a>
+    <a href="#" class="hero-btn teal">Volunteer 🤝</a>
+  </div>
+</section>
+<section class="events">
+  <div class="event-card">
+    <div class="event-img"></div>
+    <div class="event-content">
+      <div class="event-date">Mar 22 • Friday Night</div>
+      <h3>Open Mic & Talent Night</h3>
+      <p>Show off your skills — music, poetry, comedy, dance. All are welcome!</p>
+    </div>
+  </div>
+  <div class="event-card">
+    <div class="event-img"></div>
+    <div class="event-content">
+      <div class="event-date">Apr 5–7 • Weekend</div>
+      <h3>Spring Camp Retreat</h3>
+      <p>Three days of adventure, worship, and friendship at Camp Pine Ridge.</p>
+    </div>
+  </div>
+  <div class="event-card">
+    <div class="event-img"></div>
+    <div class="event-content">
+      <div class="event-date">Every Tuesday • 6pm</div>
+      <h3>Mentorship Circle</h3>
+      <p>Small groups led by caring adult mentors. Real talk, real support.</p>
+    </div>
+  </div>
+</section>
+<section class="impact">
+  <div class="impact-stat">
+    <div class="impact-num red">350+</div>
+    <div class="impact-label">Teens Served</div>
+  </div>
+  <div class="impact-stat">
+    <div class="impact-num teal">45</div>
+    <div class="impact-label">Mentors</div>
+  </div>
+  <div class="impact-stat">
+    <div class="impact-num yellow">12</div>
+    <div class="impact-label">Programs</div>
+  </div>
+</section>
+</body>
+</html>

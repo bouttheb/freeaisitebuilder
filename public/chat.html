@@ -599,11 +599,11 @@ nav {
     <h3>Your Progress</h3>
     <div class="step-item completed" data-step="1">
       <div class="step-dot"></div>
-      <span>Hosting</span>
+      <span>Design</span>
     </div>
     <div class="step-item completed" data-step="2">
       <div class="step-dot"></div>
-      <span>Content</span>
+      <span>Hosting</span>
     </div>
     <div class="step-item active" data-step="3">
       <div class="step-dot"></div>
@@ -659,7 +659,7 @@ nav {
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav" style="display:flex; justify-content:space-between; align-items:center; max-width:900px; margin:0 auto; padding:1rem 2rem;">
-  <a href="/step2.html" style="font-size:0.9rem; color:var(--gray-dark); text-decoration:none;">&larr; Back to Step 2</a>
+  <a href="/step2.html" style="font-size:0.9rem; color:var(--gray-dark); text-decoration:none;">&larr; Back to Hosting</a>
 </div>
 
 <!-- LAUNCH OVERLAY -->
@@ -779,6 +779,20 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (siteData.goals && siteData.goals.length > 0) intro += `- **Site goals:** ${siteData.goals.join(', ')}\n`;
   if (siteData.services) intro += `- **Services/offerings:** ${siteData.services}\n`;
   intro += `- **Domain:** ${domain}\n`;
+
+  // Design preferences
+  if (siteData.design) {
+    const d = siteData.design;
+    const paletteMap = { ocean: 'Ocean (cool blues #0F4C75, #3282B8, #BBE1FA, #1B262C, #F0F7FA)', earth: 'Earth (warm naturals #5C4033, #8B7355, #C4A882, #2C3E2D, #F5F0E8)', sunset: 'Sunset (warm corals #E85D3A, #F4845F, #F7B267, #2D2D2D, #FFF8F0)', midnight: 'Midnight (dark luxury #0D0D0D, #1A1A2E, #C8A46E, #E0D5C0, #16213E)', garden: 'Garden (fresh greens #2D5016, #5A8F3C, #A8D870, #3A3A3A, #F5FAF0)', berry: 'Berry (rich purples #6B2D5B, #9B4DCA, #D4A5FF, #2A1B3D, #FAF0FF)' };
+    const fontMap = { 'modern-sans': 'Inter (clean, modern sans-serif)', 'classic-serif': 'Playfair Display headings + Source Sans 3 body', 'bold-statement': 'Montserrat (bold, heavy weight)', 'elegant-refined': 'Cormorant Garamond headings + Lato body', 'friendly-rounded': 'Nunito (warm, rounded)', 'editorial': 'DM Serif Display headings + DM Sans body' };
+    const styleMap = { 'modern-minimal': 'Modern Minimal (clean, spacious, lots of white space, sharp lines)', 'bold-dynamic': 'Bold & Dynamic (high contrast, large type, dark backgrounds, strong accent colors)', 'elegant-classic': 'Elegant Classic (serif fonts, muted tones, refined spacing, luxury feel)', 'warm-friendly': 'Warm & Friendly (rounded corners, soft colors, approachable, inviting)', 'dark-sleek': 'Dark & Sleek (dark background, gold/premium accents, sophisticated)', 'colorful-fun': 'Colorful & Fun (bright multi-color palette, playful, energetic)', 'corporate-pro': 'Corporate Pro (structured, blue/professional tones, trustworthy, clean grid)', 'editorial': 'Editorial (magazine-style, serif headings, structured grid, strong typography)' };
+    if (d.palette) intro += `- **Color palette:** ${paletteMap[d.palette] || d.palette}\n`;
+    if (d.font) intro += `- **Font pairing:** ${fontMap[d.font] || d.font}\n`;
+    if (d.layoutStyle) intro += `- **Layout style:** ${styleMap[d.layoutStyle] || d.layoutStyle}\n`;
+    if (d.inspirationUrl) intro += `- **Design inspiration URL:** ${d.inspirationUrl}\n`;
+    intro += `\n**IMPORTANT: Use these exact design choices. The user picked these specifically — do NOT override with generic styles.**\n`;
+  }
+
   if (siteData.images && siteData.images.length > 0) {
     intro += `- **Images available on hosting:** ${siteData.images.join(', ')}\n`;
   }
@@ -799,6 +813,13 @@ window.addEventListener('DOMContentLoaded', async () => {
   if (siteData.goals && siteData.goals.length > 0) displayIntro += `Goals: ${siteData.goals.join(', ')}<br>`;
   if (siteData.services) displayIntro += `Services: ${siteData.services}<br>`;
   displayIntro += `Domain: ${domain}<br>`;
+  if (siteData.design) {
+    const d = siteData.design;
+    if (d.palette) displayIntro += `Color palette: ${d.palette}<br>`;
+    if (d.font) displayIntro += `Fonts: ${d.font}<br>`;
+    if (d.layoutStyle) displayIntro += `Layout style: ${d.layoutStyle}<br>`;
+    if (d.inspirationUrl) displayIntro += `Inspiration: ${d.inspirationUrl}<br>`;
+  }
   const totalImages = (siteData.images ? siteData.images.length : 0) + (siteData.directUploads ? siteData.directUploads.length : 0);
   if (totalImages > 0) {
     displayIntro += `Images: ${totalImages} available`;

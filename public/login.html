@@ -199,7 +199,7 @@ async function loadUserSessions() {
         div.className = 'session-item';
         const age = Math.round((Date.now() - s.createdAt) / (1000 * 60 * 60));
         const ageStr = age < 1 ? 'Just now' : age < 24 ? `${age}h ago` : `${Math.round(age/24)}d ago`;
-        const stepNames = { 1: 'Hosting', 2: 'Content', 3: 'Building', 4: 'Launch' };
+        const stepNames = { 1: 'Design', 2: 'Hosting', 3: 'Building', 4: 'Launch' };
         div.innerHTML = `
           <div class="domain">${s.domain || 'New Project'}</div>
           <div class="meta">Step: ${stepNames[s.step] || s.step} &middot; ${ageStr}${s.hasWebsite ? ' &middot; Website generated' : ''}</div>
@@ -266,8 +266,8 @@ if (params.get('error') === 'expired') {
 
 // Show different messaging for first-time vs returning users
 if (params.get('next') === 'step2') {
-  document.getElementById('loginTitle').textContent = 'Save Your Progress';
-  document.getElementById('loginSubtitle').textContent = "Enter your email so we can save your work. If you need to step away, you can pick up right where you left off. We'll send you a magic link — no password needed.";
+  document.getElementById('loginTitle').textContent = 'Save Your Design';
+  document.getElementById('loginSubtitle').textContent = "Your design choices are saved! Enter your email so we can keep them on file while you set up hosting. We'll send you a magic link — no password needed.";
 }
 
 checkAuth();

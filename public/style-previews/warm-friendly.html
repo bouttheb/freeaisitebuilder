@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Nunito', sans-serif; background: #FFF9F2; color: #3D2E1E; }
+
+nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align-items: center; background: #fff; box-shadow: 0 2px 20px rgba(0,0,0,0.04); border-radius: 0 0 20px 20px; }
+.logo { font-size: 1.2rem; font-weight: 800; }
+.logo span { color: #F4845F; }
+.nav-links { display: flex; gap: 2rem; font-size: 0.9rem; color: #8B7B6B; font-weight: 600; }
+.nav-cta { background: #F4845F; color: #fff; padding: 0.6rem 1.8rem; border-radius: 50px; font-size: 0.85rem; font-weight: 700; text-decoration: none; }
+
+.hero { padding: 4rem 4rem 3rem; display: flex; align-items: center; gap: 3rem; max-width: 1100px; margin: 0 auto; }
+.hero-text { flex: 1; }
+.hero-badge { display: inline-block; background: #FFF0E6; color: #F4845F; padding: 0.4rem 1rem; border-radius: 50px; font-size: 0.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+.hero h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.15; margin-bottom: 1rem; }
+.hero h1 span { color: #F4845F; }
+.hero p { font-size: 1rem; color: #8B7B6B; line-height: 1.7; margin-bottom: 2rem; }
+.hero-btns { display: flex; gap: 1rem; align-items: center; }
+.hero-btn { display: inline-block; background: #F4845F; color: #fff; padding: 0.85rem 2rem; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(244,132,95,0.3); }
+.hero-btn-text { color: #3D2E1E; font-weight: 700; font-size: 0.9rem; text-decoration: none; }
+.hero-image { flex: 1; position: relative; }
+.hero-photo { width: 100%; height: 380px; background: url('https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=600&h=600&fit=crop') center/cover; border-radius: 24px; }
+.float-card { position: absolute; background: #fff; border-radius: 16px; padding: 0.8rem 1rem; box-shadow: 0 8px 30px rgba(0,0,0,0.08); }
+.float-card.one { top: 15px; right: -10px; }
+.float-card.two { bottom: 40px; left: -15px; }
+.float-emoji { font-size: 1.2rem; margin-bottom: 0.2rem; }
+.float-text { font-size: 0.75rem; font-weight: 700; }
+.float-sub { font-size: 0.6rem; color: #999; }
+
+.services { padding: 3rem 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1100px; margin: 0 auto; }
+.service-card { background: #fff; padding: 1.8rem; border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.04); }
+.service-icon { font-size: 1.8rem; margin-bottom: 0.8rem; }
+.service-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 0.4rem; }
+.service-card p { font-size: 0.82rem; color: #8B7B6B; line-height: 1.6; }
+
+.testimonial { padding: 2.5rem 4rem; max-width: 700px; margin: 0 auto; text-align: center; }
+.testimonial blockquote { font-size: 1.1rem; color: #5A4A3A; line-height: 1.7; font-weight: 400; font-style: italic; margin-bottom: 1rem; }
+.testimonial cite { font-size: 0.85rem; color: #8B7B6B; font-style: normal; font-weight: 700; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">Sarah <span>Wells</span></div>
+  <div class="nav-links"><span>About</span><span>Services</span><span>Resources</span><span>Contact</span></div>
+  <a href="#" class="nav-cta">Book a Call</a>
+</nav>
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge">✨ Accepting new clients</div>
+    <h1>Find your path to a <span>life you love</span></h1>
+    <p>I help ambitious women break through burnout, set meaningful boundaries, and build a life that actually feels good — not just looks good.</p>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn">Free Discovery Call</a>
+      <a href="#" class="hero-btn-text">How It Works →</a>
+    </div>
+  </div>
+  <div class="hero-image">
+    <div class="hero-photo"></div>
+    <div class="float-card one">
+      <div class="float-emoji">💛</div>
+      <div class="float-text">200+ Clients</div>
+      <div class="float-sub">Transformed</div>
+    </div>
+    <div class="float-card two">
+      <div class="float-emoji">⭐</div>
+      <div class="float-text">Certified Coach</div>
+      <div class="float-sub">ICF Accredited</div>
+    </div>
+  </div>
+</section>
+<section class="services">
+  <div class="service-card">
+    <div class="service-icon">🧭</div>
+    <h3>1-on-1 Coaching</h3>
+    <p>Personalized sessions to help you gain clarity, set goals, and take bold action toward the life you want.</p>
+  </div>
+  <div class="service-card">
+    <div class="service-icon">👥</div>
+    <h3>Group Programs</h3>
+    <p>Small, intimate groups for women who want community and accountability on their growth journey.</p>
+  </div>
+  <div class="service-card">
+    <div class="service-icon">📖</div>
+    <h3>Free Resources</h3>
+    <p>Guided journals, workbooks, and podcast episodes to support your journey between sessions.</p>
+  </div>
+</section>
+<section class="testimonial">
+  <blockquote>"Sarah helped me see things I couldn't see on my own. I went from overwhelmed and stuck to running my own business and actually enjoying my life."</blockquote>
+  <cite>— Maria T., Entrepreneur</cite>
+</section>
+</body>
+</html>
