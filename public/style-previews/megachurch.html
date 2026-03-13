@@ -17,7 +17,7 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
 .nav-right { display: flex; gap: 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; font-weight: 500; }
 
 .hero { position: relative; height: 520px; overflow: hidden; }
-.hero-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1400&h=700&fit=crop') center/cover; }
+.hero-bg { position: absolute; inset: 0; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%); }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.5) 100%); }
 .hero-content { position: relative; z-index: 1; padding: 5rem 4rem; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
 .hero h1 { font-size: 4.5rem; font-weight: 800; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 0; }
@@ -30,9 +30,9 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
 .cards { padding: 3rem 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
 .card { background: #151515; border-radius: 8px; overflow: hidden; }
 .card-img { height: 140px; background-size: cover; background-position: center; }
-.card:nth-child(1) .card-img { background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=500&h=300&fit=crop'); }
-.card:nth-child(2) .card-img { background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=300&fit=crop'); }
-.card:nth-child(3) .card-img { background-image: url('https://images.unsplash.com/photo-1593113630400-ea4288922497?w=500&h=300&fit=crop'); }
+.card:nth-child(1) .card-img { background: linear-gradient(135deg, #1a1a2e, #533483); }
+.card:nth-child(2) .card-img { background: linear-gradient(135deg, #0f3460, #D4920B); }
+.card:nth-child(3) .card-img { background: linear-gradient(135deg, #16213e, #1a1a2e); }
 .card-body { padding: 1.2rem 1.5rem; }
 .card-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: #D4920B; margin-bottom: 0.5rem; font-weight: 600; }
 .card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
@@ -43,7 +43,7 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
 <nav>
   <div class="logo">
     <span class="logo-mark">✝</span>
-    <div class="logo-text">elevation<span>Church</span></div>
+    <div class="logo-text">grace point<span>Church</span></div>
   </div>
   <div class="nav-links"><span>Home</span><span>About</span><span>Connect</span><span>Ministries</span></div>
   <div class="nav-right"><span>Give</span><span>Shop</span></div>

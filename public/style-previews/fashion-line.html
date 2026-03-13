@@ -14,13 +14,11 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
 .nav-right { display: flex; gap: 1.5rem; font-size: 0.8rem; color: #555; align-items: center; }
 .cart-badge { background: #111; color: #fff; width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 0.6rem; font-weight: 700; }
 
-.hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 500px; }
-.hero-image { background: url('https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=800&h=900&fit=crop') center/cover; min-height: 500px; }
-.hero-content { display: flex; flex-direction: column; justify-content: center; padding: 4rem 5rem; background: #F7F5F2; }
+.hero { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 5rem 4rem 4rem; background: #F7F5F2; }
 .hero-tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.25em; color: #999; margin-bottom: 1.5rem; }
-.hero h1 { font-size: 3.2rem; font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
+.hero h1 { font-size: 3.5rem; font-weight: 300; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 1.2rem; }
 .hero h1 em { font-style: italic; font-weight: 400; }
-.hero p { font-size: 0.95rem; color: #777; line-height: 1.7; margin-bottom: 2rem; max-width: 380px; }
+.hero p { font-size: 0.95rem; color: #777; line-height: 1.7; margin-bottom: 2rem; max-width: 480px; }
 .hero-btn { display: inline-block; background: #111; color: #fff; padding: 0.9rem 2.5rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.15em; text-decoration: none; }
 
 .products { padding: 4rem; max-width: 1200px; margin: 0 auto; }
@@ -28,12 +26,11 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
 .products-header h2 { font-size: 1.1rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
 .products-header a { font-size: 0.8rem; color: #999; text-decoration: none; letter-spacing: 0.05em; }
 .product-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
-.product-card { }
-.product-img { height: 260px; margin-bottom: 0.8rem; background-size: cover; background-position: center; }
-.product-card:nth-child(1) .product-img { background-image: url('https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=500&fit=crop'); }
-.product-card:nth-child(2) .product-img { background-image: url('https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&h=500&fit=crop'); }
-.product-card:nth-child(3) .product-img { background-image: url('https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=500&fit=crop'); }
-.product-card:nth-child(4) .product-img { background-image: url('https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=400&h=500&fit=crop'); }
+.product-img { height: 260px; margin-bottom: 0.8rem; background-size: cover; background-position: center; border-radius: 2px; }
+.product-card:nth-child(1) .product-img { background: linear-gradient(135deg, #B8C6DB 0%, #F5F0EB 100%); }
+.product-card:nth-child(2) .product-img { background: linear-gradient(135deg, #2C3E50 0%, #4A6274 100%); }
+.product-card:nth-child(3) .product-img { background: linear-gradient(135deg, #C9A96E 0%, #F5E6D3 100%); }
+.product-card:nth-child(4) .product-img { background: linear-gradient(135deg, #8B7355 0%, #D4C5B2 100%); }
 .product-name { font-size: 0.85rem; font-weight: 500; margin-bottom: 0.2rem; }
 .product-price { font-size: 0.85rem; color: #888; }
 </style>
@@ -45,18 +42,15 @@ nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align
   <div class="nav-right"><span>Search</span><span>Account</span><span>Cart <span class="cart-badge">0</span></span></div>
 </nav>
 <section class="hero">
-  <div class="hero-image"></div>
-  <div class="hero-content">
-    <div class="hero-tag">Spring / Summer 2026</div>
-    <h1>Wear your <em>intention</em></h1>
-    <p>Thoughtfully designed essentials crafted from sustainable fabrics. Less noise, more substance.</p>
-    <a href="#" class="hero-btn">Shop the Collection</a>
-  </div>
+  <div class="hero-tag">Spring / Summer 2026</div>
+  <h1>Wear your <em>intention</em></h1>
+  <p>Thoughtfully designed essentials crafted from sustainable fabrics. Less noise, more substance.</p>
+  <a href="#" class="hero-btn">Shop the Collection</a>
 </section>
 <section class="products">
   <div class="products-header">
     <h2>New Arrivals</h2>
-    <a href="#">View All →</a>
+    <a href="#">View All &rarr;</a>
   </div>
   <div class="product-grid">
     <div class="product-card"><div class="product-img"></div><div class="product-name">Linen Overshirt</div><div class="product-price">$128</div></div>
