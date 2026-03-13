@@ -29,8 +29,42 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .nav-step.active .nav-step-dot { background: var(--accent); box-shadow: 0 0 8px rgba(200,164,110,0.4); }
 .nav-step-line { width: 24px; height: 1px; background: rgba(255,255,255,0.1); }
 
-.wizard-container { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
-.step-badge { display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,164,110,0.3); padding: 0.4rem 1.2rem; border-radius: 30px; margin-bottom: 2rem; }
+/* Template picker - full width */
+.template-container { min-height: 100vh; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
+.template-header { text-align: center; margin-bottom: 2.5rem; }
+.step-badge { display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,164,110,0.3); padding: 0.4rem 1.2rem; border-radius: 30px; margin-bottom: 1.5rem; }
+.template-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+.template-title span { color: var(--accent); }
+.template-subtitle { color: var(--gray-mid); font-size: 1rem; line-height: 1.6; }
+
+.style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1400px; margin: 0 auto 2rem; padding: 0 1rem; }
+.style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative; }
+.style-card:hover { border-color: rgba(200,164,110,0.4); transform: scale(1.03); z-index: 10; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+.style-card.selected { border-color: var(--accent); box-shadow: 0 0 20px rgba(200,164,110,0.2); }
+.style-preview { height: 220px; position: relative; overflow: hidden; background: #111; }
+.style-preview iframe { width: 1200px; height: 900px; border: none; transform: scale(0.22); transform-origin: top left; pointer-events: none; }
+.style-info { background: var(--card-bg); padding: 0.7rem 1rem; }
+.style-name { font-weight: 600; font-size: 0.85rem; }
+.style-desc { font-size: 0.7rem; color: var(--gray-dark); }
+.dp-check { display: none; position: absolute; top: 0.6rem; right: 0.6rem; width: 26px; height: 26px; background: var(--accent); border-radius: 50%; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--black); font-weight: 700; z-index: 5; }
+.selected .dp-check { display: flex; }
+
+/* Hover zoom overlay */
+.zoom-overlay { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; cursor: pointer; }
+.zoom-overlay.active { display: flex; }
+.zoom-overlay iframe { width: 90vw; height: 85vh; border: none; border-radius: 12px; background: #fff; }
+.zoom-close { position: fixed; top: 1.5rem; right: 2rem; z-index: 2001; color: #fff; font-size: 2rem; cursor: pointer; background: none; border: none; font-family: sans-serif; }
+.zoom-hint { position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.style-card:hover .zoom-hint { opacity: 1; }
+
+.template-nav { text-align: center; padding: 1rem 0 2rem; }
+.template-nav .btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.85rem 2.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.template-nav .btn-next:hover { background: var(--accent-hover); }
+.template-nav .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* Wizard card for remaining steps */
+.wizard-container { min-height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
+.wizard-container.active { display: flex; }
 .wizard-card { background: var(--dark); border: 1px solid rgba(200,164,110,0.15); border-radius: 16px; padding: 3rem; max-width: 680px; width: 100%; }
 .wizard-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
 .wizard-title span { color: var(--accent); }
@@ -41,23 +75,12 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .progress-bar.active { background: var(--accent); }
 .progress-bar.done { background: var(--green); }
 
-.wizard-step { display: none; animation: fadeIn 0.4s ease; }
-.wizard-step.active { display: block; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
 label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-light); margin-bottom: 0.5rem; }
 .helper-text { font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 0.8rem; line-height: 1.5; font-style: italic; }
 input[type="text"], textarea { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.9rem 1.2rem; color: var(--off-white); font-family: 'Source Sans 3', sans-serif; font-size: 1rem; transition: border-color 0.3s ease; }
 input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
 textarea { resize: vertical; min-height: 120px; }
 .form-group { margin-bottom: 1.8rem; }
-
-.type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem; }
-.type-card { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 1.2rem 0.8rem; text-align: center; cursor: pointer; transition: all 0.3s ease; }
-.type-card:hover { border-color: rgba(200,164,110,0.3); background: rgba(200,164,110,0.05); }
-.type-card.selected { border-color: var(--accent); background: rgba(200,164,110,0.1); }
-.type-card-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
-.type-card-label { font-size: 0.85rem; font-weight: 500; }
 
 .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
 .section-option { display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 1rem; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
@@ -89,7 +112,7 @@ textarea { resize: vertical; min-height: 120px; }
 .collapsible-header svg { transition: transform 0.3s; }
 .collapsible-header.open svg { transform: rotate(90deg); }
 .collapsible-body { display: none; padding-bottom: 1rem; }
-.collapsible-body.open { display: block; animation: fadeIn 0.3s ease; }
+.collapsible-body.open { display: block; }
 
 .photo-option { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.3s ease; }
 .photo-option.selected { border-color: rgba(200,164,110,0.4); }
@@ -134,43 +157,11 @@ textarea { resize: vertical; min-height: 120px; }
 .bottom-nav a:hover { color: var(--accent); }
 footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray-dark); border-top: 1px solid rgba(255,255,255,0.05); }
 
-/* DESIGN PICKER */
-.dp-section { margin-bottom: 2rem; }
-.dp-section-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 0.3rem; }
-.dp-section h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 600; margin-bottom: 0.3rem; }
-.dp-section .dp-sub { color: var(--gray-mid); font-size: 0.85rem; margin-bottom: 1rem; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-.palette-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
-.palette-card { background: var(--card-bg); border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.8rem; cursor: pointer; transition: border-color 0.3s, transform 0.2s; position: relative; }
-.palette-card:hover { border-color: rgba(200,164,110,0.3); }
-.palette-card.selected { border-color: var(--accent); }
-.palette-colors { display: flex; gap: 0; border-radius: 6px; overflow: hidden; height: 36px; margin-bottom: 0.5rem; }
-.palette-colors div { flex: 1; }
-.palette-name { font-weight: 600; font-size: 0.8rem; }
-.palette-desc { font-size: 0.65rem; color: var(--gray-dark); }
-
-.font-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.7rem; }
-.font-card { background: var(--card-bg); border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 1rem; cursor: pointer; transition: border-color 0.3s, transform 0.2s; text-align: center; position: relative; }
-.font-card:hover { border-color: rgba(200,164,110,0.3); }
-.font-card.selected { border-color: var(--accent); }
-.font-preview-heading { font-size: 1.1rem; margin-bottom: 0.2rem; line-height: 1.2; }
-.font-preview-body { font-size: 0.75rem; color: var(--gray-mid); margin-bottom: 0.5rem; line-height: 1.4; }
-.font-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-dark); padding-top: 0.5rem; border-top: 1px solid rgba(255,255,255,0.06); }
-
-.style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7rem; }
-.style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 10px; overflow: hidden; cursor: pointer; transition: border-color 0.3s, transform 0.2s; }
-.style-card:hover { border-color: rgba(200,164,110,0.3); }
-.style-card.selected { border-color: var(--accent); }
-.style-preview { height: 130px; position: relative; overflow: hidden; background: #111; }
-.style-preview iframe { width: 1200px; height: 900px; border: none; transform: scale(0.14); transform-origin: top left; pointer-events: none; }
-.style-info { background: var(--card-bg); padding: 0.5rem 0.7rem; }
-.style-name { font-weight: 600; font-size: 0.75rem; }
-.style-desc { font-size: 0.6rem; color: var(--gray-dark); }
-
-.dp-check { display: none; position: absolute; top: 0.4rem; right: 0.4rem; width: 20px; height: 20px; background: var(--accent); border-radius: 50%; align-items: center; justify-content: center; font-size: 0.65rem; color: var(--black); font-weight: 700; }
-.selected .dp-check { display: flex; }
-
-@media (max-width: 600px) { .wizard-card { padding: 2rem 1.5rem; } .type-grid { grid-template-columns: repeat(2, 1fr); } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .palette-grid { grid-template-columns: repeat(2, 1fr); } .font-grid { grid-template-columns: repeat(2, 1fr); } .style-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 1100px) { .style-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 768px) { .style-grid { grid-template-columns: repeat(2, 1fr); } .style-preview { height: 180px; } }
+@media (max-width: 600px) { .wizard-card { padding: 2rem 1.5rem; } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .style-grid { grid-template-columns: 1fr; } .style-preview { height: 240px; } }
 </style>
 </head>
 <body>
@@ -188,221 +179,250 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
   </div>
 </nav>
 
-<div class="wizard-container">
+<!-- STEP 0: Choose Layout Template (full width) -->
+<div class="template-container" id="step0">
+  <div class="template-header">
+    <div class="step-badge">Step 1 of 4</div>
+    <h2 class="template-title">Choose a <span>layout</span> for your site</h2>
+    <p class="template-subtitle">Each template includes its own color palette and typography. Click to preview, then select the one that fits your vision.</p>
+  </div>
+
+  <div class="style-grid" id="dpStyleGrid">
+    <div class="style-card" data-style="modern-minimal" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/modern-minimal.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Modern Minimal</div><div class="style-desc">Photographer / portfolio</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="bold-dynamic" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/bold-dynamic.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Bold & Dynamic</div><div class="style-desc">Musician / artist</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="elegant-classic" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/elegant-classic.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Elegant Classic</div><div class="style-desc">Luxury product / brand</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="warm-friendly" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/warm-friendly.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Warm & Friendly</div><div class="style-desc">Small business / local shop</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="dark-sleek" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/dark-sleek.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Dark & Sleek</div><div class="style-desc">Premium service / agency</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="colorful-fun" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/colorful-fun.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Colorful & Fun</div><div class="style-desc">Youth / community</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="corporate-pro" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/corporate-pro.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Corporate Pro</div><div class="style-desc">Consulting / professional</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="editorial" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/editorial.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Editorial</div><div class="style-desc">Church / organization</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="fashion-line" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/fashion-line.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Fashion Line</div><div class="style-desc">Clothing / ecommerce</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="band-retro" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/band-retro.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Band & Tour</div><div class="style-desc">Band / live music</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="life-coach" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/life-coach.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Life Coach</div><div class="style-desc">Coach / personal brand</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+    <div class="style-card" data-style="megachurch" onclick="selectTemplate(this)" ondblclick="zoomTemplate(this)">
+      <div class="style-preview"><iframe src="/style-previews/megachurch.html" loading="lazy"></iframe></div>
+      <div class="style-info"><div class="style-name">Modern Church</div><div class="style-desc">Megachurch / ministry</div></div>
+      <div class="dp-check">&#10003;</div>
+      <div class="zoom-hint">Double-click to preview</div>
+    </div>
+  </div>
+
+  <div class="template-nav">
+    <button class="btn-next" id="btnNextTemplate" disabled onclick="goToStep(1)">Next — Add Your Details →</button>
+  </div>
+</div>
+
+<!-- Zoom overlay for previewing templates -->
+<div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom(event)">
+  <button class="zoom-close" onclick="closeZoom(event)">&times;</button>
+  <iframe id="zoomIframe" src="about:blank"></iframe>
+</div>
+
+<!-- STEP 1: Name (wizard card) -->
+<div class="wizard-container" id="step1">
   <div class="step-badge">Step 1 of 4</div>
   <div class="wizard-card">
     <div class="wizard-progress" id="progressBars"></div>
+    <h2 class="wizard-title">What's the <span>name</span>?</h2>
+    <p class="wizard-subtitle">This will appear in the header and throughout your website.</p>
+    <div class="form-group">
+      <label>Site / Business Name</label>
+      <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="validateName()">
+    </div>
+    <div class="form-group">
+      <label>Tagline or Slogan (optional)</label>
+      <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
+      <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
+    </div>
+    <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
+      <label style="color: var(--gray-dark); font-size: 0.75rem;">Have a site you love? (optional)</label>
+      <p class="helper-text">Paste a URL and the AI will draw inspiration from its look and feel.</p>
+      <input type="text" id="inspirationUrl" placeholder="e.g., https://example.com">
+    </div>
+    <div class="wizard-nav"><button class="btn-back" onclick="goToStep(0)">← Back</button><button class="btn-next" id="btnNext1" disabled onclick="goToStep(2)">Next →</button></div>
+  </div>
+</div>
 
-    <!-- WS0: Site Type -->
-    <div class="wizard-step active" id="ws0">
-      <h2 class="wizard-title">What kind of <span>site</span> are you building?</h2>
-      <p class="wizard-subtitle">This helps the AI understand your needs and suggest the right layout.</p>
-      <div class="type-grid">
-        <div class="type-card" data-type="business" onclick="selectType(this)"><div class="type-card-icon">🏢</div><div class="type-card-label">Business</div></div>
-        <div class="type-card" data-type="portfolio" onclick="selectType(this)"><div class="type-card-icon">🎨</div><div class="type-card-label">Portfolio</div></div>
-        <div class="type-card" data-type="restaurant" onclick="selectType(this)"><div class="type-card-icon">🍽️</div><div class="type-card-label">Restaurant</div></div>
-        <div class="type-card" data-type="church" onclick="selectType(this)"><div class="type-card-icon">⛪</div><div class="type-card-label">Church</div></div>
-        <div class="type-card" data-type="blog" onclick="selectType(this)"><div class="type-card-icon">✍️</div><div class="type-card-label">Blog</div></div>
-        <div class="type-card" data-type="nonprofit" onclick="selectType(this)"><div class="type-card-icon">💛</div><div class="type-card-label">Nonprofit</div></div>
-        <div class="type-card" data-type="personal" onclick="selectType(this)"><div class="type-card-icon">👤</div><div class="type-card-label">Personal</div></div>
-        <div class="type-card" data-type="event" onclick="selectType(this)"><div class="type-card-icon">🎉</div><div class="type-card-label">Event</div></div>
-        <div class="type-card" data-type="other" onclick="selectType(this)"><div class="type-card-icon">✨</div><div class="type-card-label">Other</div></div>
-      </div>
-      <div class="form-group" id="otherTypeGroup" style="display:none;">
-        <label>What type of site?</label>
-        <input type="text" id="otherType" placeholder="e.g., music, real estate, coaching">
-      </div>
-      <div class="wizard-nav"><div></div><button class="btn-next" id="btnNext0" disabled onclick="nextStep(1)">Next →</button></div>
+<!-- STEP 2: Description -->
+<div class="wizard-container" id="step2">
+  <div class="step-badge">Step 1 of 4</div>
+  <div class="wizard-card">
+    <div class="wizard-progress" id="progressBars2"></div>
+    <h2 class="wizard-title">Tell us about your <span>project</span></h2>
+    <p class="wizard-subtitle">Give the AI as much or as little detail as you want. You can upload a document you already have, or just type a few sentences.</p>
+
+    <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
+      <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
+      <p>📄 Upload a document about your project</p>
+      <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
+      <div class="uploaded-name" id="docFileName" style="display:none;"></div>
     </div>
 
-    <!-- WS1: Design Picker -->
-    <div class="wizard-step" id="ws1">
-      <h2 class="wizard-title">Choose your <span>design</span></h2>
-      <p class="wizard-subtitle">Pick a palette, fonts, and layout style so the AI builds something you'll actually love.</p>
+    <div class="or-divider">or type it out</div>
 
-      <div class="dp-section">
-        <p class="dp-section-label">Color Palette</p>
-        <div class="palette-grid" id="dpPaletteGrid">
-          <div class="palette-card" data-palette="ocean" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#0F4C75"></div><div style="background:#3282B8"></div><div style="background:#BBE1FA"></div><div style="background:#1B262C"></div><div style="background:#F0F7FA"></div></div><div class="palette-name">Ocean</div><div class="palette-desc">Cool blues, trust & professionalism</div><div class="dp-check">&#10003;</div></div>
-          <div class="palette-card" data-palette="earth" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#5C4033"></div><div style="background:#8B7355"></div><div style="background:#C4A882"></div><div style="background:#2C3E2D"></div><div style="background:#F5F0E8"></div></div><div class="palette-name">Earth</div><div class="palette-desc">Warm naturals, grounded & organic</div><div class="dp-check">&#10003;</div></div>
-          <div class="palette-card" data-palette="sunset" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#E85D3A"></div><div style="background:#F4845F"></div><div style="background:#F7B267"></div><div style="background:#2D2D2D"></div><div style="background:#FFF8F0"></div></div><div class="palette-name">Sunset</div><div class="palette-desc">Warm corals & amber, energetic</div><div class="dp-check">&#10003;</div></div>
-          <div class="palette-card" data-palette="midnight" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#0D0D0D"></div><div style="background:#1A1A2E"></div><div style="background:#C8A46E"></div><div style="background:#E0D5C0"></div><div style="background:#16213E"></div></div><div class="palette-name">Midnight</div><div class="palette-desc">Dark & luxurious with gold accents</div><div class="dp-check">&#10003;</div></div>
-          <div class="palette-card" data-palette="garden" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#2D5016"></div><div style="background:#5A8F3C"></div><div style="background:#A8D870"></div><div style="background:#3A3A3A"></div><div style="background:#F5FAF0"></div></div><div class="palette-name">Garden</div><div class="palette-desc">Fresh greens, growth & vitality</div><div class="dp-check">&#10003;</div></div>
-          <div class="palette-card" data-palette="berry" onclick="selectDpPalette(this)"><div class="palette-colors"><div style="background:#6B2D5B"></div><div style="background:#9B4DCA"></div><div style="background:#D4A5FF"></div><div style="background:#2A1B3D"></div><div style="background:#FAF0FF"></div></div><div class="palette-name">Berry</div><div class="palette-desc">Rich purples, creative & bold</div><div class="dp-check">&#10003;</div></div>
-        </div>
-      </div>
-
-      <div class="dp-section">
-        <p class="dp-section-label">Font Pairing</p>
-        <div class="font-grid" id="dpFontGrid">
-          <div class="font-card" data-font="modern-sans" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Inter',sans-serif;font-weight:700;">Clean & Modern</div><div class="font-preview-body" style="font-family:'Inter',sans-serif;font-weight:300;">Simple, sharp, readable.</div><div class="font-label">Inter</div><div class="dp-check">&#10003;</div></div>
-          <div class="font-card" data-font="classic-serif" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Playfair Display',serif;font-weight:700;">Timeless Elegance</div><div class="font-preview-body" style="font-family:'Source Sans 3',sans-serif;font-weight:300;">Refined headlines, clean body.</div><div class="font-label">Playfair + Source Sans</div><div class="dp-check">&#10003;</div></div>
-          <div class="font-card" data-font="bold-statement" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Montserrat',sans-serif;font-weight:800;">BOLD IMPACT</div><div class="font-preview-body" style="font-family:'Montserrat',sans-serif;font-weight:300;">Strong, commands attention.</div><div class="font-label">Montserrat</div><div class="dp-check">&#10003;</div></div>
-          <div class="font-card" data-font="elegant-refined" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:1.2rem;">Graceful & Refined</div><div class="font-preview-body" style="font-family:'Lato',sans-serif;font-weight:300;">Sophisticated serif + modern body.</div><div class="font-label">Cormorant + Lato</div><div class="dp-check">&#10003;</div></div>
-          <div class="font-card" data-font="friendly-rounded" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'Nunito',sans-serif;font-weight:700;">Warm & Friendly</div><div class="font-preview-body" style="font-family:'Nunito',sans-serif;font-weight:400;">Approachable, inviting feel.</div><div class="font-label">Nunito</div><div class="dp-check">&#10003;</div></div>
-          <div class="font-card" data-font="editorial" onclick="selectDpFont(this)"><div class="font-preview-heading" style="font-family:'DM Serif Display',serif;font-weight:400;">Editorial Style</div><div class="font-preview-body" style="font-family:'DM Sans',sans-serif;font-weight:400;">Magazine-quality typography.</div><div class="font-label">DM Serif + DM Sans</div><div class="dp-check">&#10003;</div></div>
-        </div>
-      </div>
-
-      <div class="dp-section">
-        <p class="dp-section-label">Layout Style</p>
-        <div class="style-grid" id="dpStyleGrid">
-          <div class="style-card" data-style="modern-minimal" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/modern-minimal.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Modern Minimal</div><div class="style-desc">Photographer portfolio</div></div></div>
-          <div class="style-card" data-style="bold-dynamic" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/bold-dynamic.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Bold & Dynamic</div><div class="style-desc">Artist / musician</div></div></div>
-          <div class="style-card" data-style="elegant-classic" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/elegant-classic.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Elegant Classic</div><div class="style-desc">Luxury product</div></div></div>
-          <div class="style-card" data-style="warm-friendly" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/warm-friendly.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Warm & Friendly</div><div class="style-desc">Coach / therapist</div></div></div>
-          <div class="style-card" data-style="dark-sleek" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/dark-sleek.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Dark & Sleek</div><div class="style-desc">Premium service</div></div></div>
-          <div class="style-card" data-style="colorful-fun" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/colorful-fun.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Colorful & Fun</div><div class="style-desc">Youth / community</div></div></div>
-          <div class="style-card" data-style="corporate-pro" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/corporate-pro.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Corporate Pro</div><div class="style-desc">Consulting / professional</div></div></div>
-          <div class="style-card" data-style="editorial" onclick="selectDpStyle(this)"><div class="style-preview"><iframe src="/style-previews/editorial.html" loading="lazy"></iframe></div><div class="style-info"><div class="style-name">Editorial</div><div class="style-desc">Church / organization</div></div></div>
-        </div>
-      </div>
-
-      <div class="form-group" style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.06);">
-        <label style="color: var(--gray-dark); font-size: 0.75rem;">Have a site you love? (optional)</label>
-        <p class="helper-text">Paste a URL and the AI will draw inspiration from its look and feel.</p>
-        <input type="text" id="inspirationUrl" placeholder="e.g., https://example.com">
-      </div>
-
-      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(0)">← Back</button><button class="btn-next" id="btnNext1" disabled onclick="nextStep(2)">Next →</button></div>
+    <div class="form-group">
+      <label id="descLabel">About your project</label>
+      <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
+      <textarea id="siteDesc" placeholder="Describe what this site is about, who it's for, and what visitors should learn or do when they arrive." oninput="validateDesc()"></textarea>
     </div>
 
-    <!-- WS2: Name -->
-    <div class="wizard-step" id="ws2">
-      <h2 class="wizard-title">What's the <span>name</span>?</h2>
-      <p class="wizard-subtitle">This will appear in the header and throughout your website.</p>
-      <div class="form-group">
-        <label>Site / Business Name</label>
-        <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="validateName()">
-      </div>
-      <div class="form-group">
-        <label>Tagline or Slogan (optional)</label>
-        <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
-        <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
-      </div>
-      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(1)">← Back</button><button class="btn-next" id="btnNext2" disabled onclick="nextStep(3)">Next →</button></div>
+    <!-- Optional: Goals -->
+    <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      Add site goals (optional)
     </div>
-
-    <!-- WS3: Description -->
-    <div class="wizard-step" id="ws3">
-      <h2 class="wizard-title">Tell us about your <span>project</span></h2>
-      <p class="wizard-subtitle">Give the AI as much or as little detail as you want. You can upload a document you already have, or just type a few sentences and see what the AI comes up with.</p>
-
-      <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
-        <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
-        <p>📄 Upload a document about your project</p>
-        <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
-        <div class="uploaded-name" id="docFileName" style="display:none;"></div>
-      </div>
-
-      <div class="or-divider">or type it out</div>
-
-      <div class="form-group">
-        <label id="descLabel">About your project</label>
-        <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
-        <textarea id="siteDesc" placeholder="" oninput="validateDesc()"></textarea>
-      </div>
-
-      <!-- Optional: Goals -->
-      <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        Add site goals (optional)
-      </div>
-      <div class="collapsible-body" id="goalsBody">
-        <p class="helper-text">What should your site help you do? Pick any that apply.</p>
-        <div class="section-grid" id="goalGrid">
-          <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Attract customers</span></div>
-          <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Showcase work</span></div>
-          <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Provide info</span></div>
-          <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Build credibility</span></div>
-          <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Get bookings</span></div>
-          <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Collect leads</span></div>
-        </div>
-      </div>
-
-      <!-- Optional: Services -->
-      <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-        Add services / offerings (optional)
-      </div>
-      <div class="collapsible-body" id="servicesBody">
-        <div class="form-group" style="margin-bottom:0;">
-          <p class="helper-text" id="servicesHelper">List what you offer, separated by commas.</p>
-          <input type="text" id="services" placeholder="">
-        </div>
-      </div>
-
-      <div class="wizard-nav"><button class="btn-back" onclick="prevStep(2)">← Back</button><button class="btn-next" id="btnNext3" disabled onclick="nextStep(4)">Next →</button></div>
-    </div>
-
-    <!-- WS4: Photos -->
-    <div class="wizard-step" id="ws4">
-      <h2 class="wizard-title">Add your <span>photos</span></h2>
-      <p class="wizard-subtitle">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
-
-      <!-- Option A: Direct upload (5 or fewer) -->
-      <div class="photo-option" id="photoOptionUpload">
-        <div class="photo-option-header" onclick="selectPhotoOption('upload')">
-          <div class="photo-option-radio" id="radioUpload"></div>
-          <div>
-            <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
-            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
-          </div>
-        </div>
-        <div class="photo-option-body" id="uploadBody" style="display: none;">
-          <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
-            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
-            <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
-          </div>
-          <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
-          <div class="uploaded-images" id="uploadedImagesList"></div>
-        </div>
-      </div>
-
-      <!-- Option B: Bluehost hosting (many images) — hidden until hosting is set up in step 2 -->
-      <div class="photo-option" id="photoOptionHosting" style="display:none;">
-        <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
-          <div class="photo-option-radio" id="radioHosting"></div>
-          <div>
-            <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
-            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
-          </div>
-        </div>
-        <div class="photo-option-body" id="hostingBody" style="display: none;">
-          <div class="photo-instructions">
-            <h4>Three quick steps:</h4>
-            <ol>
-              <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
-              <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong> in the top toolbar. Select all your photos in Finder/Explorer and <strong>drag and drop them all at once</strong> into the upload area.</li>
-              <li>Go back to <code>public_html</code>, then download this helper file and upload it there (same level as <code>images</code>):</li>
-            </ol>
-            <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
-          </div>
-          <div class="form-group" style="margin-top: 1rem;">
-            <label>Your Domain</label>
-            <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
-            <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
-              <button class="btn-next" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
-            </div>
-          </div>
-          <div class="image-results" id="imageResults"></div>
-          <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
-            <div class="photo-check-box" id="photoCheckBox">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div>I've uploaded my photos and the helper file</div>
-          </div>
-        </div>
-      </div>
-
-      <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
-      <div class="wizard-nav" style="margin-top: 1.5rem;">
-        <button class="btn-back" onclick="prevStep(3)">← Back</button>
-        <button class="btn-next" id="btnNext4" disabled onclick="finishWizard()">Start Building →</button>
+    <div class="collapsible-body" id="goalsBody">
+      <p class="helper-text">What should your site help you do? Pick any that apply.</p>
+      <div class="section-grid" id="goalGrid">
+        <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Attract customers</span></div>
+        <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Showcase work</span></div>
+        <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Provide info</span></div>
+        <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Build credibility</span></div>
+        <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Get bookings</span></div>
+        <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Collect leads</span></div>
       </div>
     </div>
 
+    <!-- Optional: Services -->
+    <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      Add services / offerings (optional)
+    </div>
+    <div class="collapsible-body" id="servicesBody">
+      <div class="form-group" style="margin-bottom:0;">
+        <p class="helper-text">List what you offer, separated by commas.</p>
+        <input type="text" id="services" placeholder="e.g., Web Design, Branding, Photography, Consulting">
+      </div>
+    </div>
+
+    <div class="wizard-nav"><button class="btn-back" onclick="goToStep(1)">← Back</button><button class="btn-next" id="btnNext2" disabled onclick="goToStep(3)">Next →</button></div>
+  </div>
+</div>
+
+<!-- STEP 3: Photos -->
+<div class="wizard-container" id="step3">
+  <div class="step-badge">Step 1 of 4</div>
+  <div class="wizard-card">
+    <div class="wizard-progress" id="progressBars3"></div>
+    <h2 class="wizard-title">Add your <span>photos</span></h2>
+    <p class="wizard-subtitle">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
+
+    <!-- Option A: Direct upload (5 or fewer) -->
+    <div class="photo-option" id="photoOptionUpload">
+      <div class="photo-option-header" onclick="selectPhotoOption('upload')">
+        <div class="photo-option-radio" id="radioUpload"></div>
+        <div>
+          <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
+          <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
+        </div>
+      </div>
+      <div class="photo-option-body" id="uploadBody" style="display: none;">
+        <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
+          <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
+        </div>
+        <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
+        <div class="uploaded-images" id="uploadedImagesList"></div>
+      </div>
+    </div>
+
+    <!-- Option B: Bluehost hosting (many images) — hidden until hosting is set up -->
+    <div class="photo-option" id="photoOptionHosting" style="display:none;">
+      <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
+        <div class="photo-option-radio" id="radioHosting"></div>
+        <div>
+          <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
+          <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
+        </div>
+      </div>
+      <div class="photo-option-body" id="hostingBody" style="display: none;">
+        <div class="photo-instructions">
+          <h4>Three quick steps:</h4>
+          <ol>
+            <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
+            <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong> in the top toolbar. Select all your photos and <strong>drag and drop them all at once</strong> into the upload area.</li>
+            <li>Go back to <code>public_html</code>, then download this helper file and upload it there (same level as <code>images</code>):</li>
+          </ol>
+          <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
+        </div>
+        <div class="form-group" style="margin-top: 1rem;">
+          <label>Your Domain</label>
+          <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
+          <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
+            <button class="btn-next" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
+          </div>
+        </div>
+        <div class="image-results" id="imageResults"></div>
+        <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
+          <div class="photo-check-box" id="photoCheckBox">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>I've uploaded my photos and the helper file</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
+    <div class="wizard-nav" style="margin-top: 1.5rem;">
+      <button class="btn-back" onclick="goToStep(2)">← Back</button>
+      <button class="btn-next" id="btnNext3" disabled onclick="finishWizard()">Start Building →</button>
+    </div>
   </div>
 </div>
 
@@ -413,95 +433,91 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 <footer>&copy; 2026 freeaisitebuilder.com. All rights reserved.</footer>
 
 <script>
-// No auth required for step 1 — auth happens before step 2
-
-const TOTAL_STEPS = 5;
+const TOTAL_SUBSTEPS = 3; // name, desc, photos
 let currentStep = 0;
-let selectedType = null;
 let selectedGoals = [];
 let photosConfirmed = false;
 let photosSkipped = false;
 let foundImages = [];
 let uploadedDocText = '';
-let uploadedImageFiles = []; // direct uploads
+let uploadedImageFiles = [];
 let selectedPhotoOption = null;
-let dpPalette = null;
-let dpFont = null;
 let dpStyle = null;
 
-if (localStorage.getItem('wb_completed_step1') === 'true') document.getElementById('forwardBtn').style.display = 'inline';
-
-// Progress bars
-const pbContainer = document.getElementById('progressBars');
-for (let i = 0; i < TOTAL_STEPS; i++) {
-  const bar = document.createElement('div');
-  bar.className = 'progress-bar' + (i === 0 ? ' active' : '');
-  bar.id = `pb${i}`;
-  pbContainer.appendChild(bar);
+if (localStorage.getItem('wb_completed_step1') === 'true') {
+  const fwd = document.getElementById('forwardBtn');
+  if (fwd) fwd.style.display = 'inline';
 }
 
-// Contextual placeholders
-const descPlaceholders = {
-  business: "e.g., We're a family-owned landscaping company in Austin, TX. We specialize in residential lawn care, garden design, and outdoor living spaces. We've been serving the community for 12 years.",
-  portfolio: "e.g., I'm a freelance graphic designer specializing in brand identity and packaging design. I've worked with startups and established brands across the food and beverage industry.",
-  restaurant: "e.g., We're a family-run Italian restaurant in downtown Nashville. We serve authentic wood-fired pizza, handmade pasta, and a curated selection of Italian wines.",
-  church: "e.g., We're a welcoming, non-denominational church in Memphis, TN. We believe in building community through worship, service, and genuine relationships.",
-  blog: "e.g., I write about personal finance for millennials — budgeting, investing, and building wealth without sacrificing your quality of life.",
-  nonprofit: "e.g., We provide free coding education to underserved youth. Our mission is to close the digital divide.",
-  personal: "e.g., I'm a photographer and traveler based in Portland. This site is a place to share my work and connect with people.",
-  event: "e.g., An annual 3-day music festival in Boulder, CO featuring 50+ local and national acts, food vendors, and art installations.",
-  other: "Describe what this site is about, who it's for, and what visitors should learn or do when they arrive.",
-};
-const servicesPlaceholders = {
-  business: "e.g., Lawn Mowing, Garden Design, Tree Trimming, Outdoor Patios",
-  portfolio: "e.g., Brand Identity, Logo Design, Packaging, Web Design",
-  restaurant: "e.g., Dine-In, Takeout, Catering, Private Events",
-  church: "e.g., Sunday Worship, Bible Study, Youth Group, Outreach",
-  nonprofit: "e.g., After-School Classes, Summer Camp, Mentorship",
-  event: "e.g., Live Music, Food Court, Art Exhibition, Workshops",
-  other: "e.g., List the main things you offer, separated by commas",
-};
-const descLabels = { business:'About your business', portfolio:'About you and your work', restaurant:'About your restaurant', church:'About your church', blog:'What do you write about?', nonprofit:'About your organization', personal:'About you', event:'About the event', other:'About your project' };
-const descHelpers = { business:'What do you do? Who do you serve? What makes you different?', portfolio:'What kind of work do you do? What are you known for?', restaurant:"What type of food? What's the vibe? Any history?", church:"What's your mission? What can visitors expect?", blog:'What topics? Who is your audience?', nonprofit:"What's your mission? Who do you help?", personal:'Who are you? What do you want people to know?', event:'What, when, where, and who is it for?', other:'What is the purpose? Who is it for?' };
+// Build progress bars for wizard steps
+function buildProgressBars(containerId, activeIndex) {
+  const c = document.getElementById(containerId);
+  if (!c) return;
+  c.innerHTML = '';
+  for (let i = 0; i < TOTAL_SUBSTEPS; i++) {
+    const bar = document.createElement('div');
+    bar.className = 'progress-bar' + (i < activeIndex ? ' done' : '') + (i === activeIndex ? ' active' : '');
+    c.appendChild(bar);
+  }
+}
 
-// Design picker functions
-function selectDpPalette(el) {
-  document.querySelectorAll('#dpPaletteGrid .palette-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  dpPalette = el.dataset.palette;
-  checkDesignReady();
-}
-function selectDpFont(el) {
-  document.querySelectorAll('#dpFontGrid .font-card').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-  dpFont = el.dataset.font;
-  checkDesignReady();
-}
-function selectDpStyle(el) {
+// Template selection
+function selectTemplate(el) {
+  // Don't select on double-click
   document.querySelectorAll('#dpStyleGrid .style-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   dpStyle = el.dataset.style;
-  checkDesignReady();
-}
-function checkDesignReady() {
-  document.getElementById('btnNext1').disabled = !(dpPalette && dpFont && dpStyle);
+  document.getElementById('btnNextTemplate').disabled = false;
 }
 
-function selectType(card) {
-  document.querySelectorAll('#ws0 .type-card').forEach(c => c.classList.remove('selected'));
-  card.classList.add('selected');
-  selectedType = card.dataset.type;
-  document.getElementById('otherTypeGroup').style.display = selectedType === 'other' ? 'block' : 'none';
-  document.getElementById('btnNext0').disabled = false;
+// Zoom preview
+function zoomTemplate(el) {
+  const src = el.querySelector('iframe').src;
+  document.getElementById('zoomIframe').src = src;
+  document.getElementById('zoomOverlay').classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+function closeZoom(e) {
+  if (e.target === document.getElementById('zoomIframe')) return;
+  document.getElementById('zoomOverlay').classList.remove('active');
+  document.getElementById('zoomIframe').src = 'about:blank';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeZoom(e);
+});
+
+// Step navigation
+function goToStep(n) {
+  // Hide all
+  document.getElementById('step0').style.display = 'none';
+  document.getElementById('step1').style.display = 'none';
+  document.getElementById('step2').style.display = 'none';
+  document.getElementById('step3').style.display = 'none';
+
+  if (n === 0) {
+    document.getElementById('step0').style.display = 'block';
+  } else {
+    const el = document.getElementById(`step${n}`);
+    el.style.display = 'flex';
+    el.classList.add('active');
+    // Update progress bars
+    const barId = n === 1 ? 'progressBars' : n === 2 ? 'progressBars2' : 'progressBars3';
+    buildProgressBars(barId, n - 1);
+  }
+
+  currentStep = n;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// Validation
 function validateName() {
-  document.getElementById('btnNext2').disabled = !document.getElementById('siteName').value.trim();
+  document.getElementById('btnNext1').disabled = !document.getElementById('siteName').value.trim();
 }
 
 function validateDesc() {
   const hasDesc = document.getElementById('siteDesc').value.trim();
-  document.getElementById('btnNext3').disabled = !(hasDesc || uploadedDocText);
+  document.getElementById('btnNext2').disabled = !(hasDesc || uploadedDocText);
 }
 
 function toggleGoal(el) {
@@ -523,26 +539,11 @@ function handleDocUpload(event) {
 
   if (file.name.endsWith('.txt')) {
     const reader = new FileReader();
-    reader.onload = (e) => { uploadedDocText = e.target.result; document.getElementById('btnNext3').disabled = false; };
+    reader.onload = (e) => { uploadedDocText = e.target.result; document.getElementById('btnNext2').disabled = false; };
     reader.readAsText(file);
   } else {
-    // For non-text files, just note the filename — actual upload happens after auth in the build step
     uploadedDocText = `[User has a document: ${file.name} — ask them to describe its contents]`;
-    document.getElementById('btnNext3').disabled = false;
-  }
-}
-
-function updateContextualFields() {
-  const t = selectedType || 'other';
-  document.getElementById('siteDesc').placeholder = descPlaceholders[t] || descPlaceholders.other;
-  document.getElementById('descLabel').textContent = descLabels[t] || descLabels.other;
-  document.getElementById('descHelper').textContent = descHelpers[t] || descHelpers.other;
-  const sp = servicesPlaceholders[t];
-  if (!sp || t === 'blog' || t === 'personal') {
-    document.getElementById('servicesCollapsible').style.display = 'none';
-  } else {
-    document.getElementById('servicesCollapsible').style.display = 'flex';
-    document.getElementById('services').placeholder = sp;
+    document.getElementById('btnNext2').disabled = false;
   }
 }
 
@@ -559,7 +560,7 @@ function updatePhotoNextBtn() {
   const canProceed = photosSkipped
     || (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0)
     || (selectedPhotoOption === 'hosting' && (photosConfirmed || foundImages.length > 0));
-  document.getElementById('btnNext4').disabled = !canProceed;
+  document.getElementById('btnNext3').disabled = !canProceed;
 }
 
 function handleImageUpload(event) {
@@ -633,7 +634,7 @@ function togglePhotoConfirm() {
   document.getElementById('photoCheckmark').style.display = photosConfirmed ? 'block' : 'none';
   updatePhotoNextBtn();
 }
-function skipPhotos() { photosSkipped = true; document.getElementById('btnNext4').disabled = false; }
+function skipPhotos() { photosSkipped = true; document.getElementById('btnNext3').disabled = false; }
 
 function downloadPhpHelper() {
   const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
@@ -642,6 +643,7 @@ function downloadPhpHelper() {
 }
 
 async function checkImages() {
+  const domain = localStorage.getItem('wb_domain') || '';
   const el = document.getElementById('imageResults');
   el.style.display = 'block'; el.className = 'image-results'; el.innerHTML = '<p>Checking...</p>';
   try {
@@ -649,41 +651,18 @@ async function checkImages() {
     if (!resp.ok) throw new Error();
     const images = await resp.json();
     if (images.length === 0) { el.className = 'image-results error'; el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>'; }
-    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; document.getElementById('btnNext4').disabled = false; }
+    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; document.getElementById('btnNext3').disabled = false; }
   } catch { el.className = 'image-results error'; el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`; }
 }
 
-function nextStep(n) {
-  if (n === 3) updateContextualFields();
-  document.getElementById(`ws${currentStep}`).classList.remove('active');
-  document.getElementById(`ws${n}`).classList.add('active');
-  for (let i = 0; i < TOTAL_STEPS; i++) {
-    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
-  }
-  currentStep = n;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-function prevStep(n) {
-  document.getElementById(`ws${currentStep}`).classList.remove('active');
-  document.getElementById(`ws${n}`).classList.add('active');
-  for (let i = 0; i < TOTAL_STEPS; i++) {
-    document.getElementById(`pb${i}`).className = 'progress-bar' + (i < n ? ' done' : '') + (i === n ? ' active' : '');
-  }
-  currentStep = n;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
 async function finishWizard() {
-  const siteType = selectedType === 'other' ? (document.getElementById('otherType').value.trim() || 'other') : selectedType;
   const sessionId = localStorage.getItem('wb_session') || 'session-' + Date.now();
   localStorage.setItem('wb_session', sessionId);
 
   let directUploadNames = [];
 
-  // Store image file names — actual upload happens after auth in the build step
   if (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0) {
     directUploadNames = uploadedImageFiles.map(f => f.name);
-    // Store files in memory for upload after auth
     try {
       const imageDataArr = [];
       for (const f of uploadedImageFiles) {
@@ -701,7 +680,7 @@ async function finishWizard() {
   }
 
   const data = {
-    type: siteType,
+    type: 'custom',
     goals: selectedGoals,
     name: document.getElementById('siteName').value.trim(),
     tagline: document.getElementById('tagline').value.trim(),
@@ -713,8 +692,8 @@ async function finishWizard() {
     domain: localStorage.getItem('wb_domain') || '',
     photosSkipped: photosSkipped,
     design: {
-      palette: dpPalette,
-      font: dpFont,
+      palette: null,
+      font: null,
       layoutStyle: dpStyle,
       inspirationUrl: document.getElementById('inspirationUrl') ? document.getElementById('inspirationUrl').value.trim() : ''
     }
@@ -735,6 +714,9 @@ async function finishWizard() {
     window.location.href = '/login.html?next=step2';
   }
 }
+
+// Initialize — show template picker
+goToStep(0);
 </script>
 </body>
 </html>

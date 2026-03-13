@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Montserrat', sans-serif; background: #0A0A0A; color: #fff; }
+
+nav { padding: 1.2rem 4rem; display: flex; justify-content: space-between; align-items: center; background: #0A0A0A; position: relative; z-index: 10; }
+.logo { display: flex; align-items: center; gap: 0.6rem; font-size: 1.1rem; font-weight: 700; }
+.logo-mark { color: #D4920B; font-size: 1.4rem; }
+.logo-text { text-transform: lowercase; font-weight: 500; letter-spacing: 0.02em; }
+.logo-text span { display: block; font-size: 0.5rem; text-transform: uppercase; letter-spacing: 0.25em; color: #888; font-weight: 500; }
+.nav-links { display: flex; gap: 2.5rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em; color: #D4920B; font-weight: 600; }
+.nav-right { display: flex; gap: 2rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; color: #888; font-weight: 500; }
+
+.hero { position: relative; height: 520px; overflow: hidden; }
+.hero-bg { position: absolute; inset: 0; background: url('https://images.unsplash.com/photo-1516450360452-9312f5e86fc7?w=1400&h=700&fit=crop') center/cover; }
+.hero-overlay { position: absolute; inset: 0; background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 60%, rgba(0,0,0,0.5) 100%); }
+.hero-content { position: relative; z-index: 1; padding: 5rem 4rem; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.hero h1 { font-size: 4.5rem; font-weight: 800; line-height: 0.95; text-transform: uppercase; letter-spacing: -0.02em; margin-bottom: 0; }
+.hero h1 .accent { color: #D4920B; }
+.hero-info { position: absolute; bottom: 4rem; right: 4rem; text-align: right; font-size: 0.8rem; color: #ccc; line-height: 1.7; }
+.hero-btns { display: flex; gap: 1rem; margin-top: 2rem; }
+.hero-btn { background: #fff; color: #111; padding: 0.85rem 2.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none; border-radius: 30px; }
+.hero-btn-accent { background: #D4920B; color: #fff; padding: 0.85rem 2.5rem; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; text-decoration: none; border-radius: 30px; }
+
+.cards { padding: 3rem 4rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; max-width: 1200px; margin: 0 auto; }
+.card { background: #151515; border-radius: 8px; overflow: hidden; }
+.card-img { height: 140px; background-size: cover; background-position: center; }
+.card:nth-child(1) .card-img { background-image: url('https://images.unsplash.com/photo-1529070538774-1843cb3265df?w=500&h=300&fit=crop'); }
+.card:nth-child(2) .card-img { background-image: url('https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=500&h=300&fit=crop'); }
+.card:nth-child(3) .card-img { background-image: url('https://images.unsplash.com/photo-1593113630400-ea4288922497?w=500&h=300&fit=crop'); }
+.card-body { padding: 1.2rem 1.5rem; }
+.card-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.15em; color: #D4920B; margin-bottom: 0.5rem; font-weight: 600; }
+.card h3 { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.4rem; }
+.card p { font-size: 0.8rem; color: #777; line-height: 1.5; }
+</style>
+</head>
+<body>
+<nav>
+  <div class="logo">
+    <span class="logo-mark">✝</span>
+    <div class="logo-text">elevation<span>Church</span></div>
+  </div>
+  <div class="nav-links"><span>Home</span><span>About</span><span>Connect</span><span>Ministries</span></div>
+  <div class="nav-right"><span>Give</span><span>Shop</span></div>
+</nav>
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <h1>Welcome to<br><span class="accent">New Life</span></h1>
+    <div class="hero-btns">
+      <a href="#" class="hero-btn">Join Us Online</a>
+      <a href="#" class="hero-btn-accent">Give Now</a>
+    </div>
+  </div>
+  <div class="hero-info">
+    Service Times: Sundays 9 &amp; 11 AM<br>
+    1200 Faith Avenue, Charlotte, NC
+  </div>
+</section>
+<section class="cards">
+  <div class="card">
+    <div class="card-img"></div>
+    <div class="card-body">
+      <div class="card-label">Community</div>
+      <h3>Small Groups</h3>
+      <p>Find your people. Connect in weekly groups that meet across the city.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-img"></div>
+    <div class="card-body">
+      <div class="card-label">Next Generation</div>
+      <h3>Kids & Youth</h3>
+      <p>Age-specific environments where the next generation encounters God.</p>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-img"></div>
+    <div class="card-body">
+      <div class="card-label">Outreach</div>
+      <h3>Serve Our City</h3>
+      <p>Join us as we love our neighbors through service and generosity.</p>
+    </div>
+  </div>
+</section>
+</body>
+</html>
