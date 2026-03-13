@@ -40,8 +40,9 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .section-sub { color: var(--gray-mid); font-size: 1rem; line-height: 1.6; }
 
 .style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1400px; margin: 0 auto 2rem; padding: 0 1rem; }
-.style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative; }
-.style-card:hover { border-color: rgba(200,164,110,0.4); transform: scale(3); z-index: 100; box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
+.style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.3s ease, box-shadow 0.35s ease, z-index 0s; position: relative; }
+.style-card:hover { border-color: rgba(200,164,110,0.4); z-index: 100; box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
+.style-card.hovering { z-index: 100; }
 .style-card.selected { border-color: var(--accent); box-shadow: 0 0 20px rgba(200,164,110,0.2); }
 .style-preview { height: 220px; position: relative; overflow: hidden; background: #111; }
 .style-preview iframe { width: 1200px; height: 900px; border: none; transform: scale(0.22); transform-origin: top left; pointer-events: none; }
@@ -478,6 +479,25 @@ function closeZoom(e) {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(e); });
+
+// === HOVER-TO-CENTER ZOOM ===
+document.querySelectorAll('.style-card').forEach(card => {
+  card.addEventListener('mouseenter', function() {
+    const rect = this.getBoundingClientRect();
+    const cardCenterX = rect.left + rect.width / 2;
+    const cardCenterY = rect.top + rect.height / 2;
+    const viewportCenterX = window.innerWidth / 2;
+    const viewportCenterY = window.innerHeight / 2;
+    const translateX = viewportCenterX - cardCenterX;
+    const translateY = viewportCenterY - cardCenterY;
+    this.style.transform = `translate(${translateX}px, ${translateY}px) scale(3)`;
+    this.classList.add('hovering');
+  });
+  card.addEventListener('mouseleave', function() {
+    this.style.transform = '';
+    this.classList.remove('hovering');
+  });
+});
 
 // === COLLAPSIBLES ===
 function toggleCollapsible(header, bodyId) {
