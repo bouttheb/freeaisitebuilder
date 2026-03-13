@@ -43,8 +43,8 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; cursor: pointer; transition: border-color 0.3s ease, box-shadow 0.3s ease; position: relative; }
 .style-card:hover { border-color: rgba(200,164,110,0.4); box-shadow: 0 4px 20px rgba(200,164,110,0.15); }
 .style-card.selected { border-color: var(--accent); box-shadow: 0 0 20px rgba(200,164,110,0.2); }
-.style-preview { height: 220px; position: relative; overflow: hidden; background: #111; }
-.style-preview iframe { width: 1200px; height: 900px; border: none; transform: scale(0.22); transform-origin: top left; pointer-events: none; }
+.style-preview { position: relative; overflow: hidden; background: #111; aspect-ratio: 16/10; }
+.style-preview iframe { width: 1400px; height: 875px; border: none; transform-origin: top left; pointer-events: none; /* scale set by JS to fill card width */ }
 .style-info { background: var(--card-bg); padding: 0.7rem 1rem; }
 .style-name { font-weight: 600; font-size: 0.85rem; }
 .style-desc { font-size: 0.7rem; color: var(--gray-dark); }
@@ -173,8 +173,8 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 1100px) { .style-grid { grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 768px) { .style-grid { grid-template-columns: repeat(2, 1fr); } .style-preview { height: 180px; } }
-@media (max-width: 600px) { .details-card { padding: 2rem 1.5rem; } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .style-grid { grid-template-columns: 1fr; } .style-preview { height: 240px; } }
+@media (max-width: 768px) { .style-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .details-card { padding: 2rem 1.5rem; } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .style-grid { grid-template-columns: 1fr; } }
 </style>
 </head>
 <body>
@@ -501,6 +501,18 @@ function closeZoom(e) {
   document.body.style.overflow = '';
 }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(e); });
+
+// === SCALE THUMBNAIL IFRAMES TO FIT CARD WIDTH ===
+function scaleThumbnails() {
+  document.querySelectorAll('.style-preview').forEach(preview => {
+    const cardWidth = preview.offsetWidth;
+    const scale = cardWidth / 1400;
+    const iframe = preview.querySelector('iframe');
+    if (iframe) iframe.style.transform = `scale(${scale})`;
+  });
+}
+scaleThumbnails();
+window.addEventListener('resize', scaleThumbnails);
 
 // === HOVER PREVIEW PANEL ===
 let hoverTimer = null;
