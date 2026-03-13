@@ -29,13 +29,15 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .nav-step.active .nav-step-dot { background: var(--accent); box-shadow: 0 0 8px rgba(200,164,110,0.4); }
 .nav-step-line { width: 24px; height: 1px; background: rgba(255,255,255,0.1); }
 
-/* Template picker - full width */
-.template-container { min-height: 100vh; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
-.template-header { text-align: center; margin-bottom: 2.5rem; }
+/* === MAIN PAGE CONTAINER === */
+.page { padding: 6rem 2rem 2rem; background: radial-gradient(ellipse at 50% 10%, rgba(200,164,110,0.06) 0%, transparent 60%); }
+
+/* === SECTION: Template Picker === */
+.section-header { text-align: center; margin-bottom: 2rem; }
 .step-badge { display: inline-block; font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); border: 1px solid rgba(200,164,110,0.3); padding: 0.4rem 1.2rem; border-radius: 30px; margin-bottom: 1.5rem; }
-.template-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
-.template-title span { color: var(--accent); }
-.template-subtitle { color: var(--gray-mid); font-size: 1rem; line-height: 1.6; }
+.section-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
+.section-title span { color: var(--accent); }
+.section-sub { color: var(--gray-mid); font-size: 1rem; line-height: 1.6; }
 
 .style-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.2rem; max-width: 1400px; margin: 0 auto 2rem; padding: 0 1rem; }
 .style-card { border: 2px solid rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease; position: relative; }
@@ -48,15 +50,16 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .style-desc { font-size: 0.7rem; color: var(--gray-dark); }
 .dp-check { display: none; position: absolute; top: 0.6rem; right: 0.6rem; width: 26px; height: 26px; background: var(--accent); border-radius: 50%; align-items: center; justify-content: center; font-size: 0.75rem; color: var(--black); font-weight: 700; z-index: 5; }
 .selected .dp-check { display: flex; }
+.zoom-hint { position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+.style-card:hover .zoom-hint { opacity: 1; }
 
-/* Hover zoom overlay */
+/* Zoom overlay */
 .zoom-overlay { display: none; position: fixed; inset: 0; z-index: 2000; background: rgba(0,0,0,0.92); align-items: center; justify-content: center; cursor: pointer; }
 .zoom-overlay.active { display: flex; }
 .zoom-overlay iframe { width: 90vw; height: 85vh; border: none; border-radius: 12px; background: #fff; }
 .zoom-close { position: fixed; top: 1.5rem; right: 2rem; z-index: 2001; color: #fff; font-size: 2rem; cursor: pointer; background: none; border: none; font-family: sans-serif; }
-.zoom-hint { position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
-.style-card:hover .zoom-hint { opacity: 1; }
 
+/* Alt inspiration URL */
 .template-alt { max-width: 600px; margin: 1rem auto 0; text-align: center; }
 .template-alt-divider { position: relative; margin-bottom: 1rem; }
 .template-alt-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.08); }
@@ -66,23 +69,12 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .template-alt-input input { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.8rem 1.2rem; color: var(--off-white); font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; transition: border-color 0.3s; text-align: center; }
 .template-alt-input input:focus { outline: none; border-color: var(--accent); }
 
-.template-nav { text-align: center; padding: 1rem 0 2rem; }
-.template-nav .btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.85rem 2.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
-.template-nav .btn-next:hover { background: var(--accent-hover); }
-.template-nav .btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+/* === SECTION DIVIDER === */
+.section-divider { max-width: 800px; margin: 3rem auto; border: none; border-top: 1px solid rgba(200,164,110,0.12); }
 
-/* Wizard card for remaining steps */
-.wizard-container { min-height: 100vh; display: none; flex-direction: column; justify-content: center; align-items: center; padding: 7rem 2rem 4rem; background: radial-gradient(ellipse at 50% 20%, rgba(200,164,110,0.06) 0%, transparent 60%); }
-.wizard-container.active { display: flex; }
-.wizard-card { background: var(--dark); border: 1px solid rgba(200,164,110,0.15); border-radius: 16px; padding: 3rem; max-width: 680px; width: 100%; }
-.wizard-title { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 3.5vw, 2.2rem); font-weight: 700; line-height: 1.2; margin-bottom: 0.5rem; }
-.wizard-title span { color: var(--accent); }
-.wizard-subtitle { color: var(--gray-mid); font-size: 1rem; margin-bottom: 2.5rem; line-height: 1.6; }
-
-.wizard-progress { display: flex; gap: 0.35rem; margin-bottom: 2.5rem; }
-.progress-bar { flex: 1; height: 4px; border-radius: 4px; background: rgba(255,255,255,0.08); transition: all 0.4s ease; }
-.progress-bar.active { background: var(--accent); }
-.progress-bar.done { background: var(--green); }
+/* === DETAILS CARD === */
+.details-section { max-width: 680px; margin: 0 auto; padding: 0 1rem; }
+.details-card { background: var(--dark); border: 1px solid rgba(200,164,110,0.15); border-radius: 16px; padding: 3rem; margin-bottom: 2rem; }
 
 label { display: block; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gray-light); margin-bottom: 0.5rem; }
 .helper-text { font-size: 0.85rem; color: var(--gray-dark); margin-bottom: 0.8rem; line-height: 1.5; font-style: italic; }
@@ -90,6 +82,7 @@ input[type="text"], textarea { width: 100%; background: var(--card-bg); border: 
 input[type="text"]:focus, textarea:focus { outline: none; border-color: var(--accent); }
 textarea { resize: vertical; min-height: 120px; }
 .form-group { margin-bottom: 1.8rem; }
+.form-group:last-child { margin-bottom: 0; }
 
 .section-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 1rem; }
 .section-option { display: flex; align-items: center; gap: 0.7rem; padding: 0.8rem 1rem; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; cursor: pointer; transition: all 0.3s ease; font-size: 0.9rem; }
@@ -100,12 +93,12 @@ textarea { resize: vertical; min-height: 120px; }
 .section-check svg { display: none; }
 .section-option.selected .section-check svg { display: block; }
 
-.wizard-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; }
-.btn-back { background: none; border: 1px solid rgba(255,255,255,0.1); color: var(--gray-mid); padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.95rem; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
-.btn-back:hover { border-color: var(--gray-mid); color: var(--off-white); }
-.btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.75rem 2rem; border-radius: 8px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
-.btn-next:hover { background: var(--accent-hover); }
-.btn-next:disabled { opacity: 0.4; cursor: not-allowed; }
+.collapsible-header { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; padding: 0.8rem 0; color: var(--gray-mid); font-size: 0.9rem; transition: color 0.3s; }
+.collapsible-header:hover { color: var(--accent); }
+.collapsible-header svg { transition: transform 0.3s; }
+.collapsible-header.open svg { transform: rotate(90deg); }
+.collapsible-body { display: none; padding-bottom: 1rem; }
+.collapsible-body.open { display: block; }
 
 .doc-upload-area { margin-bottom: 1.2rem; padding: 1.5rem; border: 2px dashed rgba(200,164,110,0.25); border-radius: 10px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
 .doc-upload-area:hover { border-color: var(--accent); background: rgba(200,164,110,0.03); }
@@ -116,13 +109,7 @@ textarea { resize: vertical; min-height: 120px; }
 .or-divider::before { left: 0; }
 .or-divider::after { right: 0; }
 
-.collapsible-header { display: flex; align-items: center; gap: 0.6rem; cursor: pointer; padding: 0.8rem 0; color: var(--gray-mid); font-size: 0.9rem; transition: color 0.3s; }
-.collapsible-header:hover { color: var(--accent); }
-.collapsible-header svg { transition: transform 0.3s; }
-.collapsible-header.open svg { transform: rotate(90deg); }
-.collapsible-body { display: none; padding-bottom: 1rem; }
-.collapsible-body.open { display: block; }
-
+/* Photos */
 .photo-option { background: var(--card-bg); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; margin-bottom: 1rem; overflow: hidden; transition: all 0.3s ease; }
 .photo-option.selected { border-color: rgba(200,164,110,0.4); }
 .photo-option-header { display: flex; align-items: flex-start; gap: 1rem; padding: 1.2rem 1.5rem; cursor: pointer; transition: background 0.2s; }
@@ -161,6 +148,12 @@ textarea { resize: vertical; min-height: 120px; }
 .image-list { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem; }
 .image-tag { background: rgba(200,164,110,0.1); border: 1px solid rgba(200,164,110,0.2); color: var(--accent); padding: 0.3rem 0.7rem; border-radius: 6px; font-size: 0.8rem; }
 
+/* Submit button */
+.submit-section { max-width: 680px; margin: 0 auto 2rem; padding: 0 1rem; text-align: center; }
+.btn-submit { background: var(--accent); color: var(--black); border: none; padding: 1rem 3rem; border-radius: 8px; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
+.btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,164,110,0.25); }
+.btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
+
 .bottom-nav { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
 .bottom-nav a { font-size: 0.9rem; color: var(--gray-dark); text-decoration: none; transition: color 0.3s ease; }
 .bottom-nav a:hover { color: var(--accent); }
@@ -170,7 +163,7 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 
 @media (max-width: 1100px) { .style-grid { grid-template-columns: repeat(3, 1fr); } }
 @media (max-width: 768px) { .style-grid { grid-template-columns: repeat(2, 1fr); } .style-preview { height: 180px; } }
-@media (max-width: 600px) { .wizard-card { padding: 2rem 1.5rem; } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .style-grid { grid-template-columns: 1fr; } .style-preview { height: 240px; } }
+@media (max-width: 600px) { .details-card { padding: 2rem 1.5rem; } .section-grid { grid-template-columns: 1fr; } .nav-steps { display: none; } .style-grid { grid-template-columns: 1fr; } .style-preview { height: 240px; } }
 </style>
 </head>
 <body>
@@ -188,12 +181,13 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
   </div>
 </nav>
 
-<!-- STEP 0: Choose Layout Template (full width) -->
-<div class="template-container" id="step0">
-  <div class="template-header">
+<div class="page">
+
+  <!-- ============ TEMPLATES ============ -->
+  <div class="section-header">
     <div class="step-badge">Step 1 of 4</div>
-    <h2 class="template-title">Choose a <span>layout</span> for your site</h2>
-    <p class="template-subtitle">Each template includes its own color palette and typography. Click to preview, then select the one that fits your vision.</p>
+    <h2 class="section-title">Choose a <span>layout</span> for your site</h2>
+    <p class="section-sub">Each template includes its own color palette and typography. Click to select, double-click to preview full size.</p>
   </div>
 
   <div class="style-grid" id="dpStyleGrid">
@@ -275,172 +269,159 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
     <div class="template-alt-divider"><span>or</span></div>
     <p class="template-alt-text">Don't see what you're looking for? Paste a link to a site you love and the AI will use it as inspiration.</p>
     <div class="template-alt-input">
-      <input type="text" id="altInspirationUrl" placeholder="https://example.com" oninput="checkTemplateReady()">
+      <input type="text" id="altInspirationUrl" placeholder="https://example.com" oninput="checkReadyState()">
     </div>
   </div>
 
-  <div class="template-nav">
-    <button class="btn-next" id="btnNextTemplate" disabled onclick="goToStep(1)">Next — Add Your Details →</button>
+  <!-- ============ DETAILS ============ -->
+  <hr class="section-divider">
+
+  <div class="details-section">
+    <div class="section-header">
+      <h2 class="section-title">Add your <span>details</span></h2>
+      <p class="section-sub">Tell the AI what to put on your site.</p>
+    </div>
+
+    <!-- Name & Tagline -->
+    <div class="details-card">
+      <div class="form-group">
+        <label>Site / Business Name *</label>
+        <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="checkReadyState()">
+      </div>
+      <div class="form-group">
+        <label>Tagline or Slogan (optional)</label>
+        <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
+        <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
+      </div>
+      <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
+        <label style="color: var(--gray-dark); font-size: 0.75rem;">Have another site you love? (optional)</label>
+        <p class="helper-text">Paste a URL and the AI will also draw inspiration from its look and feel.</p>
+        <input type="text" id="inspirationUrl" placeholder="e.g., https://example.com">
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="details-card">
+      <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
+        <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
+        <p>📄 Upload a document about your project</p>
+        <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
+        <div class="uploaded-name" id="docFileName" style="display:none;"></div>
+      </div>
+
+      <div class="or-divider">or type it out</div>
+
+      <div class="form-group">
+        <label id="descLabel">About your project *</label>
+        <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
+        <textarea id="siteDesc" placeholder="Describe what this site is about, who it's for, and what visitors should learn or do when they arrive." oninput="checkReadyState()"></textarea>
+      </div>
+
+      <!-- Goals -->
+      <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add site goals (optional)
+      </div>
+      <div class="collapsible-body" id="goalsBody">
+        <p class="helper-text">What should your site help you do? Pick any that apply.</p>
+        <div class="section-grid" id="goalGrid">
+          <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Attract customers</span></div>
+          <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Showcase work</span></div>
+          <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Provide info</span></div>
+          <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Build credibility</span></div>
+          <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Get bookings</span></div>
+          <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span>Collect leads</span></div>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        Add services / offerings (optional)
+      </div>
+      <div class="collapsible-body" id="servicesBody">
+        <div class="form-group" style="margin-bottom:0;">
+          <p class="helper-text">List what you offer, separated by commas.</p>
+          <input type="text" id="services" placeholder="e.g., Web Design, Branding, Photography, Consulting">
+        </div>
+      </div>
+    </div>
+
+    <!-- Photos -->
+    <div class="details-card">
+      <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.3rem;">Add your <span style="color:var(--accent);">photos</span></h3>
+      <p style="color: var(--gray-mid); font-size: 0.9rem; margin-bottom: 1.5rem;">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
+
+      <div class="photo-option" id="photoOptionUpload">
+        <div class="photo-option-header" onclick="selectPhotoOption('upload')">
+          <div class="photo-option-radio" id="radioUpload"></div>
+          <div>
+            <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="uploadBody" style="display: none;">
+          <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
+            <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
+          </div>
+          <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
+          <div class="uploaded-images" id="uploadedImagesList"></div>
+        </div>
+      </div>
+
+      <div class="photo-option" id="photoOptionHosting" style="display:none;">
+        <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
+          <div class="photo-option-radio" id="radioHosting"></div>
+          <div>
+            <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
+            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
+          </div>
+        </div>
+        <div class="photo-option-body" id="hostingBody" style="display: none;">
+          <div class="photo-instructions">
+            <h4>Three quick steps:</h4>
+            <ol>
+              <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
+              <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong>. Select all your photos and <strong>drag and drop them all at once</strong>.</li>
+              <li>Go back to <code>public_html</code>, then download this helper file and upload it there:</li>
+            </ol>
+            <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
+          </div>
+          <div class="form-group" style="margin-top: 1rem;">
+            <label>Your Domain</label>
+            <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
+            <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
+              <button class="btn-submit" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
+            </div>
+          </div>
+          <div class="image-results" id="imageResults"></div>
+          <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
+            <div class="photo-check-box" id="photoCheckBox">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
+            </div>
+            <div>I've uploaded my photos and the helper file</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
+    </div>
   </div>
+
+  <!-- ============ SUBMIT ============ -->
+  <div class="submit-section">
+    <button class="btn-submit" id="btnSubmit" disabled onclick="finishWizard()">Start Building →</button>
+    <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.8rem;">You'll set up hosting in the next step.</p>
+  </div>
+
 </div>
 
-<!-- Zoom overlay for previewing templates -->
+<!-- Zoom overlay -->
 <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom(event)">
   <button class="zoom-close" onclick="closeZoom(event)">&times;</button>
   <iframe id="zoomIframe" src="about:blank"></iframe>
-</div>
-
-<!-- STEP 1: Name (wizard card) -->
-<div class="wizard-container" id="step1">
-  <div class="step-badge">Step 1 of 4</div>
-  <div class="wizard-card">
-    <div class="wizard-progress" id="progressBars"></div>
-    <h2 class="wizard-title">What's the <span>name</span>?</h2>
-    <p class="wizard-subtitle">This will appear in the header and throughout your website.</p>
-    <div class="form-group">
-      <label>Site / Business Name</label>
-      <input type="text" id="siteName" placeholder="e.g., Robinson Consulting" oninput="validateName()">
-    </div>
-    <div class="form-group">
-      <label>Tagline or Slogan (optional)</label>
-      <p class="helper-text">A short phrase that describes what you do. Leave blank and the AI will suggest one.</p>
-      <input type="text" id="tagline" placeholder="e.g., Helping small businesses grow since 2015">
-    </div>
-    <div class="form-group" style="padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.06);">
-      <label style="color: var(--gray-dark); font-size: 0.75rem;">Have a site you love? (optional)</label>
-      <p class="helper-text">Paste a URL and the AI will draw inspiration from its look and feel.</p>
-      <input type="text" id="inspirationUrl" placeholder="e.g., https://example.com">
-    </div>
-    <div class="wizard-nav"><button class="btn-back" onclick="goToStep(0)">← Back</button><button class="btn-next" id="btnNext1" disabled onclick="goToStep(2)">Next →</button></div>
-  </div>
-</div>
-
-<!-- STEP 2: Description -->
-<div class="wizard-container" id="step2">
-  <div class="step-badge">Step 1 of 4</div>
-  <div class="wizard-card">
-    <div class="wizard-progress" id="progressBars2"></div>
-    <h2 class="wizard-title">Tell us about your <span>project</span></h2>
-    <p class="wizard-subtitle">Give the AI as much or as little detail as you want. You can upload a document you already have, or just type a few sentences.</p>
-
-    <div class="doc-upload-area" id="docUploadArea" onclick="document.getElementById('docInput').click()">
-      <input type="file" id="docInput" accept=".txt,.doc,.docx,.pdf,.rtf" style="display:none" onchange="handleDocUpload(event)">
-      <p>📄 Upload a document about your project</p>
-      <p style="font-size:0.8rem; color:var(--gray-dark); margin-top:0.3rem;">Business plan, about page draft, notes — anything works (.txt, .doc, .docx, .pdf)</p>
-      <div class="uploaded-name" id="docFileName" style="display:none;"></div>
-    </div>
-
-    <div class="or-divider">or type it out</div>
-
-    <div class="form-group">
-      <label id="descLabel">About your project</label>
-      <p class="helper-text" id="descHelper">What do you do? Who is this for? What should people know?</p>
-      <textarea id="siteDesc" placeholder="Describe what this site is about, who it's for, and what visitors should learn or do when they arrive." oninput="validateDesc()"></textarea>
-    </div>
-
-    <!-- Optional: Goals -->
-    <div class="collapsible-header" onclick="toggleCollapsible(this, 'goalsBody')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      Add site goals (optional)
-    </div>
-    <div class="collapsible-body" id="goalsBody">
-      <p class="helper-text">What should your site help you do? Pick any that apply.</p>
-      <div class="section-grid" id="goalGrid">
-        <div class="section-option" data-goal="attract-customers" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Attract customers</span></div>
-        <div class="section-option" data-goal="showcase-work" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Showcase work</span></div>
-        <div class="section-option" data-goal="provide-info" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Provide info</span></div>
-        <div class="section-option" data-goal="build-credibility" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Build credibility</span></div>
-        <div class="section-option" data-goal="get-bookings" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Get bookings</span></div>
-        <div class="section-option" data-goal="collect-leads" onclick="toggleGoal(this)"><div class="section-check"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><span class="section-label">Collect leads</span></div>
-      </div>
-    </div>
-
-    <!-- Optional: Services -->
-    <div class="collapsible-header" id="servicesCollapsible" onclick="toggleCollapsible(this, 'servicesBody')">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
-      Add services / offerings (optional)
-    </div>
-    <div class="collapsible-body" id="servicesBody">
-      <div class="form-group" style="margin-bottom:0;">
-        <p class="helper-text">List what you offer, separated by commas.</p>
-        <input type="text" id="services" placeholder="e.g., Web Design, Branding, Photography, Consulting">
-      </div>
-    </div>
-
-    <div class="wizard-nav"><button class="btn-back" onclick="goToStep(1)">← Back</button><button class="btn-next" id="btnNext2" disabled onclick="goToStep(3)">Next →</button></div>
-  </div>
-</div>
-
-<!-- STEP 3: Photos -->
-<div class="wizard-container" id="step3">
-  <div class="step-badge">Step 1 of 4</div>
-  <div class="wizard-card">
-    <div class="wizard-progress" id="progressBars3"></div>
-    <h2 class="wizard-title">Add your <span>photos</span></h2>
-    <p class="wizard-subtitle">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
-
-    <!-- Option A: Direct upload (5 or fewer) -->
-    <div class="photo-option" id="photoOptionUpload">
-      <div class="photo-option-header" onclick="selectPhotoOption('upload')">
-        <div class="photo-option-radio" id="radioUpload"></div>
-        <div>
-          <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
-          <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
-        </div>
-      </div>
-      <div class="photo-option-body" id="uploadBody" style="display: none;">
-        <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
-          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
-          <p style="color: var(--gray-dark); font-size: 0.8rem; margin-top: 0.3rem;">JPG, PNG, GIF, WebP, SVG — max 10MB each</p>
-        </div>
-        <input type="file" id="imageFileInput" accept=".jpg,.jpeg,.png,.gif,.webp,.svg" multiple style="display: none;" onchange="handleImageUpload(event)">
-        <div class="uploaded-images" id="uploadedImagesList"></div>
-      </div>
-    </div>
-
-    <!-- Option B: Bluehost hosting (many images) — hidden until hosting is set up -->
-    <div class="photo-option" id="photoOptionHosting" style="display:none;">
-      <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
-        <div class="photo-option-radio" id="radioHosting"></div>
-        <div>
-          <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
-          <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
-        </div>
-      </div>
-      <div class="photo-option-body" id="hostingBody" style="display: none;">
-        <div class="photo-instructions">
-          <h4>Three quick steps:</h4>
-          <ol>
-            <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
-            <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong> in the top toolbar. Select all your photos and <strong>drag and drop them all at once</strong> into the upload area.</li>
-            <li>Go back to <code>public_html</code>, then download this helper file and upload it there (same level as <code>images</code>):</li>
-          </ol>
-          <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
-        </div>
-        <div class="form-group" style="margin-top: 1rem;">
-          <label>Your Domain</label>
-          <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
-          <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
-            <button class="btn-next" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
-          </div>
-        </div>
-        <div class="image-results" id="imageResults"></div>
-        <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
-          <div class="photo-check-box" id="photoCheckBox">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
-          </div>
-          <div>I've uploaded my photos and the helper file</div>
-        </div>
-      </div>
-    </div>
-
-    <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
-    <div class="wizard-nav" style="margin-top: 1.5rem;">
-      <button class="btn-back" onclick="goToStep(2)">← Back</button>
-      <button class="btn-next" id="btnNext3" disabled onclick="finishWizard()">Start Building →</button>
-    </div>
-  </div>
 </div>
 
 <div class="bottom-nav">
@@ -450,8 +431,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 <footer>&copy; 2026 freeaisitebuilder.com. All rights reserved.</footer>
 
 <script>
-const TOTAL_SUBSTEPS = 3; // name, desc, photos
-let currentStep = 0;
 let selectedGoals = [];
 let photosConfirmed = false;
 let photosSkipped = false;
@@ -466,32 +445,26 @@ if (localStorage.getItem('wb_completed_step1') === 'true') {
   if (fwd) fwd.style.display = 'inline';
 }
 
-// Build progress bars for wizard steps
-function buildProgressBars(containerId, activeIndex) {
-  const c = document.getElementById(containerId);
-  if (!c) return;
-  c.innerHTML = '';
-  for (let i = 0; i < TOTAL_SUBSTEPS; i++) {
-    const bar = document.createElement('div');
-    bar.className = 'progress-bar' + (i < activeIndex ? ' done' : '') + (i === activeIndex ? ' active' : '');
-    c.appendChild(bar);
-  }
+// === READY STATE: enable submit when template (or alt URL) + name + description are filled ===
+function checkReadyState() {
+  const hasTemplate = dpStyle !== null;
+  const hasAltUrl = document.getElementById('altInspirationUrl').value.trim().length > 5;
+  const hasName = document.getElementById('siteName').value.trim().length > 0;
+  const hasDesc = document.getElementById('siteDesc').value.trim().length > 0 || uploadedDocText.length > 0;
+
+  const ready = (hasTemplate || hasAltUrl) && hasName && hasDesc;
+  document.getElementById('btnSubmit').disabled = !ready;
 }
 
-// Template selection
+// === TEMPLATE SELECTION ===
 function selectTemplate(el) {
   document.querySelectorAll('#dpStyleGrid .style-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   dpStyle = el.dataset.style;
-  checkTemplateReady();
-}
-function checkTemplateReady() {
-  const hasTemplate = dpStyle !== null;
-  const hasUrl = document.getElementById('altInspirationUrl').value.trim().length > 5;
-  document.getElementById('btnNextTemplate').disabled = !(hasTemplate || hasUrl);
+  checkReadyState();
 }
 
-// Zoom preview
+// === ZOOM PREVIEW ===
 function zoomTemplate(el) {
   const src = el.querySelector('iframe').src;
   document.getElementById('zoomIframe').src = src;
@@ -504,86 +477,43 @@ function closeZoom(e) {
   document.getElementById('zoomIframe').src = 'about:blank';
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') closeZoom(e);
-});
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeZoom(e); });
 
-// Step navigation
-function goToStep(n) {
-  // Hide all
-  document.getElementById('step0').style.display = 'none';
-  document.getElementById('step1').style.display = 'none';
-  document.getElementById('step2').style.display = 'none';
-  document.getElementById('step3').style.display = 'none';
-
-  if (n === 0) {
-    document.getElementById('step0').style.display = 'block';
-  } else {
-    const el = document.getElementById(`step${n}`);
-    el.style.display = 'flex';
-    el.classList.add('active');
-    // Update progress bars
-    const barId = n === 1 ? 'progressBars' : n === 2 ? 'progressBars2' : 'progressBars3';
-    buildProgressBars(barId, n - 1);
-  }
-
-  currentStep = n;
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// === COLLAPSIBLES ===
+function toggleCollapsible(header, bodyId) {
+  header.classList.toggle('open');
+  document.getElementById(bodyId).classList.toggle('open');
 }
-
-// Validation
-function validateName() {
-  document.getElementById('btnNext1').disabled = !document.getElementById('siteName').value.trim();
-}
-
-function validateDesc() {
-  const hasDesc = document.getElementById('siteDesc').value.trim();
-  document.getElementById('btnNext2').disabled = !(hasDesc || uploadedDocText);
-}
-
 function toggleGoal(el) {
   el.classList.toggle('selected');
   selectedGoals = Array.from(document.querySelectorAll('#goalGrid .section-option.selected')).map(s => s.dataset.goal);
 }
 
-function toggleCollapsible(header, bodyId) {
-  header.classList.toggle('open');
-  document.getElementById(bodyId).classList.toggle('open');
-}
-
+// === DOC UPLOAD ===
 function handleDocUpload(event) {
   const file = event.target.files[0];
   if (!file) return;
   const nameEl = document.getElementById('docFileName');
   nameEl.textContent = '📎 ' + file.name;
   nameEl.style.display = 'block';
-
   if (file.name.endsWith('.txt')) {
     const reader = new FileReader();
-    reader.onload = (e) => { uploadedDocText = e.target.result; document.getElementById('btnNext2').disabled = false; };
+    reader.onload = (e) => { uploadedDocText = e.target.result; checkReadyState(); };
     reader.readAsText(file);
   } else {
     uploadedDocText = `[User has a document: ${file.name} — ask them to describe its contents]`;
-    document.getElementById('btnNext2').disabled = false;
+    checkReadyState();
   }
 }
 
+// === PHOTOS ===
 function selectPhotoOption(option) {
   selectedPhotoOption = option;
   document.getElementById('photoOptionUpload').classList.toggle('selected', option === 'upload');
   document.getElementById('photoOptionHosting').classList.toggle('selected', option === 'hosting');
   document.getElementById('uploadBody').style.display = option === 'upload' ? 'block' : 'none';
   document.getElementById('hostingBody').style.display = option === 'hosting' ? 'block' : 'none';
-  updatePhotoNextBtn();
 }
-
-function updatePhotoNextBtn() {
-  const canProceed = photosSkipped
-    || (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0)
-    || (selectedPhotoOption === 'hosting' && (photosConfirmed || foundImages.length > 0));
-  document.getElementById('btnNext3').disabled = !canProceed;
-}
-
 function handleImageUpload(event) {
   const files = Array.from(event.target.files);
   const allowed = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
@@ -594,16 +524,12 @@ function handleImageUpload(event) {
     uploadedImageFiles.push(f);
   });
   renderUploadedImages();
-  updatePhotoNextBtn();
   event.target.value = '';
 }
-
 function removeUploadedImage(idx) {
   uploadedImageFiles.splice(idx, 1);
   renderUploadedImages();
-  updatePhotoNextBtn();
 }
-
 function renderUploadedImages() {
   const container = document.getElementById('uploadedImagesList');
   container.innerHTML = '';
@@ -620,20 +546,15 @@ function renderUploadedImages() {
     card.appendChild(btn);
     container.appendChild(card);
   });
-  if (uploadedImageFiles.length > 0 && uploadedImageFiles.length < 5) {
+  if (uploadedImageFiles.length > 0) {
     const msg = document.createElement('p');
     msg.className = 'upload-limit-msg';
-    msg.textContent = `${uploadedImageFiles.length}/5 images`;
-    container.appendChild(msg);
-  } else if (uploadedImageFiles.length >= 5) {
-    const msg = document.createElement('p');
-    msg.className = 'upload-limit-msg';
-    msg.textContent = '5/5 images (max reached)';
+    msg.textContent = uploadedImageFiles.length >= 5 ? '5/5 images (max reached)' : `${uploadedImageFiles.length}/5 images`;
     container.appendChild(msg);
   }
 }
 
-// Drag and drop for image zone
+// Drag and drop
 const dropZone = document.getElementById('imageDropZone');
 if (dropZone) {
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
@@ -653,9 +574,8 @@ function togglePhotoConfirm() {
   photosConfirmed = !photosConfirmed;
   document.getElementById('photoConfirm').classList.toggle('checked', photosConfirmed);
   document.getElementById('photoCheckmark').style.display = photosConfirmed ? 'block' : 'none';
-  updatePhotoNextBtn();
 }
-function skipPhotos() { photosSkipped = true; document.getElementById('btnNext3').disabled = false; }
+function skipPhotos() { photosSkipped = true; }
 
 function downloadPhpHelper() {
   const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
@@ -672,16 +592,20 @@ async function checkImages() {
     if (!resp.ok) throw new Error();
     const images = await resp.json();
     if (images.length === 0) { el.className = 'image-results error'; el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>'; }
-    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; document.getElementById('btnNext3').disabled = false; }
+    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; }
   } catch { el.className = 'image-results error'; el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`; }
 }
 
+// === FINISH ===
 async function finishWizard() {
+  const btn = document.getElementById('btnSubmit');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
   const sessionId = localStorage.getItem('wb_session') || 'session-' + Date.now();
   localStorage.setItem('wb_session', sessionId);
 
   let directUploadNames = [];
-
   if (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0) {
     directUploadNames = uploadedImageFiles.map(f => f.name);
     try {
@@ -695,10 +619,11 @@ async function finishWizard() {
         imageDataArr.push({ name: f.name, data: dataUrl });
       }
       localStorage.setItem('wb_pending_images', JSON.stringify(imageDataArr));
-    } catch {
-      // Continue even if storage fails
-    }
+    } catch { /* continue */ }
   }
+
+  const altUrl = document.getElementById('altInspirationUrl').value.trim();
+  const inspUrl = document.getElementById('inspirationUrl').value.trim();
 
   const data = {
     type: 'custom',
@@ -711,18 +636,17 @@ async function finishWizard() {
     images: foundImages,
     directUploads: directUploadNames,
     domain: localStorage.getItem('wb_domain') || '',
-    photosSkipped: photosSkipped,
+    photosSkipped: photosSkipped || (selectedPhotoOption === null && uploadedImageFiles.length === 0),
     design: {
       palette: null,
       font: null,
       layoutStyle: dpStyle,
-      inspirationUrl: (document.getElementById('inspirationUrl') ? document.getElementById('inspirationUrl').value.trim() : '') || (document.getElementById('altInspirationUrl') ? document.getElementById('altInspirationUrl').value.trim() : '')
+      inspirationUrl: altUrl || inspUrl
     }
   };
   localStorage.setItem('wb_site_data', JSON.stringify(data));
   localStorage.setItem('wb_completed_step1', 'true');
 
-  // Check if authenticated before proceeding to step 2
   try {
     const authRes = await fetch('/api/auth/me');
     const authData = await authRes.json();
@@ -735,9 +659,6 @@ async function finishWizard() {
     window.location.href = '/login.html?next=step2';
   }
 }
-
-// Initialize — show template picker
-goToStep(0);
 </script>
 </body>
 </html>
