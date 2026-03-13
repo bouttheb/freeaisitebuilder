@@ -57,6 +57,15 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .zoom-hint { position: absolute; bottom: 0.5rem; left: 50%; transform: translateX(-50%); font-size: 0.65rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
 .style-card:hover .zoom-hint { opacity: 1; }
 
+.template-alt { max-width: 600px; margin: 1rem auto 0; text-align: center; }
+.template-alt-divider { position: relative; margin-bottom: 1rem; }
+.template-alt-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(255,255,255,0.08); }
+.template-alt-divider span { position: relative; background: var(--black); padding: 0 1.2rem; font-size: 0.85rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; }
+.template-alt-text { font-size: 0.9rem; color: var(--gray-mid); margin-bottom: 0.8rem; line-height: 1.6; }
+.template-alt-input { max-width: 450px; margin: 0 auto; }
+.template-alt-input input { width: 100%; background: var(--card-bg); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 0.8rem 1.2rem; color: var(--off-white); font-family: 'Source Sans 3', sans-serif; font-size: 0.95rem; transition: border-color 0.3s; text-align: center; }
+.template-alt-input input:focus { outline: none; border-color: var(--accent); }
+
 .template-nav { text-align: center; padding: 1rem 0 2rem; }
 .template-nav .btn-next { background: var(--accent); color: var(--black); border: none; padding: 0.85rem 2.5rem; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-family: 'Source Sans 3', sans-serif; }
 .template-nav .btn-next:hover { background: var(--accent-hover); }
@@ -262,6 +271,14 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
     </div>
   </div>
 
+  <div class="template-alt">
+    <div class="template-alt-divider"><span>or</span></div>
+    <p class="template-alt-text">Don't see what you're looking for? Paste a link to a site you love and the AI will use it as inspiration.</p>
+    <div class="template-alt-input">
+      <input type="text" id="altInspirationUrl" placeholder="https://example.com" oninput="checkTemplateReady()">
+    </div>
+  </div>
+
   <div class="template-nav">
     <button class="btn-next" id="btnNextTemplate" disabled onclick="goToStep(1)">Next — Add Your Details →</button>
   </div>
@@ -463,11 +480,15 @@ function buildProgressBars(containerId, activeIndex) {
 
 // Template selection
 function selectTemplate(el) {
-  // Don't select on double-click
   document.querySelectorAll('#dpStyleGrid .style-card').forEach(c => c.classList.remove('selected'));
   el.classList.add('selected');
   dpStyle = el.dataset.style;
-  document.getElementById('btnNextTemplate').disabled = false;
+  checkTemplateReady();
+}
+function checkTemplateReady() {
+  const hasTemplate = dpStyle !== null;
+  const hasUrl = document.getElementById('altInspirationUrl').value.trim().length > 5;
+  document.getElementById('btnNextTemplate').disabled = !(hasTemplate || hasUrl);
 }
 
 // Zoom preview
@@ -695,7 +716,7 @@ async function finishWizard() {
       palette: null,
       font: null,
       layoutStyle: dpStyle,
-      inspirationUrl: document.getElementById('inspirationUrl') ? document.getElementById('inspirationUrl').value.trim() : ''
+      inspirationUrl: (document.getElementById('inspirationUrl') ? document.getElementById('inspirationUrl').value.trim() : '') || (document.getElementById('altInspirationUrl') ? document.getElementById('altInspirationUrl').value.trim() : '')
     }
   };
   localStorage.setItem('wb_site_data', JSON.stringify(data));
