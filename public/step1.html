@@ -371,7 +371,7 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
         </div>
       </div>
 
-      <div class="photo-option" id="photoOptionHosting" style="display:none;">
+      <div class="photo-option" id="photoOptionHosting">
         <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
           <div class="photo-option-radio" id="radioHosting"></div>
           <div>
@@ -391,7 +391,7 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
           </div>
           <div class="form-group" style="margin-top: 1rem;">
             <label>Your Domain</label>
-            <input type="text" id="photoDomain" readonly style="opacity: 0.7;">
+            <input type="text" id="photoDomain" placeholder="e.g., yourdomain.com">
             <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
               <button class="btn-submit" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
             </div>
@@ -584,7 +584,7 @@ function downloadPhpHelper() {
 }
 
 async function checkImages() {
-  const domain = localStorage.getItem('wb_domain') || '';
+  const domain = document.getElementById('photoDomain').value.trim() || localStorage.getItem('wb_domain') || '';
   const el = document.getElementById('imageResults');
   el.style.display = 'block'; el.className = 'image-results'; el.innerHTML = '<p>Checking...</p>';
   try {
