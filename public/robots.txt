@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /login.html
+Disallow: /chat.html
+
+Sitemap: https://freeaisitebuilder.com/sitemap.xml
