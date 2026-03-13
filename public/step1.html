@@ -59,17 +59,6 @@ nav { position: fixed; top: 0; width: 100%; z-index: 1000; padding: 1rem 2rem; d
 .zoom-overlay iframe { width: 90vw; height: 85vh; border: none; border-radius: 12px; background: #fff; }
 .zoom-close { position: fixed; top: 1.5rem; right: 2rem; z-index: 2001; color: #fff; font-size: 2rem; cursor: pointer; background: none; border: none; font-family: sans-serif; }
 
-/* Hover preview panel */
-.hover-preview { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1500; width: 70vw; max-width: 900px; background: #111; border: 2px solid rgba(200,164,110,0.4); border-radius: 16px; overflow: hidden; box-shadow: 0 40px 120px rgba(0,0,0,0.9); pointer-events: none; }
-.hover-preview.active { display: block; }
-.hover-preview-iframe-wrap { overflow: hidden; position: relative; }
-.hover-preview iframe { width: 1400px; height: 900px; border: none; transform-origin: top left; pointer-events: none; position: absolute; top: 0; left: 0; }
-.hover-preview-label { background: rgba(10,10,10,0.95); padding: 0.8rem 1.2rem; display: flex; justify-content: space-between; align-items: center; }
-.hover-preview-label .hp-name { font-weight: 600; font-size: 1rem; color: var(--off-white); }
-.hover-preview-label .hp-hint { font-size: 0.75rem; color: var(--gray-dark); text-transform: uppercase; letter-spacing: 0.1em; }
-.hover-preview-backdrop { display: none; position: fixed; inset: 0; z-index: 1499; background: rgba(0,0,0,0.6); pointer-events: none; }
-.hover-preview-backdrop.active { display: block; }
-
 /* Alt inspiration URL */
 .template-alt { max-width: 600px; margin: 1rem auto 0; text-align: center; }
 .template-alt-divider { position: relative; margin-bottom: 1rem; }
@@ -429,18 +418,6 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 
 </div>
 
-<!-- Hover preview panel -->
-<div class="hover-preview-backdrop" id="hoverBackdrop"></div>
-<div class="hover-preview" id="hoverPreview">
-  <div class="hover-preview-iframe-wrap" id="hoverIframeWrap">
-    <iframe id="hoverIframe" src="about:blank"></iframe>
-  </div>
-  <div class="hover-preview-label">
-    <span class="hp-name" id="hoverName"></span>
-    <span class="hp-hint">Click to select · Double-click for full screen</span>
-  </div>
-</div>
-
 <!-- Zoom overlay -->
 <div class="zoom-overlay" id="zoomOverlay" onclick="closeZoom(event)">
   <button class="zoom-close" onclick="closeZoom(event)">&times;</button>
@@ -513,45 +490,6 @@ function scaleThumbnails() {
 }
 scaleThumbnails();
 window.addEventListener('resize', scaleThumbnails);
-
-// === HOVER PREVIEW PANEL ===
-let hoverTimer = null;
-const hoverPreview = document.getElementById('hoverPreview');
-const hoverBackdrop = document.getElementById('hoverBackdrop');
-const hoverIframe = document.getElementById('hoverIframe');
-const hoverName = document.getElementById('hoverName');
-
-function showHoverPreview(card) {
-  const src = card.querySelector('iframe').src;
-  const name = card.querySelector('.style-name').textContent;
-  hoverIframe.src = src;
-  hoverName.textContent = name;
-  // Scale iframe to fit the preview panel
-  const panelWidth = Math.min(window.innerWidth * 0.7, 900);
-  const iframeScale = panelWidth / 1400;
-  const scaledHeight = Math.min(900 * iframeScale, window.innerHeight * 0.7);
-  hoverIframe.style.transform = `scale(${iframeScale})`;
-  document.getElementById('hoverIframeWrap').style.height = scaledHeight + 'px';
-  hoverPreview.classList.add('active');
-  hoverBackdrop.classList.add('active');
-}
-
-function hideHoverPreview() {
-  hoverPreview.classList.remove('active');
-  hoverBackdrop.classList.remove('active');
-  hoverIframe.src = 'about:blank';
-}
-
-document.querySelectorAll('.style-card').forEach(card => {
-  card.addEventListener('mouseenter', function() {
-    clearTimeout(hoverTimer);
-    hoverTimer = setTimeout(() => showHoverPreview(this), 200);
-  });
-  card.addEventListener('mouseleave', function() {
-    clearTimeout(hoverTimer);
-    hideHoverPreview();
-  });
-});
 
 // === COLLAPSIBLES ===
 function toggleCollapsible(header, bodyId) {
