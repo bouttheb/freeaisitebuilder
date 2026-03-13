@@ -57,6 +57,8 @@ nav {
   font-size: 0.8rem; color: var(--gray-dark);
 }
 .nav-step.active { color: var(--accent); }
+.nav-step.completed { color: var(--green); }
+.nav-step.completed .nav-step-dot { background: var(--green); }
 .nav-step-dot {
   width: 8px; height: 8px; border-radius: 50%;
   background: var(--gray-dark);
@@ -687,7 +689,7 @@ footer {
         <label>Your domain name</label>
         <input type="text" id="domainInput" placeholder="e.g., mybusiness.com" required>
       </div>
-      <button type="submit" class="confirm-btn" id="confirmBtn">Continue to Step 2 →</button>
+      <button type="submit" class="confirm-btn" id="confirmBtn">Continue to Build →</button>
       <p class="confirm-note">
         Make sure you've completed your hosting setup before continuing. You'll need your domain for the next steps.
       </p>
@@ -697,8 +699,8 @@ footer {
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <a href="/" class="bottom-nav-back">&larr; Back</a>
-  <a href="#" onclick="event.preventDefault(); fetch('/api/auth/me').then(r=>r.json()).then(d=>{ window.location.href = d.authenticated ? '/step2.html' : '/login.html?next=step2'; })" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
+  <a href="/step1.html" class="bottom-nav-back">&larr; Back to Step 1</a>
+  <a href="/chat.html" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
 </div>
 
 <footer>
@@ -706,7 +708,15 @@ footer {
 </footer>
 
 <script>
-// No auth required for step 1 — auth happens before step 2
+// Auth check — redirect to login if not authenticated
+fetch('/api/auth/me').then(r => r.json()).then(d => {
+  if (!d.authenticated) window.location.href = '/login.html?next=step2';
+}).catch(() => {});
+
+// Step 1 prerequisite check
+if (!localStorage.getItem('wb_completed_step1')) {
+  window.location.href = '/step1.html';
+}
 
 // Track if they clicked the affiliate link
 let clickedAffiliate = false;
@@ -748,7 +758,7 @@ if (localStorage.getItem('wb_clicked_affiliate') === 'true') {
 }
 
 // Show Forward button if they've already completed this step
-if (localStorage.getItem('wb_completed_step1') === 'true') {
+if (localStorage.getItem('wb_completed_step2') === 'true') {
   document.getElementById('forwardBtn').style.display = 'inline';
 }
 
@@ -783,7 +793,7 @@ async function confirmDomain(e) {
 
     if (!verifyData.verified) {
       btn.disabled = false;
-      btn.textContent = 'Continue to Step 2 →';
+      btn.textContent = 'Continue to Build →';
       showDnsError(verifyData.message || 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first.');
       return;
     }
@@ -792,7 +802,7 @@ async function confirmDomain(e) {
     let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
     localStorage.setItem('wb_session', sessionId);
     localStorage.setItem('wb_domain', cleaned);
-    localStorage.setItem('wb_completed_step1', 'true');
+    localStorage.setItem('wb_completed_step2', 'true');
 
     // Register domain with backend
     await fetch('/api/register-domain', {
@@ -801,17 +811,30 @@ async function confirmDomain(e) {
       body: JSON.stringify({ sessionId, domain: cleaned })
     });
 
-    // Check if authenticated before proceeding
-    const authRes = await fetch('/api/auth/me');
-    const authData = await authRes.json();
-    if (authData.authenticated) {
-      window.location.href = '/step2.html';
-    } else {
-      window.location.href = '/login.html?next=step2';
-    }
+    // Upload any pending images from step 1
+    try {
+      const pendingImages = localStorage.getItem('wb_pending_images');
+      if (pendingImages) {
+        const images = JSON.parse(pendingImages);
+        if (images.length > 0) {
+          const formData = new FormData();
+          formData.append('sessionId', sessionId);
+          for (const img of images) {
+            const resp = await fetch(img.data);
+            const blob = await resp.blob();
+            formData.append('files', blob, img.name);
+          }
+          await fetch('/api/upload', { method: 'POST', body: formData });
+          localStorage.removeItem('wb_pending_images');
+        }
+      }
+    } catch {}
+
+    // Proceed to build step
+    window.location.href = '/chat.html';
   } catch (err) {
     btn.disabled = false;
-    btn.textContent = 'Continue to Step 2 →';
+    btn.textContent = 'Continue to Build →';
     showDnsError('Could not verify your domain. Please check your internet connection and try again.');
   }
 }
