@@ -551,6 +551,48 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
   session.domain = domain;
   saveSession(sessionId);
 
+  // Auto-create affiliate account for this user
+  let userRefCode = null;
+  if (AIRTABLE_TOKEN) {
+    try {
+      const userEmail = getAuthEmail(req);
+      if (userEmail) {
+        const existingAffiliate = await findAffiliate('Email', userEmail);
+        if (existingAffiliate) {
+          userRefCode = existingAffiliate.fields.RefCode;
+        } else {
+          // Create a new affiliate account automatically
+          const refCode = generateRefCode(userEmail.split('@')[0]);
+          const createRes = await fetch(AFFILIATES_URL, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              records: [{
+                fields: {
+                  Name: userEmail.split('@')[0],
+                  Email: userEmail.toLowerCase().trim(),
+                  RefCode: refCode,
+                  PayPalEmail: userEmail.toLowerCase().trim(),
+                  Clicks: 0,
+                  Conversions: 0,
+                }
+              }]
+            }),
+          });
+          if (createRes.ok) {
+            userRefCode = refCode;
+            console.log(`[Affiliate] Auto-created affiliate for ${userEmail}: ${refCode}`);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Auto-create affiliate error:', err.message);
+    }
+  }
+
   // Track affiliate conversion if ref code provided
   if (ref && AIRTABLE_TOKEN) {
     try {
@@ -597,7 +639,22 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
     }
   }
 
-  res.json({ ok: true, domain });
+  res.json({ ok: true, domain, refCode: userRefCode });
+});
+
+// GET /api/affiliate/my-link — get current user's affiliate ref code
+app.get('/api/affiliate/my-link', async (req, res) => {
+  const email = getAuthEmail(req);
+  if (!email || !AIRTABLE_TOKEN) return res.json({ refCode: null });
+  try {
+    const affiliate = await findAffiliate('Email', email);
+    if (affiliate) {
+      return res.json({ refCode: affiliate.fields.RefCode });
+    }
+  } catch (err) {
+    console.error('Get my-link error:', err.message);
+  }
+  res.json({ refCode: null });
 });
 
 // --- Airtable config ---

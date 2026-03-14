@@ -486,6 +486,64 @@ nav {
 }
 .launch-actions button:hover { color: var(--accent); }
 
+/* SHARE & EARN */
+.share-earn {
+  background: rgba(200,164,110,0.06);
+  border: 1px solid rgba(200,164,110,0.2);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  margin-bottom: 1.5rem;
+}
+.share-earn-header {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+  color: var(--accent);
+}
+.share-earn-sub {
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+.share-earn-msg {
+  background: var(--black);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  color: var(--off-white);
+  line-height: 1.5;
+  margin-bottom: 0.6rem;
+  white-space: pre-wrap;
+}
+.share-earn-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+.share-earn-actions button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: none;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.share-earn-copy {
+  background: var(--accent);
+  color: var(--black);
+}
+.share-earn-copy:hover { background: var(--accent-hover); }
+.share-earn-text {
+  background: rgba(255,255,255,0.08);
+  color: var(--off-white);
+}
+.share-earn-text:hover { background: rgba(255,255,255,0.12); }
+
 .launch-desktop {
   display: none;
   background: var(--card-bg);
@@ -673,6 +731,20 @@ nav {
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
       Download My Website (.zip)
     </button>
+
+    <!-- Share & Earn -->
+    <div class="share-earn" id="shareEarn" style="display:none;">
+      <div class="share-earn-header">Share the Love &amp; Earn $10</div>
+      <div class="share-earn-sub" id="shareEarnSub">Once your site is live, come back here and share it with friends and family. You'll earn <strong style="color:var(--accent);">$10</strong> for every person who builds a website through your link.</div>
+      <button class="share-earn-copy" id="activateRefBtn" onclick="activateReferral()" style="width:100%;padding:0.75rem;">Activate My Referral Link</button>
+      <div id="shareRevealed" style="display:none;">
+        <div class="share-earn-msg" id="shareMsg"></div>
+        <div class="share-earn-actions">
+          <button class="share-earn-copy" onclick="copyShareMsg()">Copy Message</button>
+          <button class="share-earn-text" onclick="textShareMsg()">Send via Text</button>
+        </div>
+      </div>
+    </div>
 
     <div class="launch-steps" id="launchSteps">
       <div class="launch-steps-header" onclick="toggleLaunchSteps()">
@@ -912,6 +984,51 @@ function showLaunchPanel() {
   const desktopUrl = `${window.location.origin}/chat.html?session=${sessionId}`;
   document.getElementById('desktopLink').value = desktopUrl;
   generateQrCode(desktopUrl);
+  // Show Share & Earn section
+  document.getElementById('shareEarn').style.display = 'block';
+}
+
+// --- Share & Earn ---
+let userRefCode = null;
+
+async function activateReferral() {
+  const btn = document.getElementById('activateRefBtn');
+  btn.textContent = 'Loading...';
+  btn.disabled = true;
+  try {
+    const res = await fetch('/api/affiliate/my-link');
+    const data = await res.json();
+    if (data.refCode) {
+      userRefCode = data.refCode;
+      const refLink = `${window.location.origin}/?ref=${userRefCode}`;
+      const msg = `I just built my website using this free AI tool — it took me like 15 minutes. If you or anyone you know needs a website, I highly recommend it:\n\n${refLink}`;
+      document.getElementById('shareMsg').textContent = msg;
+      document.getElementById('shareRevealed').style.display = 'block';
+      btn.style.display = 'none';
+      document.getElementById('shareEarnSub').innerHTML = 'Send this to your friends and family. You earn <strong style="color:var(--accent);">$10</strong> every time someone builds a website through your link.';
+    } else {
+      btn.textContent = 'Could not activate — try again';
+      btn.disabled = false;
+    }
+  } catch (err) {
+    btn.textContent = 'Could not activate — try again';
+    btn.disabled = false;
+  }
+}
+
+function copyShareMsg() {
+  const msg = document.getElementById('shareMsg').textContent;
+  navigator.clipboard.writeText(msg).then(() => {
+    const btn = document.querySelector('.share-earn-copy:not(#activateRefBtn)');
+    const orig = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = orig; }, 2000);
+  });
+}
+
+function textShareMsg() {
+  const msg = document.getElementById('shareMsg').textContent;
+  window.open(`sms:?body=${encodeURIComponent(msg)}`, '_blank');
 }
 
 function closeLaunchPanel() {
