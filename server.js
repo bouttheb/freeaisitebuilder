@@ -752,6 +752,9 @@ const AFFILIATES_TABLE = 'Affiliates';
 const CONVERSIONS_TABLE = 'Conversions';
 const AFFILIATES_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AFFILIATES_TABLE)}`;
 const CONVERSIONS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(CONVERSIONS_TABLE)}`;
+const REIMBURSEMENTS_TABLE = 'Reimbursements';
+const REIMBURSEMENTS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(REIMBURSEMENTS_TABLE)}`;
+const REIMBURSE_CAP = 20;
 
 // In-memory click counter (persisted to Airtable periodically)
 const clickBuffer = new Map(); // refCode -> count since last flush
@@ -1069,6 +1072,137 @@ app.post('/api/affiliate/track-click', requireOrigin, async (req, res) => {
   // Buffer clicks in memory, flush to Airtable periodically
   clickBuffer.set(ref, (clickBuffer.get(ref) || 0) + 1);
   res.json({ ok: true });
+});
+
+// --- Hosting Reimbursement ---
+
+// GET /api/reimbursement/spots — check remaining spots and if user already applied
+app.get('/api/reimbursement/spots', async (req, res) => {
+  if (!AIRTABLE_TOKEN) return res.json({ remaining: 0, userApplied: false });
+
+  try {
+    // Count total reimbursement records
+    const countRes = await fetch(`${REIMBURSEMENTS_URL}?maxRecords=100&fields%5B%5D=Email`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const countData = await countRes.json();
+    const total = (countData.records || []).length;
+    const remaining = Math.max(0, REIMBURSE_CAP - total);
+
+    // Check if current user already applied
+    let userApplied = false;
+    const email = getAuthEmail(req);
+    if (email) {
+      userApplied = (countData.records || []).some(r =>
+        r.fields.Email && r.fields.Email.toLowerCase() === email.toLowerCase()
+      );
+    }
+
+    res.json({ remaining, total, userApplied });
+  } catch (err) {
+    console.error('Reimbursement spots error:', err.message);
+    res.json({ remaining: 0, userApplied: false });
+  }
+});
+
+// POST /api/reimbursement/apply — apply for hosting reimbursement
+app.post('/api/reimbursement/apply', requireOrigin, async (req, res) => {
+  const { paypalEmail } = req.body;
+  const email = getAuthEmail(req);
+
+  if (!paypalEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypalEmail)) {
+    return res.status(400).json({ error: 'Please enter a valid PayPal email.' });
+  }
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Reimbursement system not configured.' });
+  }
+
+  try {
+    // Check remaining spots
+    const countRes = await fetch(`${REIMBURSEMENTS_URL}?maxRecords=100&fields%5B%5D=Email`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const countData = await countRes.json();
+    const total = (countData.records || []).length;
+
+    if (total >= REIMBURSE_CAP) {
+      return res.status(400).json({ error: 'Sorry, all reimbursement spots have been claimed.' });
+    }
+
+    // Check if user already applied
+    if (email) {
+      const alreadyApplied = (countData.records || []).some(r =>
+        r.fields.Email && r.fields.Email.toLowerCase() === email.toLowerCase()
+      );
+      if (alreadyApplied) {
+        return res.status(400).json({ error: 'You\'ve already applied for reimbursement.' });
+      }
+    }
+
+    // Create reimbursement record
+    const createRes = await fetch(REIMBURSEMENTS_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            Email: (email || paypalEmail).toLowerCase().trim(),
+            PayPalEmail: paypalEmail.toLowerCase().trim(),
+            Amount: 47.88,
+            Date: new Date().toISOString().split('T')[0],
+            Status: 'Pending',
+            PaidOut: false,
+          }
+        }]
+      }),
+    });
+
+    if (!createRes.ok) {
+      const errData = await createRes.json();
+      console.error('Airtable reimbursement error:', errData);
+      return res.status(500).json({ error: 'Could not submit application. Please try again.' });
+    }
+
+    console.log(`[Reimbursement] Application from ${email || paypalEmail}`);
+
+    // Also sign them up for the Zoom walkthrough
+    const userEmail = (email || paypalEmail).toLowerCase().trim();
+    try {
+      const zoomSearchUrl = `${AIRTABLE_URL}?filterByFormula=${encodeURIComponent(`LOWER({Email})="${userEmail}"`)}&maxRecords=1`;
+      const zoomSearchRes = await fetch(zoomSearchUrl, {
+        headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+      });
+      const zoomSearchData = await zoomSearchRes.json();
+      if (!zoomSearchData.records || zoomSearchData.records.length === 0) {
+        await fetch(AIRTABLE_URL, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{
+              fields: {
+                Name: userEmail.split('@')[0],
+                Email: userEmail,
+              }
+            }]
+          }),
+        });
+        console.log(`[Zoom] Auto-signed up reimbursement user: ${userEmail}`);
+      }
+    } catch (zoomErr) {
+      console.error('Zoom auto-signup error:', zoomErr.message);
+    }
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Reimbursement apply error:', err.message);
+    res.status(500).json({ error: 'Could not submit application. Please try again.' });
+  }
 });
 
 // --- Admin: Payout Scan ---

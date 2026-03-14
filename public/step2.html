@@ -677,6 +677,53 @@ footer {
   </div>
 </section>
 
+<!-- REIMBURSEMENT OFFER -->
+<section id="reimbursementSection" style="display:none;padding:3rem 2rem;background:rgba(200,164,110,0.03);border-top:1px solid rgba(200,164,110,0.08);">
+  <div style="max-width:600px;margin:0 auto;text-align:center;">
+    <p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.15em;color:var(--accent);font-weight:600;margin-bottom:0.5rem;">LIMITED OFFER</p>
+    <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.5vw,1.8rem);font-weight:600;margin-bottom:0.8rem;">Still Not Convinced? <span style="color:var(--accent);">We'll Reimburse Your Hosting.</span></h2>
+    <p style="color:var(--gray-mid);font-size:0.95rem;line-height:1.7;margin-bottom:0.5rem;">For a limited time and a limited number of people, we will reimburse you <strong style="color:var(--off-white);">$47.88</strong> — the full cost of your first year of hosting (you pay tax). That's right: your hosting is essentially free.</p>
+    <p id="spotsCounter" style="display:none;"></p>
+    <p style="color:var(--off-white);font-size:1.05rem;font-weight:500;margin-bottom:1.5rem;font-style:italic;">So now you really have no excuse. Let's build your website.</p>
+
+    <!-- Apply button -->
+    <button id="reimbursApplyBtn" onclick="showReimbursementForm()" style="background:var(--accent);color:var(--black);border:none;border-radius:8px;padding:0.9rem 2.5rem;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:background 0.3s;">Apply for Reimbursement</button>
+
+    <!-- Form (hidden until they click apply) -->
+    <div id="reimbursForm" style="display:none;margin-top:1.5rem;text-align:left;">
+      <div style="background:var(--card-bg);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.5rem;">
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.8rem;">How it works</h3>
+        <ol style="color:var(--gray-mid);font-size:0.9rem;line-height:1.8;margin-left:1.2rem;margin-bottom:1.2rem;">
+          <li>Enter your PayPal email below</li>
+          <li>Sign up for hosting through our link</li>
+          <li>Come back and enter your domain</li>
+          <li>We reimburse $47.88 to your PayPal in 50 days</li>
+        </ol>
+
+        <div style="background:rgba(200,164,110,0.06);border:1px solid rgba(200,164,110,0.15);border-radius:8px;padding:1rem;margin-bottom:1.2rem;">
+          <p style="font-size:0.85rem;color:var(--gray-mid);line-height:1.7;"><strong style="color:var(--off-white);">About the 50-day timeline:</strong> The hosting platform has a lock period of 36 days — this is how long they require your account to stay active before confirming the signup. We process your reimbursement 14 days after that.</p>
+        </div>
+
+        <label style="font-size:0.85rem;font-weight:600;display:block;margin-bottom:0.4rem;">Your PayPal email</label>
+        <input type="email" id="reimbursPaypal" placeholder="your PayPal email" required style="width:100%;padding:0.75rem 1rem;border-radius:8px;border:1px solid rgba(255,255,255,0.1);background:var(--black);color:var(--off-white);font-size:0.95rem;font-family:'Source Sans 3',sans-serif;margin-bottom:1rem;">
+
+        <button onclick="submitReimbursement()" id="reimbursSubmitBtn" style="width:100%;background:var(--accent);color:var(--black);border:none;border-radius:8px;padding:0.9rem;font-weight:700;font-size:1rem;cursor:pointer;font-family:'Source Sans 3',sans-serif;transition:background 0.3s;">Submit &amp; Continue to Hosting Setup</button>
+        <p id="reimbursMsg" style="font-size:0.85rem;text-align:center;margin-top:0.8rem;display:none;"></p>
+      </div>
+    </div>
+
+    <!-- Success state -->
+    <div id="reimbursSuccess" style="display:none;margin-top:1.5rem;">
+      <div style="background:rgba(76,175,80,0.08);border:1px solid rgba(76,175,80,0.2);border-radius:12px;padding:1.5rem;text-align:center;">
+        <div style="font-size:2rem;margin-bottom:0.5rem;">✅</div>
+        <h3 style="font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:600;margin-bottom:0.5rem;color:#4CAF50;">You're approved for reimbursement!</h3>
+        <p style="font-size:0.9rem;color:var(--gray-mid);line-height:1.6;margin-bottom:1rem;">Now set up your hosting using the button above. Once you enter your domain, your $47.88 reimbursement will be sent to your PayPal in 50 days.</p>
+        <p style="font-size:0.88rem;color:var(--accent);line-height:1.6;">We've also signed you up for our free Zoom walkthrough where we'll guide you through the entire process step by step. Check your email for details!</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- CONFIRMATION (hidden until affiliate link is clicked) -->
 <section class="confirmation" id="confirm" style="display:none;">
   <div class="section-inner">
@@ -815,6 +862,73 @@ async function confirmDomain(e) {
     btn.textContent = 'Verify & Start Building →';
     showDnsError('Could not verify your domain. Please check your internet connection and try again.');
   }
+}
+
+// --- Reimbursement ---
+const REIMBURSE_CAP = 20;
+
+async function loadReimbursementSpots() {
+  try {
+    const res = await fetch('/api/reimbursement/spots');
+    const data = await res.json();
+    if (data.remaining > 0) {
+      document.getElementById('reimbursementSection').style.display = 'block';
+    }
+    // If user already applied, show success state
+    if (data.userApplied) {
+      document.getElementById('reimbursApplyBtn').style.display = 'none';
+      document.getElementById('reimbursSuccess').style.display = 'block';
+    }
+  } catch (err) {}
+}
+loadReimbursementSpots();
+
+function showReimbursementForm() {
+  document.getElementById('reimbursApplyBtn').style.display = 'none';
+  document.getElementById('reimbursForm').style.display = 'block';
+}
+
+async function submitReimbursement() {
+  const paypal = document.getElementById('reimbursPaypal').value.trim();
+  if (!paypal || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypal)) {
+    showReimbursMsg('Please enter a valid PayPal email.', 'error');
+    return;
+  }
+
+  const btn = document.getElementById('reimbursSubmitBtn');
+  btn.disabled = true;
+  btn.textContent = 'Submitting...';
+
+  try {
+    const res = await fetch('/api/reimbursement/apply', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ paypalEmail: paypal })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      document.getElementById('reimbursForm').style.display = 'none';
+      document.getElementById('reimbursSuccess').style.display = 'block';
+      // Refresh spot count
+      loadReimbursementSpots();
+    } else {
+      showReimbursMsg(data.error || 'Could not submit. Please try again.', 'error');
+      btn.disabled = false;
+      btn.textContent = 'Submit & Continue to Hosting Setup';
+    }
+  } catch (err) {
+    showReimbursMsg('Something went wrong. Please try again.', 'error');
+    btn.disabled = false;
+    btn.textContent = 'Submit & Continue to Hosting Setup';
+  }
+}
+
+function showReimbursMsg(text, type) {
+  const el = document.getElementById('reimbursMsg');
+  el.textContent = text;
+  el.style.color = type === 'error' ? '#E57373' : '#4CAF50';
+  el.style.display = 'block';
 }
 
 function showDnsError(message) {
