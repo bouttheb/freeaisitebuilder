@@ -299,6 +299,10 @@ app.get('/healthz', (req, res) => res.status(200).send('ok'));
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Clean URL routes
+app.get('/affiliate', (req, res) => res.sendFile(path.join(__dirname, 'public', 'affiliate.html')));
+app.get('/affiliate-dashboard', (req, res) => res.sendFile(path.join(__dirname, 'public', 'affiliate-dashboard.html')));
+
 // --- Global daily token budget (prevent runaway costs) ---
 const DAILY_TOKEN_BUDGET = 100_000_000; // 100M tokens/day — emergency brake only (~$300/day max)
 let dailyTokensUsed = 0;
