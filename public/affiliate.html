@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affiliate Program — Free AI Site Builder</title>
+<meta name="description" content="Earn $10 for every person you refer who builds a website. Join the Free AI Site Builder affiliate program.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card-bg: #1A1A1A;
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --gray-light: #E0E0E0;
+  --gray-mid: #999999;
+  --gray-dark: #666666;
+  --accent: #C8A46E;
+  --accent-hover: #D4B57E;
+  --green: #4CAF50;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--black);
+  color: var(--off-white);
+  overflow-x: hidden;
+  line-height: 1.6;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  padding: 1rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(10,10,10,0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(200,164,110,0.1);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 600; color: #fff;
+  text-decoration: none;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  justify-content: center; align-items: center;
+  text-align: center;
+  padding: 6rem 2rem 4rem;
+  background: radial-gradient(ellipse at 50% 30%, rgba(200,164,110,0.06) 0%, transparent 60%);
+}
+.hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  margin-bottom: 1.2rem;
+  max-width: 750px;
+}
+.hero h1 span { color: var(--accent); }
+.hero p.lead {
+  font-size: 1.2rem;
+  color: var(--gray-mid);
+  max-width: 600px;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+  line-height: 1.8;
+}
+
+/* EARNINGS BADGE */
+.earnings-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, var(--accent), #D4B57E);
+  color: var(--black);
+  font-size: 2.2rem;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  padding: 1rem 2.5rem;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  box-shadow: 0 8px 30px rgba(200,164,110,0.25);
+}
+
+/* HOW IT WORKS */
+.how-section {
+  padding: 5rem 2rem;
+  background: var(--dark);
+}
+.how-inner {
+  max-width: 900px;
+  margin: 0 auto;
+}
+.how-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 0.8rem;
+}
+.how-subtitle {
+  text-align: center;
+  color: var(--gray-mid);
+  font-size: 1.05rem;
+  font-weight: 300;
+  margin-bottom: 3rem;
+}
+.how-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+}
+.how-step {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  transition: border-color 0.3s;
+}
+.how-step:hover { border-color: rgba(200,164,110,0.2); }
+.how-step-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: rgba(200,164,110,0.1);
+  color: var(--accent);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+.how-step h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.how-step p {
+  color: var(--gray-mid);
+  font-size: 0.9rem;
+  font-weight: 300;
+  line-height: 1.7;
+}
+
+/* SIGNUP FORM */
+.signup-section {
+  padding: 5rem 2rem;
+  background: var(--black);
+}
+.signup-inner {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+}
+.signup-inner h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.signup-inner .subtitle {
+  color: var(--gray-mid);
+  font-size: 1rem;
+  font-weight: 300;
+  margin-bottom: 2rem;
+}
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  text-align: left;
+}
+.signup-form label {
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  font-weight: 500;
+}
+.signup-form input {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.signup-form input:focus { border-color: rgba(200,164,110,0.5); }
+.signup-form input::placeholder { color: var(--gray-dark); }
+.signup-form .btn-submit {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+  margin-top: 0.5rem;
+}
+.signup-form .btn-submit:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+.signup-form .btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.form-note {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  text-align: center;
+}
+
+/* SUCCESS STATE */
+.signup-success {
+  display: none;
+  text-align: center;
+  padding: 2rem 0;
+}
+.signup-success .ref-link-box {
+  background: var(--card-bg);
+  border: 1px solid rgba(200,164,110,0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+}
+.signup-success .ref-link {
+  font-family: monospace;
+  font-size: 1rem;
+  color: var(--accent);
+  word-break: break-all;
+  margin: 0.8rem 0;
+}
+.signup-success .copy-btn {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.signup-success .copy-btn:hover { background: var(--accent-hover); }
+
+/* LOGIN SECTION */
+.login-section {
+  padding: 4rem 2rem;
+  background: var(--dark);
+  text-align: center;
+}
+.login-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+.login-section p {
+  color: var(--gray-mid);
+  font-size: 0.95rem;
+  font-weight: 300;
+  margin-bottom: 1.5rem;
+}
+.login-form {
+  max-width: 400px;
+  margin: 0 auto;
+  display: flex;
+  gap: 0.8rem;
+}
+.login-form input {
+  flex: 1;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+}
+.login-form input:focus { border-color: rgba(200,164,110,0.5); }
+.login-form button {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 0.85rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  white-space: nowrap;
+}
+.login-form button:hover { background: var(--accent-hover); }
+.login-msg {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+  min-height: 1.4rem;
+}
+.login-msg.success { color: #4ade80; }
+.login-msg.error { color: #f87171; }
+
+/* FOOTER */
+footer {
+  padding: 2rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+
+/* RESPONSIVE */
+@media (max-width: 700px) {
+  .how-steps { grid-template-columns: 1fr; }
+  nav { padding: 0.8rem 1rem; }
+  .login-form { flex-direction: column; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">freeaisitebuilder.com</a>
+  <a href="#login" style="color:var(--accent);text-decoration:none;font-weight:600;font-size:0.9rem;">Affiliate Login</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="earnings-badge">$10 Per Referral</div>
+  <h1>Earn Money Sharing <span>Free AI Site Builder</span></h1>
+  <p class="lead">Share your unique link with your audience. Every time someone uses it to build their website and sets up hosting, you earn $10. It's that simple.</p>
+  <a href="#signup" style="display:inline-block;background:var(--accent);color:var(--black);padding:1rem 3rem;border-radius:4px;text-decoration:none;font-weight:700;font-size:1.1rem;transition:background 0.3s, transform 0.2s;">Become an Affiliate</a>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how-section">
+  <div class="how-inner">
+    <h2>How It Works</h2>
+    <p class="how-subtitle">Three steps to start earning.</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="how-step-num">1</div>
+        <h3>Sign Up</h3>
+        <p>Create your free affiliate account. You'll get a unique referral link instantly — no approval process.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">2</div>
+        <h3>Share Your Link</h3>
+        <p>Share it with your audience — on social media, YouTube, your blog, anywhere. When someone clicks it, they're tagged as your referral.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step-num">3</div>
+        <h3>Get Paid</h3>
+        <p>Every time one of your referrals sets up hosting and builds their site, you earn $10. We track everything and pay you out monthly.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SIGNUP -->
+<section class="signup-section" id="signup">
+  <div class="signup-inner">
+    <h2>Join the Affiliate Program</h2>
+    <p class="subtitle">Create your account and get your link in 30 seconds.</p>
+
+    <form class="signup-form" id="signupForm" onsubmit="handleSignup(event)">
+      <label for="affName">Your name</label>
+      <input type="text" id="affName" placeholder="Full name" required>
+
+      <label for="affEmail">Email address</label>
+      <input type="email" id="affEmail" placeholder="you@example.com" required>
+
+      <label for="affPaypal">PayPal or Venmo email <span style="color:var(--gray-dark);font-weight:300;">(for payouts)</span></label>
+      <input type="email" id="affPaypal" placeholder="paypal@example.com" required>
+
+      <button type="submit" class="btn-submit" id="signupBtn">Create My Affiliate Link</button>
+      <p class="form-note">Free to join. No minimum payouts. We pay monthly via PayPal.</p>
+    </form>
+
+    <div class="signup-success" id="signupSuccess">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem;">&#127881;</div>
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:0.5rem;">You're in!</h2>
+      <p style="color:var(--gray-mid);font-size:0.95rem;margin-bottom:1rem;">Here's your unique referral link:</p>
+      <div class="ref-link-box">
+        <p class="ref-link" id="refLinkText"></p>
+        <button class="copy-btn" onclick="copyRefLink()">Copy Link</button>
+      </div>
+      <p style="color:var(--gray-mid);font-size:0.9rem;margin-top:1rem;">We also sent a login link to your email so you can access your <strong style="color:var(--off-white);">affiliate dashboard</strong> anytime.</p>
+    </div>
+  </div>
+</section>
+
+<!-- LOGIN -->
+<section class="login-section" id="login">
+  <h2>Already an affiliate?</h2>
+  <p>Enter your email to access your dashboard.</p>
+  <form class="login-form" onsubmit="handleLogin(event)">
+    <input type="email" id="loginEmail" placeholder="your@email.com" required>
+    <button type="submit" id="loginBtn">Send Login Link</button>
+  </form>
+  <p class="login-msg" id="loginMsg"></p>
+</section>
+
+<footer>
+  &copy; 2026 freeaisitebuilder.com. All rights reserved.
+</footer>
+
+<script>
+async function handleSignup(e) {
+  e.preventDefault();
+  const name = document.getElementById('affName').value.trim();
+  const email = document.getElementById('affEmail').value.trim();
+  const paypal = document.getElementById('affPaypal').value.trim();
+  const btn = document.getElementById('signupBtn');
+
+  if (!name || !email || !paypal) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Creating your link...';
+
+  try {
+    const res = await fetch('/api/affiliate/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, paypal })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      document.getElementById('signupForm').style.display = 'none';
+      document.getElementById('signupSuccess').style.display = 'block';
+      document.getElementById('refLinkText').textContent = data.refLink;
+    } else {
+      alert(data.error || 'Something went wrong. Please try again.');
+      btn.disabled = false;
+      btn.textContent = 'Create My Affiliate Link';
+    }
+  } catch {
+    alert('Could not connect. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Create My Affiliate Link';
+  }
+}
+
+function copyRefLink() {
+  const link = document.getElementById('refLinkText').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Link'; }, 2000);
+  });
+}
+
+async function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value.trim();
+  const btn = document.getElementById('loginBtn');
+  const msg = document.getElementById('loginMsg');
+
+  btn.disabled = true;
+  btn.textContent = 'Sending...';
+  msg.textContent = '';
+  msg.className = 'login-msg';
+
+  try {
+    const res = await fetch('/api/affiliate/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email })
+    });
+    const data = await res.json();
+
+    if (data.ok) {
+      msg.textContent = 'Check your email for a login link to your dashboard.';
+      msg.className = 'login-msg success';
+      btn.textContent = 'Link Sent!';
+    } else {
+      msg.textContent = data.error || 'Something went wrong.';
+      msg.className = 'login-msg error';
+      btn.disabled = false;
+      btn.textContent = 'Send Login Link';
+    }
+  } catch {
+    msg.textContent = 'Network error. Please try again.';
+    msg.className = 'login-msg error';
+    btn.disabled = false;
+    btn.textContent = 'Send Login Link';
+  }
+}
+
+// Check if already authenticated — redirect to dashboard
+fetch('/api/auth/me').then(r => r.json()).then(data => {
+  if (data.authenticated) {
+    // Check if they're an affiliate
+    fetch('/api/affiliate/stats').then(r => r.json()).then(stats => {
+      if (stats.ok) {
+        window.location.href = '/affiliate-dashboard.html';
+      }
+    }).catch(() => {});
+  }
+}).catch(() => {});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Affiliate Dashboard — Free AI Site Builder</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='16' fill='%230A0A0A'/><text x='50' y='68' font-size='55' text-anchor='middle' fill='%23C8A46E' font-family='serif'>AI</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --black: #0A0A0A;
+  --dark: #111111;
+  --card-bg: #1A1A1A;
+  --white: #FFFFFF;
+  --off-white: #F5F5F5;
+  --gray-light: #E0E0E0;
+  --gray-mid: #999999;
+  --gray-dark: #666666;
+  --accent: #C8A46E;
+  --accent-hover: #D4B57E;
+  --green: #4CAF50;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  background: var(--black);
+  color: var(--off-white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* NAV */
+nav {
+  position: fixed; top: 0; width: 100%; z-index: 1000;
+  padding: 1rem 2rem;
+  display: flex; justify-content: space-between; align-items: center;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(200,164,110,0.1);
+}
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.05rem; font-weight: 600; color: #fff;
+  text-decoration: none;
+}
+.nav-right {
+  display: flex; gap: 1rem; align-items: center;
+}
+.nav-email {
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+}
+.nav-logout {
+  font-size: 0.85rem;
+  color: var(--gray-dark);
+  text-decoration: none;
+  cursor: pointer;
+}
+.nav-logout:hover { color: var(--accent); }
+
+/* DASHBOARD */
+.dashboard {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 6rem 2rem 4rem;
+}
+
+.dash-header {
+  margin-bottom: 2rem;
+}
+.dash-header h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  margin-bottom: 0.3rem;
+}
+.dash-header p {
+  color: var(--gray-mid);
+  font-size: 0.95rem;
+  font-weight: 300;
+}
+
+/* REFERRAL LINK BOX */
+.ref-link-section {
+  background: var(--card-bg);
+  border: 1px solid rgba(200,164,110,0.2);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 2rem;
+}
+.ref-link-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.ref-link-row {
+  display: flex;
+  gap: 0.8rem;
+  align-items: center;
+}
+.ref-link-url {
+  flex: 1;
+  background: var(--black);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-family: monospace;
+  font-size: 0.9rem;
+  color: var(--off-white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.copy-btn {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  font-family: 'Source Sans 3', sans-serif;
+  white-space: nowrap;
+  transition: background 0.3s;
+}
+.copy-btn:hover { background: var(--accent-hover); }
+
+/* STATS GRID */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+.stat-card.highlight {
+  border-color: rgba(200,164,110,0.25);
+  background: rgba(200,164,110,0.05);
+}
+.stat-value {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  margin-bottom: 0.3rem;
+}
+.stat-card.highlight .stat-value { color: var(--accent); }
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--gray-mid);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 500;
+}
+
+/* CONVERSIONS TABLE */
+.conversions-section {
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+}
+.conversions-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+.conversions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.conversions-table th {
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--gray-dark);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.conversions-table td {
+  padding: 0.75rem 0.8rem;
+  font-size: 0.9rem;
+  color: var(--gray-light);
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+.conversions-table tr:last-child td { border-bottom: none; }
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+.status-badge.paid {
+  background: rgba(76,175,80,0.15);
+  color: #4CAF50;
+}
+.status-badge.pending {
+  background: rgba(200,164,110,0.15);
+  color: var(--accent);
+}
+.no-conversions {
+  text-align: center;
+  padding: 2rem;
+  color: var(--gray-dark);
+  font-size: 0.95rem;
+}
+
+/* LOADING */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 1rem;
+  color: var(--gray-mid);
+}
+
+/* NOT AUTH */
+.not-auth {
+  display: none;
+  text-align: center;
+  padding: 8rem 2rem;
+}
+.not-auth h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+.not-auth p {
+  color: var(--gray-mid);
+  margin-bottom: 2rem;
+}
+.not-auth a {
+  display: inline-block;
+  background: var(--accent);
+  color: var(--black);
+  padding: 0.8rem 2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  .stats-grid { grid-template-columns: 1fr; }
+  .ref-link-row { flex-direction: column; }
+  .ref-link-url { width: 100%; }
+  nav { padding: 0.8rem 1rem; }
+  .conversions-table { font-size: 0.8rem; }
+  .conversions-table th, .conversions-table td { padding: 0.5rem 0.4rem; }
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="nav-logo">freeaisitebuilder.com</a>
+  <div class="nav-right">
+    <span class="nav-email" id="navEmail"></span>
+    <a class="nav-logout" onclick="logout()">Log out</a>
+  </div>
+</nav>
+
+<!-- LOADING STATE -->
+<div class="loading" id="loadingState">Loading your dashboard...</div>
+
+<!-- NOT AUTHENTICATED -->
+<div class="not-auth" id="notAuthState">
+  <h2>You need to log in</h2>
+  <p>Please log in to view your affiliate dashboard.</p>
+  <a href="/affiliate.html#login">Go to Affiliate Login</a>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboardState" style="display:none;">
+
+  <div class="dash-header">
+    <h1>Affiliate Dashboard</h1>
+    <p>Welcome back, <span id="affName"></span>. Here's how your referrals are doing.</p>
+  </div>
+
+  <!-- REFERRAL LINK -->
+  <div class="ref-link-section">
+    <div class="ref-link-label">Your Referral Link</div>
+    <div class="ref-link-row">
+      <div class="ref-link-url" id="refLinkUrl"></div>
+      <button class="copy-btn" onclick="copyLink()">Copy Link</button>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-value" id="statClicks">0</div>
+      <div class="stat-label">Clicks</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-value" id="statConversions">0</div>
+      <div class="stat-label">Conversions</div>
+    </div>
+    <div class="stat-card highlight">
+      <div class="stat-value" id="statEarnings">$0</div>
+      <div class="stat-label">Total Earnings</div>
+    </div>
+  </div>
+
+  <!-- CONVERSIONS -->
+  <div class="conversions-section">
+    <h2>Conversion History</h2>
+    <div id="conversionsContent">
+      <p class="no-conversions">No conversions yet. Share your link to start earning!</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+async function loadDashboard() {
+  try {
+    // Check auth
+    const authRes = await fetch('/api/auth/me');
+    const authData = await authRes.json();
+
+    if (!authData.authenticated) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('notAuthState').style.display = 'block';
+      return;
+    }
+
+    document.getElementById('navEmail').textContent = authData.email;
+
+    // Fetch affiliate stats
+    const statsRes = await fetch('/api/affiliate/stats');
+    const stats = await statsRes.json();
+
+    if (!stats.ok) {
+      document.getElementById('loadingState').style.display = 'none';
+      document.getElementById('notAuthState').style.display = 'block';
+      document.querySelector('.not-auth h2').textContent = 'Not an affiliate yet';
+      document.querySelector('.not-auth p').textContent = 'Sign up to become an affiliate and start earning.';
+      document.querySelector('.not-auth a').href = '/affiliate.html#signup';
+      document.querySelector('.not-auth a').textContent = 'Become an Affiliate';
+      return;
+    }
+
+    // Populate dashboard
+    document.getElementById('affName').textContent = stats.name;
+    document.getElementById('refLinkUrl').textContent = stats.refLink;
+    document.getElementById('statClicks').textContent = stats.clicks || 0;
+    document.getElementById('statConversions').textContent = stats.conversions || 0;
+    document.getElementById('statEarnings').textContent = '$' + ((stats.conversions || 0) * 10);
+
+    // Build conversions table
+    if (stats.conversionList && stats.conversionList.length > 0) {
+      let html = '<table class="conversions-table"><thead><tr><th>Domain</th><th>Date</th><th>Earned</th><th>Status</th></tr></thead><tbody>';
+      for (const c of stats.conversionList) {
+        const paid = c.paidOut;
+        html += `<tr>
+          <td>${c.domain || 'Unknown'}</td>
+          <td>${c.date || 'N/A'}</td>
+          <td style="color:var(--accent);font-weight:600;">$10</td>
+          <td><span class="status-badge ${paid ? 'paid' : 'pending'}">${paid ? 'Paid' : 'Pending'}</span></td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      document.getElementById('conversionsContent').innerHTML = html;
+    }
+
+    // Show dashboard
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('dashboardState').style.display = 'block';
+
+  } catch (err) {
+    document.getElementById('loadingState').textContent = 'Error loading dashboard. Please refresh.';
+  }
+}
+
+function copyLink() {
+  const link = document.getElementById('refLinkUrl').textContent;
+  navigator.clipboard.writeText(link).then(() => {
+    const btn = document.querySelector('.copy-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy Link'; }, 2000);
+  });
+}
+
+async function logout() {
+  await fetch('/api/auth/logout', { method: 'POST' });
+  window.location.href = '/affiliate.html';
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

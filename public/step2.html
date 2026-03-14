@@ -794,11 +794,12 @@ async function confirmDomain(e) {
     localStorage.setItem('wb_domain', cleaned);
     localStorage.setItem('wb_completed_step2', 'true');
 
-    // Register domain with backend
+    // Register domain with backend (include referral code if present)
+    const ref = localStorage.getItem('wb_referral') || '';
     await fetch('/api/register-domain', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ sessionId, domain: cleaned })
+      body: JSON.stringify({ sessionId, domain: cleaned, ref })
     });
 
     // Check if authenticated before proceeding to Step 3 (Build)

@@ -676,6 +676,26 @@ footer {
 </div>
 
 <script>
+// Referral tracking — capture ?ref= param
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const ref = params.get('ref');
+  if (ref) {
+    localStorage.setItem('wb_referral', ref);
+    document.cookie = `wb_ref=${ref}; max-age=2592000; path=/`; // 30 days
+    // Track the click
+    fetch('/api/affiliate/track-click', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ref })
+    }).catch(() => {});
+    // Clean URL (remove ref param)
+    const url = new URL(window.location);
+    url.searchParams.delete('ref');
+    window.history.replaceState({}, '', url.pathname + url.search);
+  }
+})();
+
 // FAQ toggle
 document.querySelectorAll('.faq-question').forEach(q => {
   q.addEventListener('click', () => {

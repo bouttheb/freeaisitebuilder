@@ -147,7 +147,7 @@ app.post('/api/auth/send-magic-link', requireOrigin, authLimiter, async (req, re
   }
 
   // Whitelist valid redirect destinations
-  const validNextPages = { step1: '/step1.html', step2: '/step2.html', chat: '/chat.html' };
+  const validNextPages = { step1: '/step1.html', step2: '/step2.html', chat: '/chat.html', 'affiliate-dashboard': '/affiliate-dashboard.html' };
   const redirectTo = validNextPages[next] || '/step2.html';
 
   const token = crypto.randomBytes(32).toString('hex');
@@ -537,8 +537,8 @@ app.post('/api/verify-domain', requireOrigin, verifyLimiter, async (req, res) =>
 });
 
 // --- Register domain ---
-app.post('/api/register-domain', requireOrigin, (req, res) => {
-  const { sessionId, domain } = req.body;
+app.post('/api/register-domain', requireOrigin, async (req, res) => {
+  const { sessionId, domain, ref } = req.body;
   const ip = req.ip;
   const session = getSession(sessionId, ip);
   if (!session) {
@@ -546,14 +546,68 @@ app.post('/api/register-domain', requireOrigin, (req, res) => {
   }
   session.domain = domain;
   saveSession(sessionId);
+
+  // Track affiliate conversion if ref code provided
+  if (ref && AIRTABLE_TOKEN) {
+    try {
+      const affiliate = await findAffiliate('RefCode', ref);
+      if (affiliate) {
+        const customerEmail = getAuthEmail(req) || 'unknown';
+
+        // Log conversion in Conversions table
+        await fetch(CONVERSIONS_URL, {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            records: [{
+              fields: {
+                RefCode: ref,
+                CustomerEmail: customerEmail,
+                Domain: domain,
+                Date: new Date().toISOString().split('T')[0],
+                PaidOut: false,
+              }
+            }]
+          }),
+        });
+
+        // Increment conversion count on affiliate record
+        const currentConversions = affiliate.fields.Conversions || 0;
+        await fetch(`${AFFILIATES_URL}/${affiliate.id}`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fields: { Conversions: currentConversions + 1 } }),
+        });
+
+        console.log(`[Affiliate] Conversion logged: ref=${ref}, domain=${domain}`);
+      }
+    } catch (err) {
+      console.error('Affiliate conversion tracking error:', err.message);
+      // Don't block the main flow — conversion tracking is best-effort
+    }
+  }
+
   res.json({ ok: true, domain });
 });
 
-// --- Zoom signup (Airtable) ---
+// --- Airtable config ---
 const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
 const AIRTABLE_BASE_ID = 'appv8t55Y7YYDmXQj';
 const AIRTABLE_TABLE_NAME = 'Free AI Site Builder Website';
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
+const AFFILIATES_TABLE = 'Affiliates';
+const CONVERSIONS_TABLE = 'Conversions';
+const AFFILIATES_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AFFILIATES_TABLE)}`;
+const CONVERSIONS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(CONVERSIONS_TABLE)}`;
+
+// In-memory click counter (persisted to Airtable periodically)
+const clickBuffer = new Map(); // refCode -> count since last flush
 
 app.post('/api/zoom-signup', requireOrigin, async (req, res) => {
   const { name, email } = req.body;
@@ -606,6 +660,267 @@ app.post('/api/zoom-signup', requireOrigin, async (req, res) => {
     console.error('Zoom signup error:', err);
     res.status(500).json({ error: 'Could not save signup. Please try again.' });
   }
+});
+
+// --- Affiliate Program ---
+
+// Generate a unique ref code from name
+function generateRefCode(name) {
+  const prefix = name.toLowerCase().replace(/[^a-z]/g, '').slice(0, 5) || 'ref';
+  const suffix = Math.random().toString(36).slice(2, 6);
+  return `${prefix}${suffix}`;
+}
+
+// Helper: find affiliate by field
+async function findAffiliate(field, value) {
+  if (!AIRTABLE_TOKEN) return null;
+  const formula = encodeURIComponent(`LOWER({${field}})="${value.toLowerCase()}"`);
+  const url = `${AFFILIATES_URL}?filterByFormula=${formula}&maxRecords=1`;
+  const res = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` } });
+  const data = await res.json();
+  return data.records && data.records.length > 0 ? data.records[0] : null;
+}
+
+// Flush click buffer to Airtable
+async function flushClicks() {
+  if (!AIRTABLE_TOKEN || clickBuffer.size === 0) return;
+  for (const [refCode, count] of clickBuffer) {
+    try {
+      const affiliate = await findAffiliate('RefCode', refCode);
+      if (affiliate) {
+        const currentClicks = affiliate.fields.Clicks || 0;
+        await fetch(`${AFFILIATES_URL}/${affiliate.id}`, {
+          method: 'PATCH',
+          headers: {
+            Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ fields: { Clicks: currentClicks + count } }),
+        });
+      }
+    } catch (err) {
+      console.error(`Failed to flush clicks for ${refCode}:`, err.message);
+    }
+  }
+  clickBuffer.clear();
+}
+
+// Flush clicks every 5 minutes
+setInterval(flushClicks, 5 * 60 * 1000);
+
+// POST /api/affiliate/signup — register new affiliate
+app.post('/api/affiliate/signup', requireOrigin, async (req, res) => {
+  const { name, email, paypal } = req.body;
+  if (!name || !email || !paypal) {
+    return res.status(400).json({ error: 'Please fill out all fields.' });
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypal)) {
+    return res.status(400).json({ error: 'Please enter valid email addresses.' });
+  }
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Affiliate system not configured.' });
+  }
+
+  try {
+    // Check for existing affiliate
+    const existing = await findAffiliate('Email', email);
+    if (existing) {
+      return res.status(400).json({ error: 'This email is already registered as an affiliate. Use the login to access your dashboard.' });
+    }
+
+    // Generate unique ref code
+    let refCode = generateRefCode(name);
+    // Ensure uniqueness
+    let existingRef = await findAffiliate('RefCode', refCode);
+    let attempts = 0;
+    while (existingRef && attempts < 5) {
+      refCode = generateRefCode(name);
+      existingRef = await findAffiliate('RefCode', refCode);
+      attempts++;
+    }
+
+    // Create affiliate in Airtable
+    const createRes = await fetch(AFFILIATES_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            Name: name.trim(),
+            Email: email.toLowerCase().trim(),
+            RefCode: refCode,
+            PayPalEmail: paypal.trim(),
+            Clicks: 0,
+            Conversions: 0,
+          }
+        }]
+      }),
+    });
+
+    if (!createRes.ok) {
+      const errData = await createRes.json();
+      console.error('Airtable create affiliate error:', errData);
+      return res.status(500).json({ error: 'Could not create affiliate account. Please try again.' });
+    }
+
+    const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
+    const refLink = `${baseUrl}?ref=${refCode}`;
+
+    // Send magic link email so they can access dashboard
+    const token = crypto.randomBytes(32).toString('hex');
+    magicTokens.set(token, {
+      email: email.toLowerCase(),
+      redirectTo: '/affiliate-dashboard.html',
+      expiresAt: Date.now() + 24 * 60 * 60 * 1000, // 24 hours for signup
+    });
+
+    const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
+    const resendKey = process.env.RESEND_API_KEY;
+    if (resendKey) {
+      try {
+        const { Resend } = await import('resend');
+        const resend = new Resend(resendKey);
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'Free AI Site Builder <noreply@freeaisitebuilder.com>',
+          to: email.toLowerCase(),
+          subject: 'Welcome to the Affiliate Program — Free AI Site Builder',
+          html: `
+            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
+              <h2 style="color:#1a1a1a;">Welcome, ${name}!</h2>
+              <p style="color:#666;line-height:1.6;">You're now part of the Free AI Site Builder affiliate program. Here's your unique referral link:</p>
+              <div style="background:#f5f5f5;border:1px solid #e0e0e0;border-radius:8px;padding:1rem;margin:1rem 0;font-family:monospace;font-size:0.95rem;word-break:break-all;">${refLink}</div>
+              <p style="color:#666;line-height:1.6;">Share this link with your audience. You earn <strong>$10 for every person</strong> who uses it to build their site and set up hosting.</p>
+              <a href="${magicLink}" style="display:inline-block;background:#C8A46E;color:#0A0A0A;padding:12px 32px;border-radius:6px;text-decoration:none;font-weight:700;margin:1rem 0;">View Your Dashboard</a>
+              <hr style="border:none;border-top:1px solid #eee;margin:1.5rem 0;">
+              <p style="color:#bbb;font-size:0.75rem;">freeaisitebuilder.com</p>
+            </div>
+          `,
+        });
+      } catch (emailErr) {
+        console.error('Affiliate welcome email error:', emailErr.message);
+      }
+    }
+
+    res.json({ ok: true, refCode, refLink });
+  } catch (err) {
+    console.error('Affiliate signup error:', err);
+    res.status(500).json({ error: 'Could not create affiliate account. Please try again.' });
+  }
+});
+
+// POST /api/affiliate/login — send magic link to affiliate
+app.post('/api/affiliate/login', requireOrigin, authLimiter, async (req, res) => {
+  const { email } = req.body;
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Please enter a valid email address.' });
+  }
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Affiliate system not configured.' });
+  }
+
+  try {
+    const affiliate = await findAffiliate('Email', email);
+    if (!affiliate) {
+      return res.status(400).json({ error: 'No affiliate account found with this email. Sign up first.' });
+    }
+
+    const token = crypto.randomBytes(32).toString('hex');
+    magicTokens.set(token, {
+      email: email.toLowerCase(),
+      redirectTo: '/affiliate-dashboard.html',
+      expiresAt: Date.now() + 15 * 60 * 1000,
+    });
+
+    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
+    const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
+
+    const resendKey = process.env.RESEND_API_KEY;
+    if (!resendKey) {
+      console.error('RESEND_API_KEY not set — affiliate magic link:', magicLink);
+      return res.json({ ok: true });
+    }
+
+    const { Resend } = await import('resend');
+    const resend = new Resend(resendKey);
+    await resend.emails.send({
+      from: process.env.EMAIL_FROM || 'Free AI Site Builder <noreply@freeaisitebuilder.com>',
+      to: email.toLowerCase(),
+      subject: 'Your Dashboard Login — Free AI Site Builder',
+      html: `
+        <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem;">
+          <h2 style="color:#1a1a1a;">Log in to your affiliate dashboard</h2>
+          <p style="color:#666;line-height:1.6;">Click below to view your referral stats. This link expires in 15 minutes.</p>
+          <a href="${magicLink}" style="display:inline-block;background:#C8A46E;color:#0A0A0A;padding:12px 32px;border-radius:6px;text-decoration:none;font-weight:700;margin:1rem 0;">View Dashboard</a>
+          <hr style="border:none;border-top:1px solid #eee;margin:1.5rem 0;">
+          <p style="color:#bbb;font-size:0.75rem;">freeaisitebuilder.com</p>
+        </div>
+      `,
+    });
+
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Affiliate login error:', err);
+    res.status(500).json({ error: 'Could not send login email. Please try again.' });
+  }
+});
+
+// GET /api/affiliate/stats — get affiliate's dashboard data
+app.get('/api/affiliate/stats', requireAuth, async (req, res) => {
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Affiliate system not configured.' });
+  }
+
+  try {
+    const affiliate = await findAffiliate('Email', req.userEmail);
+    if (!affiliate) {
+      return res.json({ ok: false, error: 'Not an affiliate.' });
+    }
+
+    const f = affiliate.fields;
+    const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
+
+    // Include any buffered clicks
+    const bufferedClicks = clickBuffer.get(f.RefCode) || 0;
+
+    // Fetch conversions for this affiliate
+    const convFormula = encodeURIComponent(`{RefCode}="${f.RefCode}"`);
+    const convRes = await fetch(`${CONVERSIONS_URL}?filterByFormula=${convFormula}&sort%5B0%5D%5Bfield%5D=Date&sort%5B0%5D%5Bdirection%5D=desc&maxRecords=50`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const convData = await convRes.json();
+
+    const conversionList = (convData.records || []).map(r => ({
+      domain: r.fields.Domain || '',
+      date: r.fields.Date || '',
+      paidOut: r.fields.PaidOut || false,
+    }));
+
+    res.json({
+      ok: true,
+      name: f.Name,
+      refCode: f.RefCode,
+      refLink: `${baseUrl}?ref=${f.RefCode}`,
+      clicks: (f.Clicks || 0) + bufferedClicks,
+      conversions: f.Conversions || 0,
+      conversionList,
+    });
+  } catch (err) {
+    console.error('Affiliate stats error:', err);
+    res.status(500).json({ error: 'Could not load stats.' });
+  }
+});
+
+// POST /api/affiliate/track-click — record a click
+app.post('/api/affiliate/track-click', requireOrigin, async (req, res) => {
+  const { ref } = req.body;
+  if (!ref) return res.json({ ok: false });
+
+  // Buffer clicks in memory, flush to Airtable periodically
+  clickBuffer.set(ref, (clickBuffer.get(ref) || 0) + 1);
+  res.json({ ok: true });
 });
 
 // --- System prompt ---
