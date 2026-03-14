@@ -98,6 +98,49 @@ function requireOrigin(req, res, next) {
   return res.status(403).json({ error: 'Forbidden' });
 }
 
+// Stripe webhook needs raw body — must be before express.json()
+app.post('/api/stripe/webhook', express.raw({ type: 'application/json' }), async (req, res) => {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+  const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!STRIPE_SECRET_KEY || !STRIPE_WEBHOOK_SECRET) {
+    return res.status(503).json({ error: 'Stripe not configured' });
+  }
+
+  try {
+    const { default: Stripe } = await import('stripe');
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
+    const sig = req.headers['stripe-signature'];
+    const event = stripe.webhooks.constructEvent(req.body, sig, STRIPE_WEBHOOK_SECRET);
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object;
+      const email = session.metadata.email || session.client_reference_id;
+      const tokens = parseInt(session.metadata.tokens) || 0;
+      const tier = session.metadata.tier;
+      const sessionId = session.metadata.sessionId;
+
+      console.log(`[Stripe] Payment received: ${email}, tier=${tier}, tokens=${tokens}`);
+
+      // Credit tokens to user's session
+      if (email && tokens > 0) {
+        for (const [sid, sess] of sessions) {
+          if (sess.email && sess.email.toLowerCase() === email.toLowerCase()) {
+            sess.bonusTokens = (sess.bonusTokens || 0) + tokens;
+            await saveSession(sid);
+            console.log(`[Stripe] Credited ${tokens} tokens to ${email} (session ${sid})`);
+            break;
+          }
+        }
+      }
+    }
+
+    res.json({ received: true });
+  } catch (err) {
+    console.error('Stripe webhook error:', err.message);
+    res.status(400).json({ error: 'Webhook error' });
+  }
+});
+
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 
@@ -414,7 +457,7 @@ const verifyLimiter = rateLimit({
 
 // --- Config ---
 const PORT = process.env.PORT || 3000;
-const TOKEN_CAP = 100_000;
+const TOKEN_CAP = 20_000;
 
 const anthropic = new Anthropic(); // uses ANTHROPIC_API_KEY env var
 
@@ -450,6 +493,8 @@ function getSession(id, ip, email) {
       ip: ip || 'unknown',
       email: email || null,
       referralTokenCredited: false,
+      referralCount: 0,
+      pendingReward: null, // null or { type: 'choose', referrerEmail, domain }
     });
   }
   return sessions.get(id);
@@ -644,33 +689,50 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
 
         console.log(`[Affiliate] Conversion logged: ref=${ref}, domain=${domain}`);
 
-        // Credit bonus tokens to referrer if this is their first referral conversion
+        // Credit referrer — 1st referral: auto-grant 100k tokens. 2nd+: let them choose tokens or $10.
         const referrerEmail = affiliate.fields.Email;
         if (referrerEmail) {
-          // Find referrer's session and credit 100k bonus tokens (first conversion only)
+          // Find referrer's session (most recent one)
           let referrerSession = null;
           let referrerSessionId = null;
           for (const [sid, sess] of sessions) {
-            if (sess.email && sess.email.toLowerCase() === referrerEmail.toLowerCase() && !sess.referralTokenCredited) {
+            if (sess.email && sess.email.toLowerCase() === referrerEmail.toLowerCase()) {
               referrerSession = sess;
               referrerSessionId = sid;
               break;
             }
           }
 
-          if (referrerSession && !referrerSession.referralTokenCredited) {
-            referrerSession.bonusTokens = (referrerSession.bonusTokens || 0) + 100000;
-            referrerSession.referralTokenCredited = true;
-            await saveSession(referrerSessionId);
-            console.log(`[Affiliate] Credited 100k bonus tokens to ${referrerEmail}`);
+          if (referrerSession) {
+            const refCount = (referrerSession.referralCount || 0) + 1;
+            referrerSession.referralCount = refCount;
+
+            if (refCount === 1) {
+              // First referral: auto-credit 100k tokens
+              referrerSession.bonusTokens = (referrerSession.bonusTokens || 0) + 100000;
+              referrerSession.referralTokenCredited = true;
+              await saveSession(referrerSessionId);
+              console.log(`[Affiliate] 1st referral — credited 100k bonus tokens to ${referrerEmail}`);
+            } else {
+              // 2nd+ referral: set pending reward for user to choose
+              referrerSession.pendingReward = { type: 'choose', domain };
+              await saveSession(referrerSessionId);
+              console.log(`[Affiliate] Referral #${refCount} — pending reward choice for ${referrerEmail}`);
+            }
           }
 
           // Send email notification to referrer
           const RESEND_API_KEY = process.env.RESEND_API_KEY;
           if (RESEND_API_KEY) {
             const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
-            // Create a magic link so they can jump back to their session
             const magicLink = createMagicToken(referrerEmail, '/chat.html' + (referrerSessionId ? `?session=${referrerSessionId}` : ''));
+            const refCount = referrerSession ? (referrerSession.referralCount || 1) : 1;
+            const subject = refCount === 1
+              ? 'Your friend signed up! You just earned 100k bonus tokens'
+              : `Friend #${refCount} signed up! Choose your reward`;
+            const bodyText = refCount === 1
+              ? `<p style="color:#666;line-height:1.6;">We've credited your account with <strong style="color:#1a1a1a;">100,000 bonus tokens</strong> — that's 5x your original allowance! Keep building your site.</p>`
+              : `<p style="color:#666;line-height:1.6;">You can now choose: <strong style="color:#1a1a1a;">100,000 more tokens</strong> to keep building, or <strong style="color:#1a1a1a;">$10 cash</strong> to your PayPal. Log in to choose your reward.</p>`;
             try {
               await fetch('https://api.resend.com/emails', {
                 method: 'POST',
@@ -681,23 +743,23 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
                 body: JSON.stringify({
                   from: 'Free AI Site Builder <noreply@freeaisitebuilder.com>',
                   to: [referrerEmail],
-                  subject: 'Your friend signed up! You just earned 100k bonus tokens 🎉',
+                  subject,
                   html: `
                     <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:2rem;">
                       <h2 style="color:#1a1a1a;">Great news!</h2>
                       <p style="color:#666;line-height:1.6;">One of the friends you shared your link with just signed up and started building their website.</p>
-                      <p style="color:#666;line-height:1.6;">We've credited your account with <strong style="color:#1a1a1a;">100,000 bonus tokens</strong> so you can keep building your site.</p>
+                      ${bodyText}
                       <div style="text-align:center;margin:2rem 0;">
                         <a href="${magicLink}" style="display:inline-block;background:#C8A46E;color:#0A0A0A;padding:0.8rem 2rem;border-radius:6px;text-decoration:none;font-weight:700;">Continue Building My Site</a>
                       </div>
-                      <p style="color:#999;font-size:0.85rem;">Every additional friend who builds a site earns you $10. Keep sharing!</p>
+                      <p style="color:#999;font-size:0.85rem;">Keep sharing — every friend earns you tokens or cash!</p>
                     </div>
                   `,
                 }),
               });
-              console.log(`[Affiliate] Sent token credit email to ${referrerEmail}`);
+              console.log(`[Affiliate] Sent referral email to ${referrerEmail}`);
             } catch (emailErr) {
-              console.error('Failed to send referral token email:', emailErr.message);
+              console.error('Failed to send referral email:', emailErr.message);
             }
           }
         }
@@ -722,10 +784,150 @@ app.get('/api/session/token-status', requireAuth, (req, res) => {
         bonusTokens: sess.bonusTokens || 0,
         tokenCap: TOKEN_CAP + (sess.bonusTokens || 0),
         referralTokenCredited: sess.referralTokenCredited || false,
+        referralCount: sess.referralCount || 0,
+        pendingReward: sess.pendingReward || null,
       });
     }
   }
-  res.json({ bonusTokens: 0, tokenCap: TOKEN_CAP, referralTokenCredited: false });
+  res.json({ bonusTokens: 0, tokenCap: TOKEN_CAP, referralTokenCredited: false, referralCount: 0, pendingReward: null });
+});
+
+// POST /api/referral/choose-reward — user chooses tokens or cash for 2nd+ referrals
+app.post('/api/referral/choose-reward', requireAuth, async (req, res) => {
+  const { choice } = req.body; // 'tokens' or 'cash'
+  if (!choice || !['tokens', 'cash'].includes(choice)) {
+    return res.status(400).json({ error: 'Invalid choice. Must be "tokens" or "cash".' });
+  }
+
+  // Find user's session
+  let userSession = null;
+  let userSessionId = null;
+  for (const [sid, sess] of sessions) {
+    if (sess.email && sess.email.toLowerCase() === req.userEmail.toLowerCase()) {
+      userSession = sess;
+      userSessionId = sid;
+      break;
+    }
+  }
+
+  if (!userSession || !userSession.pendingReward) {
+    return res.status(400).json({ error: 'No pending reward to claim.' });
+  }
+
+  if (choice === 'tokens') {
+    // Credit 100k bonus tokens
+    userSession.bonusTokens = (userSession.bonusTokens || 0) + 100000;
+    userSession.pendingReward = null;
+    await saveSession(userSessionId);
+    console.log(`[Referral] ${req.userEmail} chose 100k tokens (referral #${userSession.referralCount})`);
+    return res.json({
+      ok: true,
+      choice: 'tokens',
+      bonusTokens: userSession.bonusTokens,
+      tokenCap: TOKEN_CAP + userSession.bonusTokens,
+    });
+  } else {
+    // Cash — log as affiliate conversion in Airtable (same payout system)
+    if (AIRTABLE_TOKEN) {
+      try {
+        const affiliate = await findAffiliate('Email', req.userEmail);
+        if (affiliate) {
+          const domain = userSession.pendingReward.domain || 'referral-cash-choice';
+          await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(CONVERSIONS_TABLE)}`, {
+            method: 'POST',
+            headers: {
+              Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              fields: {
+                AffiliateEmail: req.userEmail,
+                RefCode: affiliate.fields.RefCode,
+                Domain: domain,
+                Date: new Date().toISOString().split('T')[0],
+                Amount: 10,
+                Status: 'Pending',
+              },
+            }),
+          });
+          console.log(`[Referral] ${req.userEmail} chose $10 cash — conversion logged`);
+        }
+      } catch (err) {
+        console.error('Failed to log cash reward conversion:', err.message);
+      }
+    }
+    userSession.pendingReward = null;
+    await saveSession(userSessionId);
+    return res.json({
+      ok: true,
+      choice: 'cash',
+      message: 'Your $10 commission has been logged. It will be paid out on the 1st of the month following the lock period.',
+    });
+  }
+});
+
+// POST /api/tokens/purchase — create Stripe Checkout session for token purchase
+const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
+
+const TOKEN_PRODUCTS = {
+  small: { tokens: 50000, price: 500, label: '50,000 tokens' },   // $5 = 500 cents
+  large: { tokens: 100000, price: 1000, label: '100,000 tokens' }, // $10 = 1000 cents
+};
+
+app.post('/api/tokens/purchase', requireAuth, async (req, res) => {
+  const { tier } = req.body; // 'small' or 'large'
+  if (!tier || !TOKEN_PRODUCTS[tier]) {
+    return res.status(400).json({ error: 'Invalid tier. Use "small" or "large".' });
+  }
+  if (!STRIPE_SECRET_KEY) {
+    return res.status(503).json({ error: 'Payment system is not yet configured.' });
+  }
+
+  const product = TOKEN_PRODUCTS[tier];
+  const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
+
+  // Find session ID for the user
+  let userSessionId = null;
+  for (const [sid, sess] of sessions) {
+    if (sess.email && sess.email.toLowerCase() === req.userEmail.toLowerCase()) {
+      userSessionId = sid;
+      break;
+    }
+  }
+
+  try {
+    // Dynamic import of Stripe
+    const { default: Stripe } = await import('stripe');
+    const stripe = new Stripe(STRIPE_SECRET_KEY);
+
+    const checkoutSession = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          product_data: { name: `${product.label} — Free AI Site Builder` },
+          unit_amount: product.price,
+        },
+        quantity: 1,
+      }],
+      mode: 'payment',
+      success_url: `${baseUrl}/chat.html?session=${userSessionId || ''}&purchased=${tier}`,
+      cancel_url: `${baseUrl}/chat.html?session=${userSessionId || ''}`,
+      client_reference_id: req.userEmail,
+      metadata: {
+        tier,
+        tokens: product.tokens.toString(),
+        email: req.userEmail,
+        sessionId: userSessionId || '',
+      },
+    });
+
+    res.json({ url: checkoutSession.url });
+  } catch (err) {
+    console.error('Stripe checkout error:', err.message);
+    res.status(500).json({ error: 'Failed to create checkout session.' });
+  }
 });
 
 // GET /api/affiliate/my-link — get current user's affiliate ref code
