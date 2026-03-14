@@ -120,6 +120,26 @@ nav {
   font-size: 0.85rem;
   color: var(--gray-dark);
 }
+.scroll-hint {
+  margin-top: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--off-white);
+  cursor: pointer;
+  animation: float 3s ease-in-out infinite;
+}
+.scroll-hint span {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.2rem, 2.5vw, 1.6rem);
+  font-weight: 600;
+}
+.scroll-hint svg { opacity: 0.5; }
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
 
 /* SECTIONS */
 section { padding: 6rem 2rem; }
@@ -502,6 +522,10 @@ footer {
   <p>No coding required. Our AI walks you through every step — from content, to design, to launching your new website.</p>
   <a href="/step1.html" class="hero-cta">Start Building My Site — Free</a>
   <p class="hero-help">Need help? <a href="#" onclick="event.preventDefault();openZoomModal();">Join a free Zoom session →</a></p>
+  <div class="scroll-hint" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
+    <span>Learn More</span>
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+  </div>
 </section>
 
 <!-- HOW IT WORKS -->
