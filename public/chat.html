@@ -117,6 +117,85 @@ nav {
   background: var(--accent);
 }
 
+/* PHOTO UPLOAD PANEL (sidebar) */
+.sidebar-photo-panel {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.sidebar-photo-panel h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.sidebar-photo-panel h4 svg { transition: transform 0.3s; }
+.sidebar-photo-panel h4.open svg { transform: rotate(180deg); }
+.photo-panel-body { display: none; }
+.photo-panel-body.open { display: block; }
+.photo-panel-body ol {
+  padding-left: 1.2rem;
+  color: var(--gray-light);
+  font-size: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+.photo-panel-body ol li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+.photo-panel-body code {
+  background: rgba(200,164,110,0.1);
+  color: var(--accent);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  font-size: 0.75rem;
+}
+.photo-panel-body input[type="text"] {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  padding: 0.5rem 0.7rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+.photo-panel-body input[type="text"]:focus { outline: none; border-color: var(--accent); }
+.photo-panel-btn {
+  width: 100%;
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: none;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-bottom: 0.4rem;
+  transition: all 0.3s;
+}
+.photo-panel-btn.primary { background: var(--accent); color: var(--black); }
+.photo-panel-btn.primary:hover { background: var(--accent-hover); }
+.photo-panel-btn.secondary { background: rgba(200,164,110,0.15); color: var(--accent); border: 1px solid rgba(200,164,110,0.3); }
+.photo-panel-btn.secondary:hover { background: rgba(200,164,110,0.25); }
+.photo-panel-results {
+  margin-top: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  display: none;
+}
+.photo-panel-results.success { background: rgba(76,175,80,0.05); border: 1px solid rgba(76,175,80,0.2); color: var(--gray-light); }
+.photo-panel-results.error { background: rgba(229,115,115,0.05); border: 1px solid rgba(229,115,115,0.2); color: var(--gray-light); }
+.photo-panel-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+.photo-panel-tag { background: rgba(200,164,110,0.1); border: 1px solid rgba(200,164,110,0.2); color: var(--accent); padding: 0.15rem 0.5rem; border-radius: 4px; font-size: 0.7rem; }
+
 /* CHAT AREA */
 .chat-area {
   flex: 1;
@@ -678,6 +757,27 @@ nav {
       <div class="step-dot"></div>
       <span>Launch</span>
     </div>
+
+    <!-- Photo upload to hosting -->
+    <div class="sidebar-photo-panel">
+      <h4 onclick="togglePhotoPanel(this)">
+        📷 Upload Photos to Hosting
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </h4>
+      <div class="photo-panel-body" id="photoPanelBody">
+        <p style="font-size:0.8rem;color:var(--gray-mid);margin-bottom:0.8rem;line-height:1.5;">Have lots of photos? Upload them directly to your Bluehost hosting and the AI will use them.</p>
+        <ol>
+          <li>In Bluehost → <strong>Hosting</strong> → <strong>File Manager</strong></li>
+          <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Upload all your photos there.</li>
+          <li>Download this helper file and upload it to <code>public_html</code>:</li>
+        </ol>
+        <button class="photo-panel-btn secondary" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
+        <label style="display:block;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gray-dark);margin:0.8rem 0 0.3rem;">Your Domain</label>
+        <input type="text" id="photoDomain" placeholder="e.g., yourdomain.com">
+        <button class="photo-panel-btn primary" onclick="checkHostingImages()">Check for Images</button>
+        <div class="photo-panel-results" id="photoResults"></div>
+      </div>
+    </div>
   </div>
 
   <!-- CHAT -->
@@ -870,6 +970,57 @@ const TOKEN_CAP = 20000;
 let pendingFiles = [];
 let conversationHistory = [];
 let currentStep = 1;
+let hostingImages = [];
+
+// === PHOTO PANEL (sidebar) ===
+function togglePhotoPanel(h4) {
+  h4.classList.toggle('open');
+  document.getElementById('photoPanelBody').classList.toggle('open');
+  // Auto-fill domain from saved data
+  const domainInput = document.getElementById('photoDomain');
+  if (!domainInput.value) {
+    domainInput.value = localStorage.getItem('wb_domain') || '';
+  }
+}
+
+function downloadPhpHelper() {
+  const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
+  const blob = new Blob([php], { type: 'application/x-php' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'list-images.php'; a.click();
+}
+
+async function checkHostingImages() {
+  const domain = document.getElementById('photoDomain').value.trim() || localStorage.getItem('wb_domain') || '';
+  const el = document.getElementById('photoResults');
+  el.style.display = 'block';
+  el.className = 'photo-panel-results success';
+  el.innerHTML = '<p>Checking...</p>';
+  try {
+    const resp = await fetch(`https://${domain}/list-images.php`);
+    if (!resp.ok) throw new Error();
+    const images = await resp.json();
+    if (images.length === 0) {
+      el.className = 'photo-panel-results error';
+      el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>';
+    } else {
+      hostingImages = images;
+      // Save to site data so the AI can use them
+      try {
+        const siteData = JSON.parse(localStorage.getItem('wb_site_data') || '{}');
+        siteData.images = images;
+        siteData.photosSkipped = false;
+        localStorage.setItem('wb_site_data', JSON.stringify(siteData));
+      } catch {}
+      el.className = 'photo-panel-results success';
+      el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="photo-panel-tags">${images.map(i=>`<span class="photo-panel-tag">${i.replace('images/','')}</span>`).join('')}</div>`;
+      // Notify in chat
+      addSystemMessage(`📷 Found ${images.length} image${images.length===1?'':'s'} on your hosting. The AI will use these in your site.`);
+    }
+  } catch {
+    el.className = 'photo-panel-results error';
+    el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`;
+  }
+}
 
 // Initialize — use wizard data to auto-start the build
 window.addEventListener('DOMContentLoaded', async () => {

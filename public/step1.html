@@ -352,15 +352,14 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
       <h3 style="font-family: 'Playfair Display', serif; font-size: 1.3rem; margin-bottom: 0.3rem;">Add your <span style="color:var(--accent);">photos</span></h3>
       <p style="color: var(--gray-mid); font-size: 0.9rem; margin-bottom: 1.5rem;">Give the AI real images to work with, or skip and it'll use tasteful placeholders.</p>
 
-      <div class="photo-option" id="photoOptionUpload">
-        <div class="photo-option-header" onclick="selectPhotoOption('upload')">
-          <div class="photo-option-radio" id="radioUpload"></div>
+      <div class="photo-option selected" id="photoOptionUpload">
+        <div class="photo-option-header">
           <div>
-            <strong>Upload images here</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
+            <strong>Upload images</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(up to 5 images)</span>
             <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best for a few key photos — logo, hero image, team photo, etc.</p>
           </div>
         </div>
-        <div class="photo-option-body" id="uploadBody" style="display: none;">
+        <div class="photo-option-body" id="uploadBody">
           <div class="image-drop-zone" id="imageDropZone" onclick="document.getElementById('imageFileInput').click()">
             <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--gray-mid)" stroke-width="1.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
             <p style="margin-top: 0.5rem; color: var(--gray-light); font-size: 0.95rem;">Drag & drop images here, or <span style="color: var(--accent); text-decoration: underline;">browse</span></p>
@@ -371,40 +370,7 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
         </div>
       </div>
 
-      <div class="photo-option" id="photoOptionHosting">
-        <div class="photo-option-header" onclick="selectPhotoOption('hosting')">
-          <div class="photo-option-radio" id="radioHosting"></div>
-          <div>
-            <strong>Upload to my Bluehost hosting</strong> <span style="color: var(--gray-mid); font-size: 0.85rem;">(unlimited images)</span>
-            <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 0.2rem;">Best if you have lots of photos — upload them to your hosting and the AI will find them.</p>
-          </div>
-        </div>
-        <div class="photo-option-body" id="hostingBody" style="display: none;">
-          <div class="photo-instructions">
-            <h4>Three quick steps:</h4>
-            <ol>
-              <li>Log in to <strong>Bluehost</strong> → click <strong>Hosting</strong> in the left sidebar → click <strong>File Manager</strong></li>
-              <li>Inside <code>public_html</code>, create a folder called <code>images</code>. Open it, then click <strong>Upload</strong>. Select all your photos and <strong>drag and drop them all at once</strong>.</li>
-              <li>Go back to <code>public_html</code>, then download this helper file and upload it there:</li>
-            </ol>
-            <button class="download-btn" onclick="downloadPhpHelper()">⬇ Download list-images.php</button>
-          </div>
-          <div class="form-group" style="margin-top: 1rem;">
-            <label>Your Domain</label>
-            <input type="text" id="photoDomain" placeholder="e.g., yourdomain.com">
-            <div style="display: flex; gap: 0.8rem; margin-top: 0.8rem;">
-              <button class="btn-submit" style="font-size: 0.9rem; padding: 0.6rem 1.2rem;" onclick="checkImages()">Check for Images</button>
-            </div>
-          </div>
-          <div class="image-results" id="imageResults"></div>
-          <div class="photo-check" id="photoConfirm" onclick="togglePhotoConfirm()">
-            <div class="photo-check-box" id="photoCheckBox">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" style="display:none;" id="photoCheckmark"><polyline points="20 6 9 17 4 12"/></svg>
-            </div>
-            <div>I've uploaded my photos and the helper file</div>
-          </div>
-        </div>
-      </div>
+      <p style="color: var(--gray-dark); font-size: 0.85rem; margin-top: 1rem; line-height: 1.5;">Have lots of photos? You can upload unlimited images directly to your Bluehost hosting in Step 3 (after you set up hosting in Step 2).</p>
 
       <button class="skip-link" onclick="skipPhotos()">Skip — AI will use placeholders</button>
     </div>
@@ -432,12 +398,9 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
 
 <script>
 let selectedGoals = [];
-let photosConfirmed = false;
 let photosSkipped = false;
-let foundImages = [];
 let uploadedDocText = '';
 let uploadedImageFiles = [];
-let selectedPhotoOption = null;
 let dpStyle = null;
 
 if (localStorage.getItem('wb_completed_step1') === 'true') {
@@ -519,13 +482,6 @@ function handleDocUpload(event) {
 }
 
 // === PHOTOS ===
-function selectPhotoOption(option) {
-  selectedPhotoOption = option;
-  document.getElementById('photoOptionUpload').classList.toggle('selected', option === 'upload');
-  document.getElementById('photoOptionHosting').classList.toggle('selected', option === 'hosting');
-  document.getElementById('uploadBody').style.display = option === 'upload' ? 'block' : 'none';
-  document.getElementById('hostingBody').style.display = option === 'hosting' ? 'block' : 'none';
-}
 function handleImageUpload(event) {
   const files = Array.from(event.target.files);
   const allowed = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
@@ -582,31 +538,7 @@ if (dropZone) {
   });
 }
 
-function togglePhotoConfirm() {
-  photosConfirmed = !photosConfirmed;
-  document.getElementById('photoConfirm').classList.toggle('checked', photosConfirmed);
-  document.getElementById('photoCheckmark').style.display = photosConfirmed ? 'block' : 'none';
-}
 function skipPhotos() { photosSkipped = true; }
-
-function downloadPhpHelper() {
-  const php = `<?php\nheader('Content-Type: application/json');\nheader('Access-Control-Allow-Origin: *');\n$files = glob('images/*.{jpg,jpeg,png,gif,webp,svg}', GLOB_BRACE);\necho json_encode($files);\n`;
-  const blob = new Blob([php], { type: 'application/x-php' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'list-images.php'; a.click();
-}
-
-async function checkImages() {
-  const domain = document.getElementById('photoDomain').value.trim() || localStorage.getItem('wb_domain') || '';
-  const el = document.getElementById('imageResults');
-  el.style.display = 'block'; el.className = 'image-results'; el.innerHTML = '<p>Checking...</p>';
-  try {
-    const resp = await fetch(`https://${domain}/list-images.php`);
-    if (!resp.ok) throw new Error();
-    const images = await resp.json();
-    if (images.length === 0) { el.className = 'image-results error'; el.innerHTML = '<p>Helper file works, but no images found in the <code>images</code> folder yet.</p>'; }
-    else { foundImages = images; el.innerHTML = `<p>Found <strong>${images.length}</strong> image${images.length===1?'':'s'}:</p><div class="image-list">${images.map(i=>`<span class="image-tag">${i.replace('images/','')}</span>`).join('')}</div>`; }
-  } catch { el.className = 'image-results error'; el.innerHTML = `<p>Couldn't connect. Make sure your domain is active and <code>list-images.php</code> is in <code>public_html</code>.</p>`; }
-}
 
 // === FINISH ===
 async function finishWizard() {
@@ -618,7 +550,7 @@ async function finishWizard() {
   localStorage.setItem('wb_session', sessionId);
 
   let directUploadNames = [];
-  if (selectedPhotoOption === 'upload' && uploadedImageFiles.length > 0) {
+  if (uploadedImageFiles.length > 0) {
     directUploadNames = uploadedImageFiles.map(f => f.name);
     try {
       const imageDataArr = [];
@@ -645,10 +577,10 @@ async function finishWizard() {
     description: document.getElementById('siteDesc').value.trim(),
     uploadedDocText: uploadedDocText,
     services: document.getElementById('services') ? document.getElementById('services').value.trim() : '',
-    images: foundImages,
+    images: [],
     directUploads: directUploadNames,
     domain: localStorage.getItem('wb_domain') || '',
-    photosSkipped: photosSkipped || (selectedPhotoOption === null && uploadedImageFiles.length === 0),
+    photosSkipped: photosSkipped || uploadedImageFiles.length === 0,
     design: {
       palette: null,
       font: null,
