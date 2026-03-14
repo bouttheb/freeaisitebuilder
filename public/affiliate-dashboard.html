@@ -214,6 +214,14 @@ nav {
   background: rgba(200,164,110,0.15);
   color: var(--accent);
 }
+.status-badge.approved {
+  background: rgba(76,175,80,0.15);
+  color: #4CAF50;
+}
+.status-badge.cancelled {
+  background: rgba(255,82,82,0.15);
+  color: #FF5252;
+}
 .no-conversions {
   text-align: center;
   padding: 2rem;
@@ -331,8 +339,10 @@ nav {
   <!-- PAYOUT TERMS -->
   <div style="margin-top:2rem;background:var(--card-bg);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:1.5rem 2rem;">
     <h2 style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:600;margin-bottom:0.8rem;">Payout Schedule</h2>
-    <p style="color:var(--gray-mid);font-size:0.9rem;line-height:1.7;margin-bottom:0.6rem;">Payouts are sent on the <strong style="color:var(--off-white);">1st of every month</strong> via PayPal. Each conversion goes through a verification period of approximately 2 months before it's included in a payout.</p>
-    <p style="color:var(--gray-dark);font-size:0.85rem;line-height:1.6;"><strong>Example:</strong> A conversion in March would be paid out on June 1st.</p>
+    <p style="color:var(--gray-mid);font-size:0.9rem;line-height:1.7;margin-bottom:0.8rem;">We only pay out on <strong style="color:var(--off-white);">approved conversions</strong>. A conversion is approved once it locks — meaning the person you referred kept their hosting account active through the verification period. If they cancel before the lock, the conversion is not approved and won't be paid out.</p>
+    <p style="color:var(--gray-mid);font-size:0.9rem;line-height:1.7;margin-bottom:0.8rem;">Conversions lock <strong style="color:var(--off-white);">1 month and 6 days</strong> after the end of the month they were tracked. Approved conversions are paid on the <strong style="color:var(--off-white);">1st of the month following the lock</strong>, provided that date is at least 20 days after the lock. If not, the payout moves to the 1st of the following month.</p>
+    <p style="color:var(--gray-dark);font-size:0.85rem;line-height:1.6;margin-bottom:0.3rem;"><strong>Example:</strong> A conversion on March 14th locks on May 6th. May 6th to June 1st is 26 days (more than 20), so you get paid <strong>June 1st</strong>.</p>
+    <p style="color:var(--gray-dark);font-size:0.85rem;line-height:1.6;"><strong>Example:</strong> A conversion on April 25th locks on June 6th. June 6th to July 1st is 25 days (more than 20), so you get paid <strong>July 1st</strong>.</p>
   </div>
 
 </div>
@@ -377,12 +387,15 @@ async function loadDashboard() {
     if (stats.conversionList && stats.conversionList.length > 0) {
       let html = '<table class="conversions-table"><thead><tr><th>Domain</th><th>Date</th><th>Earned</th><th>Status</th></tr></thead><tbody>';
       for (const c of stats.conversionList) {
-        const paid = c.paidOut;
+        const status = c.paidOut ? 'Paid' : (c.status || 'Pending');
+        const statusClass = status.toLowerCase();
+        const earned = status === 'Cancelled' ? '—' : '$10';
+        const earnedStyle = status === 'Cancelled' ? 'color:var(--gray-dark);' : 'color:var(--accent);font-weight:600;';
         html += `<tr>
           <td>${c.domain || 'Unknown'}</td>
           <td>${c.date || 'N/A'}</td>
-          <td style="color:var(--accent);font-weight:600;">$10</td>
-          <td><span class="status-badge ${paid ? 'paid' : 'pending'}">${paid ? 'Paid' : 'Pending'}</span></td>
+          <td style="${earnedStyle}">${earned}</td>
+          <td><span class="status-badge ${statusClass}">${status}</span></td>
         </tr>`;
       }
       html += '</tbody></table>';

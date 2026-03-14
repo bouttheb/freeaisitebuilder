@@ -615,6 +615,7 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
                 Domain: domain,
                 Date: new Date().toISOString().split('T')[0],
                 PaidOut: false,
+                Status: 'Pending',
               }
             }]
           }),
@@ -957,6 +958,7 @@ app.get('/api/affiliate/stats', requireAuth, async (req, res) => {
       domain: r.fields.Domain || '',
       date: r.fields.Date || '',
       paidOut: r.fields.PaidOut || false,
+      status: r.fields.Status || 'Pending',
     }));
 
     res.json({
@@ -982,6 +984,132 @@ app.post('/api/affiliate/track-click', requireOrigin, async (req, res) => {
   // Buffer clicks in memory, flush to Airtable periodically
   clickBuffer.set(ref, (clickBuffer.get(ref) || 0) + 1);
   res.json({ ok: true });
+});
+
+// --- Admin: Payout Scan ---
+const ADMIN_SECRET = process.env.ADMIN_SECRET || '';
+
+// GET /api/admin/payout-scan — scan eligible conversions, check DNS, return report
+app.get('/api/admin/payout-scan', async (req, res) => {
+  // Auth: require admin secret
+  const secret = req.query.secret || req.headers['x-admin-secret'];
+  if (!ADMIN_SECRET || secret !== ADMIN_SECRET) {
+    return res.status(403).json({ error: 'Unauthorized.' });
+  }
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Airtable not configured.' });
+  }
+
+  try {
+    // Calculate cutoff: conversions older than 1 month + 20 days ago
+    const now = new Date();
+    const cutoff = new Date(now);
+    cutoff.setMonth(cutoff.getMonth() - 1);
+    cutoff.setDate(cutoff.getDate() - 20);
+    const cutoffStr = cutoff.toISOString().split('T')[0];
+
+    // Fetch all pending conversions (Status is empty or "Pending") with Date <= cutoff
+    const formula = encodeURIComponent(`AND(OR({Status}="Pending",{Status}=""),IS_BEFORE({Date},"${cutoffStr}"))`);
+    const convRes = await fetch(`${CONVERSIONS_URL}?filterByFormula=${formula}&maxRecords=100`, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const convData = await convRes.json();
+    const records = convData.records || [];
+
+    if (records.length === 0) {
+      return res.json({ message: 'No eligible conversions to scan.', results: [] });
+    }
+
+    const results = [];
+
+    for (const record of records) {
+      const domain = record.fields.Domain || '';
+      const refCode = record.fields.RefCode || '';
+      const date = record.fields.Date || '';
+      let dnsActive = false;
+
+      if (domain) {
+        // Clean domain for DNS check
+        const cleaned = domain.replace(/^https?:\/\//, '').replace(/\/.*$/, '').toLowerCase().trim();
+        try {
+          const nsRecords = await dns.resolveNs(cleaned);
+          dnsActive = nsRecords.some(ns =>
+            BLUEHOST_NS_PATTERNS.some(pattern => ns.toLowerCase().includes(pattern))
+          );
+        } catch (nsErr) {
+          // NS failed, try A record
+          try {
+            const aRecords = await dns.resolve4(cleaned);
+            dnsActive = aRecords.length > 0;
+          } catch (aErr) {
+            dnsActive = false;
+          }
+        }
+      }
+
+      const newStatus = dnsActive ? 'Approved' : 'Cancelled';
+      results.push({ id: record.id, domain, refCode, date, dnsActive, status: newStatus });
+    }
+
+    res.json({
+      message: `Scanned ${results.length} conversions.`,
+      approved: results.filter(r => r.status === 'Approved').length,
+      cancelled: results.filter(r => r.status === 'Cancelled').length,
+      results,
+    });
+  } catch (err) {
+    console.error('Payout scan error:', err);
+    res.status(500).json({ error: 'Scan failed.' });
+  }
+});
+
+// POST /api/admin/payout-approve — apply scan results (update Status in Airtable)
+app.post('/api/admin/payout-approve', async (req, res) => {
+  const secret = req.query.secret || req.headers['x-admin-secret'];
+  if (!ADMIN_SECRET || secret !== ADMIN_SECRET) {
+    return res.status(403).json({ error: 'Unauthorized.' });
+  }
+  if (!AIRTABLE_TOKEN) {
+    return res.status(500).json({ error: 'Airtable not configured.' });
+  }
+
+  const { results } = req.body;
+  if (!results || !Array.isArray(results)) {
+    return res.status(400).json({ error: 'Provide results array from payout-scan.' });
+  }
+
+  try {
+    let updated = 0;
+    // Airtable batch update: max 10 records per request
+    for (let i = 0; i < results.length; i += 10) {
+      const batch = results.slice(i, i + 10);
+      const records = batch.map(r => ({
+        id: r.id,
+        fields: { Status: r.status },
+      }));
+
+      const patchRes = await fetch(CONVERSIONS_URL, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ records }),
+      });
+
+      if (patchRes.ok) {
+        updated += batch.length;
+      } else {
+        const errData = await patchRes.json();
+        console.error('Airtable batch update error:', errData);
+      }
+    }
+
+    res.json({ message: `Updated ${updated} conversions.` });
+  } catch (err) {
+    console.error('Payout approve error:', err);
+    res.status(500).json({ error: 'Update failed.' });
+  }
 });
 
 // --- System prompt ---
