@@ -294,6 +294,9 @@ app.use('/generated', (req, res, next) => {
   next();
 });
 
+// Health check endpoint — responds before static files for fast Render health checks
+app.get('/healthz', (req, res) => res.status(200).send('ok'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // --- Global daily token budget (prevent runaway costs) ---
