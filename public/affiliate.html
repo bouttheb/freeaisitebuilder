@@ -477,11 +477,8 @@ footer {
       <label for="affName">Your name</label>
       <input type="text" id="affName" placeholder="Full name" required>
 
-      <label for="affEmail">Email address</label>
+      <label for="affEmail">PayPal email <span style="color:var(--gray-dark);font-weight:300;">(used for login &amp; payouts)</span></label>
       <input type="email" id="affEmail" placeholder="you@example.com" required>
-
-      <label for="affPaypal">PayPal or Venmo email <span style="color:var(--gray-dark);font-weight:300;">(for payouts)</span></label>
-      <input type="email" id="affPaypal" placeholder="paypal@example.com" required>
 
       <button type="submit" class="btn-submit" id="signupBtn">Create My Affiliate Link</button>
       <p class="form-note">Free to join. No minimum payouts. All you need is a PayPal account.</p>
@@ -503,9 +500,9 @@ footer {
 <!-- LOGIN -->
 <section class="login-section" id="login">
   <h2>Already an affiliate?</h2>
-  <p>Enter your email to access your dashboard.</p>
+  <p>Enter your PayPal email to access your dashboard.</p>
   <form class="login-form" onsubmit="handleLogin(event)">
-    <input type="email" id="loginEmail" placeholder="your@email.com" required>
+    <input type="email" id="loginEmail" placeholder="your PayPal email" required>
     <button type="submit" id="loginBtn">Send Login Link</button>
   </form>
   <p class="login-msg" id="loginMsg"></p>
@@ -520,10 +517,9 @@ async function handleSignup(e) {
   e.preventDefault();
   const name = document.getElementById('affName').value.trim();
   const email = document.getElementById('affEmail').value.trim();
-  const paypal = document.getElementById('affPaypal').value.trim();
   const btn = document.getElementById('signupBtn');
 
-  if (!name || !email || !paypal) return;
+  if (!name || !email) return;
 
   btn.disabled = true;
   btn.textContent = 'Creating your link...';
@@ -532,7 +528,7 @@ async function handleSignup(e) {
     const res = await fetch('/api/affiliate/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, paypal })
+      body: JSON.stringify({ name, email, paypal: email })
     });
     const data = await res.json();
 
