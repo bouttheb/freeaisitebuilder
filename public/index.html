@@ -262,6 +262,139 @@ section { padding: 6rem 2rem; }
   padding-top: 0.5rem;
 }
 
+/* ZOOM MODAL */
+.zoom-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+}
+.zoom-overlay.active { display: flex; }
+.zoom-modal {
+  background: var(--dark);
+  border: 1px solid rgba(200,164,110,0.2);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+}
+.zoom-modal-close {
+  position: absolute;
+  top: 1rem; right: 1.2rem;
+  background: none; border: none;
+  color: var(--gray-dark);
+  font-size: 1.5rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.zoom-modal-close:hover { color: var(--off-white); }
+.zoom-modal .zoom-icon {
+  width: 48px; height: 48px;
+  background: rgba(200,164,110,0.1);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.2rem;
+}
+.zoom-modal h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.6rem;
+}
+.zoom-modal .zoom-desc {
+  color: var(--gray-mid);
+  font-size: 0.95rem;
+  font-weight: 300;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+.zoom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.zoom-form input {
+  width: 100%;
+  background: var(--card-bg);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  padding: 0.85rem 1.1rem;
+  color: var(--off-white);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.zoom-form input:focus { border-color: rgba(200,164,110,0.5); }
+.zoom-form input::placeholder { color: var(--gray-dark); }
+.zoom-form button {
+  background: var(--accent);
+  color: var(--black);
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.2s;
+  font-family: 'Source Sans 3', sans-serif;
+}
+.zoom-form button:hover {
+  background: var(--accent-hover);
+  transform: translateY(-2px);
+}
+.zoom-form button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+.zoom-success {
+  display: none;
+  color: var(--accent);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.6;
+  padding: 1rem 0;
+}
+.zoom-note {
+  margin-top: 0.8rem;
+  font-size: 0.8rem;
+  color: var(--gray-dark);
+}
+.nav-help {
+  display: inline-block;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.5rem 1.25rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: background 0.3s, color 0.3s;
+}
+.nav-help:hover { background: var(--accent); color: var(--black); }
+.hero-help {
+  margin-top: 1.2rem;
+  font-size: 0.95rem;
+  color: var(--gray-mid);
+  font-weight: 300;
+}
+.hero-help a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.hero-help a:hover { color: var(--accent-hover); text-decoration: underline; }
+
 /* FINAL CTA */
 .final-cta {
   text-align: center;
@@ -357,6 +490,7 @@ footer {
 <nav>
   <a href="/" class="nav-logo">freeaisitebuilder.com</a>
   <div style="display:flex;gap:0.75rem;align-items:center;">
+    <a href="#" onclick="event.preventDefault();openZoomModal();" class="nav-help">Need Help?</a>
     <a href="/login.html" class="nav-continue" style="display:inline-block;background:var(--white);color:var(--black);padding:0.5rem 1.25rem;border-radius:6px;text-decoration:none;font-size:0.9rem;font-weight:700;">Continue Building</a>
     <a href="/step1.html" class="nav-cta">Start Building</a>
   </div>
@@ -367,6 +501,7 @@ footer {
   <h1>Build Your Professional Website <span>in Minutes</span></h1>
   <p>No coding required. Our AI walks you through every step — from content, to design, to launching your new website.</p>
   <a href="/step1.html" class="hero-cta">Start Building My Site — Free</a>
+  <p class="hero-help">Need help? <a href="#" onclick="event.preventDefault();openZoomModal();">Join a free Zoom session →</a></p>
 </section>
 
 <!-- HOW IT WORKS -->
@@ -495,6 +630,27 @@ footer {
   &copy; 2026 freeaisitebuilder.com. All rights reserved.
 </footer>
 
+<!-- ZOOM MODAL -->
+<div class="zoom-overlay" id="zoomOverlay">
+  <div class="zoom-modal">
+    <button class="zoom-modal-close" onclick="closeZoomModal()">&times;</button>
+    <div class="zoom-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#C8A46E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+    </div>
+    <h3>Join a Free Zoom Session</h3>
+    <p class="zoom-desc">Get hands-on guidance building your site. We'll walk you through it step by step — completely free.</p>
+    <form class="zoom-form" id="zoomForm" onsubmit="submitZoomSignup(event)">
+      <input type="text" id="zoomName" placeholder="First name" required>
+      <input type="email" id="zoomEmail" placeholder="Email address" required>
+      <button type="submit" id="zoomBtn">Save My Spot</button>
+      <p class="zoom-note">We'll email you when the next session is scheduled. No spam, ever.</p>
+    </form>
+    <div class="zoom-success" id="zoomSuccess">
+      You're on the list! We'll email you when the next session is scheduled.
+    </div>
+  </div>
+</div>
+
 <script>
 // FAQ toggle
 document.querySelectorAll('.faq-question').forEach(q => {
@@ -502,6 +658,54 @@ document.querySelectorAll('.faq-question').forEach(q => {
     q.parentElement.classList.toggle('open');
   });
 });
+
+// Zoom modal
+function openZoomModal() {
+  document.getElementById('zoomOverlay').classList.add('active');
+}
+function closeZoomModal() {
+  document.getElementById('zoomOverlay').classList.remove('active');
+}
+document.getElementById('zoomOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeZoomModal();
+});
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeZoomModal();
+});
+
+// Zoom signup
+async function submitZoomSignup(e) {
+  e.preventDefault();
+  const name = document.getElementById('zoomName').value.trim();
+  const email = document.getElementById('zoomEmail').value.trim();
+  const btn = document.getElementById('zoomBtn');
+
+  if (!name || !email) return;
+
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+
+  try {
+    const res = await fetch('/api/zoom-signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      document.getElementById('zoomForm').style.display = 'none';
+      document.getElementById('zoomSuccess').style.display = 'block';
+    } else {
+      btn.disabled = false;
+      btn.textContent = 'Save My Spot';
+      alert(data.error || 'Something went wrong. Please try again.');
+    }
+  } catch {
+    btn.disabled = false;
+    btn.textContent = 'Save My Spot';
+    alert('Could not connect. Please try again.');
+  }
+}
 </script>
 
 </body>

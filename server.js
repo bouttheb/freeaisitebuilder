@@ -141,13 +141,17 @@ const authLimiter = rateLimit({
 
 // Send magic link email
 app.post('/api/auth/send-magic-link', requireOrigin, authLimiter, async (req, res) => {
-  const { email } = req.body;
+  const { email, next } = req.body;
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
     return res.status(400).json({ error: 'Please enter a valid email address.' });
   }
 
+  // Whitelist valid redirect destinations
+  const validNextPages = { step1: '/step1.html', step2: '/step2.html', chat: '/chat.html' };
+  const redirectTo = validNextPages[next] || '/step2.html';
+
   const token = crypto.randomBytes(32).toString('hex');
-  magicTokens.set(token, { email: email.toLowerCase(), expiresAt: Date.now() + 15 * 60 * 1000 }); // 15 min expiry
+  magicTokens.set(token, { email: email.toLowerCase(), redirectTo, expiresAt: Date.now() + 15 * 60 * 1000 }); // 15 min expiry
 
   const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
   const magicLink = `${baseUrl}/api/auth/verify?token=${token}`;
@@ -211,7 +215,7 @@ app.get('/api/auth/verify', async (req, res) => {
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 
-  res.redirect('/step2.html');
+  res.redirect(record.redirectTo || '/step2.html');
 });
 
 // Check auth status
@@ -540,6 +544,51 @@ app.post('/api/register-domain', requireOrigin, (req, res) => {
   session.domain = domain;
   saveSession(sessionId);
   res.json({ ok: true, domain });
+});
+
+// --- Zoom signup ---
+const ZOOM_SIGNUPS_FILE = path.join(__dirname, 'data', 'zoom-signups.json');
+
+async function loadZoomSignups() {
+  try {
+    const data = await readFile(ZOOM_SIGNUPS_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch {
+    return [];
+  }
+}
+
+async function saveZoomSignups(signups) {
+  await mkdir(path.dirname(ZOOM_SIGNUPS_FILE), { recursive: true });
+  await writeFile(ZOOM_SIGNUPS_FILE, JSON.stringify(signups, null, 2));
+}
+
+app.post('/api/zoom-signup', requireOrigin, async (req, res) => {
+  const { name, email } = req.body;
+  if (!name || !email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return res.status(400).json({ error: 'Please provide a valid name and email.' });
+  }
+
+  try {
+    const signups = await loadZoomSignups();
+
+    // Check for duplicate email
+    if (signups.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+      return res.json({ ok: true, message: 'Already signed up.' });
+    }
+
+    signups.push({
+      name: name.trim(),
+      email: email.toLowerCase().trim(),
+      signedUpAt: new Date().toISOString()
+    });
+
+    await saveZoomSignups(signups);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Zoom signup error:', err);
+    res.status(500).json({ error: 'Could not save signup. Please try again.' });
+  }
 });
 
 // --- System prompt ---

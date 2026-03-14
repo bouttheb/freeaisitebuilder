@@ -687,7 +687,7 @@ footer {
         <label>Your domain name</label>
         <input type="text" id="domainInput" placeholder="e.g., mybusiness.com" required>
       </div>
-      <button type="submit" class="confirm-btn" id="confirmBtn">Continue to Step 2 →</button>
+      <button type="submit" class="confirm-btn" id="confirmBtn">Verify &amp; Start Building →</button>
       <p class="confirm-note">
         Make sure you've completed your hosting setup before continuing. You'll need your domain for the next steps.
       </p>
@@ -697,8 +697,8 @@ footer {
 
 <!-- BOTTOM NAV -->
 <div class="bottom-nav">
-  <a href="/" class="bottom-nav-back">&larr; Back</a>
-  <a href="#" onclick="event.preventDefault(); fetch('/api/auth/me').then(r=>r.json()).then(d=>{ window.location.href = d.authenticated ? '/step2.html' : '/login.html?next=step2'; })" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
+  <a href="/step1.html" class="bottom-nav-back">&larr; Back to Design</a>
+  <a href="#" onclick="event.preventDefault(); fetch('/api/auth/me').then(r=>r.json()).then(d=>{ window.location.href = d.authenticated ? '/chat.html' : '/login.html?next=chat'; })" class="bottom-nav-forward" id="forwardBtn" style="display:none;">Forward &rarr;</a>
 </div>
 
 <footer>
@@ -748,7 +748,7 @@ if (localStorage.getItem('wb_clicked_affiliate') === 'true') {
 }
 
 // Show Forward button if they've already completed this step
-if (localStorage.getItem('wb_completed_step1') === 'true') {
+if (localStorage.getItem('wb_completed_step2') === 'true') {
   document.getElementById('forwardBtn').style.display = 'inline';
 }
 
@@ -783,7 +783,7 @@ async function confirmDomain(e) {
 
     if (!verifyData.verified) {
       btn.disabled = false;
-      btn.textContent = 'Continue to Step 2 →';
+      btn.textContent = 'Verify & Start Building →';
       showDnsError(verifyData.message || 'This domain doesn\'t appear to be hosted on Bluehost. Please set up your hosting first.');
       return;
     }
@@ -792,7 +792,7 @@ async function confirmDomain(e) {
     let sessionId = localStorage.getItem('wb_session') || crypto.randomUUID();
     localStorage.setItem('wb_session', sessionId);
     localStorage.setItem('wb_domain', cleaned);
-    localStorage.setItem('wb_completed_step1', 'true');
+    localStorage.setItem('wb_completed_step2', 'true');
 
     // Register domain with backend
     await fetch('/api/register-domain', {
@@ -801,17 +801,17 @@ async function confirmDomain(e) {
       body: JSON.stringify({ sessionId, domain: cleaned })
     });
 
-    // Check if authenticated before proceeding
+    // Check if authenticated before proceeding to Step 3 (Build)
     const authRes = await fetch('/api/auth/me');
     const authData = await authRes.json();
     if (authData.authenticated) {
-      window.location.href = '/step2.html';
+      window.location.href = '/chat.html';
     } else {
-      window.location.href = '/login.html?next=step2';
+      window.location.href = '/login.html?next=chat';
     }
   } catch (err) {
     btn.disabled = false;
-    btn.textContent = 'Continue to Step 2 →';
+    btn.textContent = 'Verify & Start Building →';
     showDnsError('Could not verify your domain. Please check your internet connection and try again.');
   }
 }

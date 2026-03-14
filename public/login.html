@@ -178,7 +178,8 @@ async function checkAuth() {
       const sessionList = document.getElementById('sessionList');
       if (!sessionList.children.length) {
         const next = new URLSearchParams(window.location.search).get('next');
-        window.location.href = next === 'step2' ? '/step2.html' : '/step2.html';
+        const destinations = { step1: '/step1.html', step2: '/step2.html', chat: '/chat.html' };
+        window.location.href = destinations[next] || '/step2.html';
       }
     }
   } catch {}
@@ -235,7 +236,7 @@ async function sendMagicLink(e) {
     const res = await fetch(`${API_BASE}/api/auth/send-magic-link`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, next: new URLSearchParams(window.location.search).get('next') }),
     });
     const data = await res.json();
 
