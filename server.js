@@ -833,7 +833,7 @@ app.post('/api/referral/choose-reward', requireAuth, async (req, res) => {
         const affiliate = await findAffiliate('Email', req.userEmail);
         if (affiliate) {
           const domain = userSession.pendingReward.domain || 'referral-cash-choice';
-          await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE}/${encodeURIComponent(CONVERSIONS_TABLE)}`, {
+          await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(CONVERSIONS_TABLE)}`, {
             method: 'POST',
             headers: {
               Authorization: `Bearer ${AIRTABLE_TOKEN}`,
@@ -1422,11 +1422,10 @@ app.get('/api/admin/payout-scan', async (req, res) => {
   }
 
   try {
-    // Calculate cutoff: conversions older than 1 month + 20 days ago
+    // Calculate cutoff: conversions older than 50 days ago
     const now = new Date();
     const cutoff = new Date(now);
-    cutoff.setMonth(cutoff.getMonth() - 1);
-    cutoff.setDate(cutoff.getDate() - 20);
+    cutoff.setDate(cutoff.getDate() - 50);
     const cutoffStr = cutoff.toISOString().split('T')[0];
 
     // Fetch all pending conversions (Status is empty or "Pending") with Date <= cutoff

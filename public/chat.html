@@ -747,7 +747,7 @@ nav {
           <button onclick="chooseReward('cash')" style="flex:1;padding:1rem;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:none;color:var(--off-white);cursor:pointer;font-family:'Source Sans 3',sans-serif;">
             <div style="font-size:1.5rem;margin-bottom:0.3rem;">💰</div>
             <div style="font-weight:700;font-size:1rem;margin-bottom:0.2rem;">$10 Cash</div>
-            <div style="font-size:0.8rem;color:var(--gray-mid);">Paid to your PayPal on the 1st of the month</div>
+            <div style="font-size:0.8rem;color:var(--gray-mid);">Paid to your PayPal on the 1st of the month following the 50-day lock period</div>
           </button>
         </div>
         <p id="rewardStatus" style="font-size:0.85rem;color:var(--gray-mid);min-height:1.2rem;"></p>
@@ -1161,7 +1161,7 @@ async function chooseReward(choice) {
       } else {
         status.textContent = '';
         document.getElementById('rewardChoiceModal').style.display = 'none';
-        addMessage('assistant', '<div class="message-content"><p>💰 <strong>$10 commission logged!</strong> It will be paid to your PayPal on the 1st of the month following the verification period. Keep sharing to earn more!</p></div>');
+        addMessage('assistant', '<div class="message-content"><p>💰 <strong>$10 commission logged!</strong> In accordance with the platform, we observe a 50-day lock period. Your payout will be sent on the 1st of the month following the lock. Keep sharing to earn more!</p></div>');
       }
     } else {
       status.textContent = data.error || 'Something went wrong.';
