@@ -549,22 +549,11 @@ app.post('/api/register-domain', requireOrigin, (req, res) => {
   res.json({ ok: true, domain });
 });
 
-// --- Zoom signup ---
-const ZOOM_SIGNUPS_FILE = path.join(__dirname, 'data', 'zoom-signups.json');
-
-async function loadZoomSignups() {
-  try {
-    const data = await readFile(ZOOM_SIGNUPS_FILE, 'utf8');
-    return JSON.parse(data);
-  } catch {
-    return [];
-  }
-}
-
-async function saveZoomSignups(signups) {
-  await mkdir(path.dirname(ZOOM_SIGNUPS_FILE), { recursive: true });
-  await writeFile(ZOOM_SIGNUPS_FILE, JSON.stringify(signups, null, 2));
-}
+// --- Zoom signup (Airtable) ---
+const AIRTABLE_TOKEN = process.env.AIRTABLE_TOKEN;
+const AIRTABLE_BASE_ID = 'appv8t55Y7YYDmXQj';
+const AIRTABLE_TABLE_NAME = 'Free AI Site Builder Website';
+const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`;
 
 app.post('/api/zoom-signup', requireOrigin, async (req, res) => {
   const { name, email } = req.body;
@@ -572,21 +561,46 @@ app.post('/api/zoom-signup', requireOrigin, async (req, res) => {
     return res.status(400).json({ error: 'Please provide a valid name and email.' });
   }
 
-  try {
-    const signups = await loadZoomSignups();
+  if (!AIRTABLE_TOKEN) {
+    console.error('AIRTABLE_TOKEN not set');
+    return res.status(500).json({ error: 'Signup service not configured.' });
+  }
 
-    // Check for duplicate email
-    if (signups.some(s => s.email.toLowerCase() === email.toLowerCase())) {
+  try {
+    // Check for duplicate email in Airtable
+    const searchUrl = `${AIRTABLE_URL}?filterByFormula=${encodeURIComponent(`LOWER({Email})="${email.toLowerCase().trim()}"`)}&maxRecords=1`;
+    const searchRes = await fetch(searchUrl, {
+      headers: { Authorization: `Bearer ${AIRTABLE_TOKEN}` },
+    });
+    const searchData = await searchRes.json();
+
+    if (searchData.records && searchData.records.length > 0) {
       return res.json({ ok: true, message: 'Already signed up.' });
     }
 
-    signups.push({
-      name: name.trim(),
-      email: email.toLowerCase().trim(),
-      signedUpAt: new Date().toISOString()
+    // Create new record
+    const createRes = await fetch(AIRTABLE_URL, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${AIRTABLE_TOKEN}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        records: [{
+          fields: {
+            Name: name.trim(),
+            Email: email.toLowerCase().trim(),
+          }
+        }]
+      }),
     });
 
-    await saveZoomSignups(signups);
+    if (!createRes.ok) {
+      const errData = await createRes.json();
+      console.error('Airtable create error:', errData);
+      return res.status(500).json({ error: 'Could not save signup. Please try again.' });
+    }
+
     res.json({ ok: true });
   } catch (err) {
     console.error('Zoom signup error:', err);
