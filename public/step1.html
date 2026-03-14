@@ -154,6 +154,27 @@ textarea { resize: vertical; min-height: 120px; }
 .btn-submit:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 8px 24px rgba(200,164,110,0.25); }
 .btn-submit:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: none; }
 
+/* Preview section */
+.preview-section { max-width: 900px; margin: 0 auto; padding: 0 1rem; }
+.preview-container { max-width: 900px; margin: 0 auto; }
+.preview-frame-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(200,164,110,0.2);
+  box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+  background: #111;
+}
+.preview-frame-wrap iframe {
+  width: 1400px;
+  height: 787px;
+  border: none;
+  transform-origin: top left;
+  pointer-events: none;
+}
+
 .bottom-nav { display: flex; justify-content: space-between; align-items: center; max-width: 900px; margin: 0 auto; padding: 1.5rem 2rem 3rem; }
 .bottom-nav a { font-size: 0.9rem; color: var(--gray-dark); text-decoration: none; transition: color 0.3s ease; }
 .bottom-nav a:hover { color: var(--accent); }
@@ -376,6 +397,21 @@ footer { text-align: center; padding: 2rem; font-size: 0.8rem; color: var(--gray
     </div>
   </div>
 
+  <!-- ============ PREVIEW ============ -->
+  <div class="preview-section" id="previewSection" style="display:none;">
+    <hr class="section-divider">
+    <div class="section-header">
+      <h2 class="section-title">Here's a <span>preview</span></h2>
+      <p class="section-sub">Don't worry if it's not perfect — after we set up your hosting, you can add more pictures and make any changes you desire.</p>
+    </div>
+    <div class="preview-container" id="previewContainer">
+      <div class="preview-frame-wrap">
+        <iframe id="previewIframe" src="about:blank"></iframe>
+      </div>
+      <p style="text-align:center;color:var(--gray-dark);font-size:0.8rem;margin-top:0.8rem;">This is just a starting point — the AI will fully customize your site in Step 3.</p>
+    </div>
+  </div>
+
   <!-- ============ SUBMIT ============ -->
   <div class="submit-section">
     <button class="btn-submit" id="btnSubmit" disabled onclick="finishWizard()">Start Building →</button>
@@ -425,6 +461,7 @@ function selectTemplate(el) {
   el.classList.add('selected');
   dpStyle = el.dataset.style;
   checkReadyState();
+  updatePreview();
 }
 
 // === ZOOM PREVIEW ===
@@ -539,6 +576,76 @@ if (dropZone) {
 }
 
 function skipPhotos() { photosSkipped = true; }
+
+// === PREVIEW ===
+let previewDebounce = null;
+function updatePreview() {
+  clearTimeout(previewDebounce);
+  previewDebounce = setTimeout(_doUpdatePreview, 400);
+}
+function _doUpdatePreview() {
+  const section = document.getElementById('previewSection');
+  const name = document.getElementById('siteName').value.trim();
+  if (!dpStyle || !name) {
+    section.style.display = 'none';
+    return;
+  }
+  section.style.display = 'block';
+
+  const iframe = document.getElementById('previewIframe');
+  const src = `/style-previews/${dpStyle}.html`;
+
+  // Only reload if template changed
+  if (iframe.dataset.loadedStyle !== dpStyle) {
+    iframe.dataset.loadedStyle = dpStyle;
+    iframe.src = src;
+    iframe.onload = () => injectPreviewContent(iframe);
+  } else {
+    injectPreviewContent(iframe);
+  }
+
+  // Scale iframe to fit container
+  const wrap = document.querySelector('.preview-frame-wrap');
+  if (wrap) {
+    const scale = wrap.offsetWidth / 1400;
+    iframe.style.transform = `scale(${scale})`;
+  }
+}
+
+function injectPreviewContent(iframe) {
+  try {
+    const doc = iframe.contentDocument || iframe.contentWindow.document;
+    const name = document.getElementById('siteName').value.trim();
+    const tagline = document.getElementById('tagline').value.trim();
+
+    // Try to find and replace common heading patterns
+    const h1 = doc.querySelector('h1');
+    if (h1 && name) h1.textContent = name;
+
+    // Look for tagline/subtitle elements
+    const taglineEl = doc.querySelector('.tagline, .subtitle, .hero-subtitle, h1 + p, .hero p');
+    if (taglineEl && tagline) taglineEl.textContent = tagline;
+
+    // Also try second h2 or hero paragraph
+    if (!taglineEl && tagline) {
+      const heroP = doc.querySelector('.hero p, header p, .banner p');
+      if (heroP) heroP.textContent = tagline;
+    }
+  } catch {
+    // Cross-origin or other error — preview still shows the template
+  }
+}
+
+// Wire up preview updates
+document.getElementById('siteName').addEventListener('input', updatePreview);
+document.getElementById('tagline').addEventListener('input', updatePreview);
+window.addEventListener('resize', () => {
+  const wrap = document.querySelector('.preview-frame-wrap');
+  const iframe = document.getElementById('previewIframe');
+  if (wrap && iframe && iframe.dataset.loadedStyle) {
+    iframe.style.transform = `scale(${wrap.offsetWidth / 1400})`;
+  }
+});
 
 // === FINISH ===
 async function finishWizard() {
