@@ -278,7 +278,7 @@ section { padding: 6rem 2rem; }
   transition: max-height 0.4s ease, padding-top 0.3s;
 }
 .faq-item.open .faq-answer {
-  max-height: 200px;
+  max-height: 400px;
   padding-top: 0.5rem;
 }
 
@@ -490,7 +490,15 @@ footer {
       "name": "Is this really free?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "The AI builder is completely free. You only pay for hosting (which you'd need regardless). Hosting through our partner Bluehost is very affordable."
+        "text": "The AI website builder is 100% free — no trial, no credit card, no catch. The only cost is web hosting, which every website on the internet requires. We've partnered with Bluehost to get you hosting starting at a few dollars a month with 60% off — under $36/year compared to $200–$400/year on other platforms."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do I need hosting?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The AI builder creates your website's files, and hosting is the place where those files live so anyone can visit your site. Every website in the world needs hosting — we just make it easy and affordable."
       }
     },
     {
@@ -521,6 +529,7 @@ footer {
   <h1>Build Your Professional Website <span>in Minutes</span></h1>
   <p>No coding required. Our AI walks you through every step — from content, to design, to launching your new website.</p>
   <a href="/step1.html" class="hero-cta">Start Building My Site — Free</a>
+  <p class="hero-sub" style="margin-top:0.6rem;">Free AI builder. Hosting from just a few $/mo.</p>
   <p class="hero-help">Need help? <a href="#" onclick="event.preventDefault();openZoomModal();">Join a free Zoom session →</a></p>
   <div class="scroll-hint" onclick="document.getElementById('how').scrollIntoView({behavior:'smooth'})">
     <span>Learn More</span>
@@ -546,7 +555,7 @@ footer {
         <div class="step-num">02</div>
         <div>
           <h3>Hosting & Domain</h3>
-          <p>Set up your hosting account and register your domain name. We'll walk you through it — takes about 5 minutes.</p>
+          <p>Every website needs a home on the internet. We've partnered with Bluehost to get you premium hosting at a fraction of what you'd pay elsewhere — starting at just a few dollars a month (60% off through us). Setup takes about 5 minutes.</p>
         </div>
       </div>
       <div class="step">
@@ -605,6 +614,33 @@ footer {
   </div>
 </section>
 
+<!-- PRICING COMPARISON -->
+<section style="padding:5rem 2rem;text-align:center;">
+  <div class="section-inner">
+    <p class="section-label">The Math</p>
+    <h2 class="section-title">See How Much You'll Save</h2>
+    <p class="section-subtitle" style="margin-left:auto;margin-right:auto;">Other builders charge $200–$400/year. We charge $0.</p>
+    <div style="display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;">
+      <div style="background:rgba(229,115,115,0.06);border:1px solid rgba(229,115,115,0.15);border-radius:12px;padding:1.5rem 2rem;min-width:140px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--red-soft);margin-bottom:0.5rem;">Wix</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gray-mid);text-decoration:line-through;">$17/mo</div>
+        <div style="font-size:0.8rem;color:var(--gray-dark);margin-top:0.3rem;">$204/year</div>
+      </div>
+      <div style="background:rgba(229,115,115,0.06);border:1px solid rgba(229,115,115,0.15);border-radius:12px;padding:1.5rem 2rem;min-width:140px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--red-soft);margin-bottom:0.5rem;">Squarespace</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--gray-mid);text-decoration:line-through;">$33/mo</div>
+        <div style="font-size:0.8rem;color:var(--gray-dark);margin-top:0.3rem;">$396/year</div>
+      </div>
+      <div style="background:rgba(200,164,110,0.08);border:1px solid rgba(200,164,110,0.25);border-radius:12px;padding:1.5rem 2rem;min-width:140px;">
+        <div style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);margin-bottom:0.5rem;">Free AI Site Builder</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--accent);font-weight:700;">~$3/mo</div>
+        <div style="font-size:0.8rem;color:var(--accent);margin-top:0.3rem;font-weight:600;">Under $36/year</div>
+      </div>
+    </div>
+    <p style="color:var(--gray-dark);font-size:0.85rem;margin-top:1.5rem;">$0 AI builder + affordable hosting = a professional site for a fraction of the cost.</p>
+  </div>
+</section>
+
 <!-- FAQ -->
 <section class="faq" id="faq">
   <div class="section-inner">
@@ -625,7 +661,11 @@ footer {
       </div>
       <div class="faq-item">
         <div class="faq-question">Is this really free?</div>
-        <div class="faq-answer">The AI builder is completely free. You only pay for hosting (which you'd need regardless). Hosting through our partner Bluehost is very affordable — just a few dollars a month — and you get 60% off through our link.</div>
+        <div class="faq-answer">The AI website builder is 100% free — no trial, no credit card, no catch. The only cost is web hosting, which every website on the internet requires (even ones built with Wix or Squarespace — they just hide it in their monthly fee). We've partnered with Bluehost to get you hosting starting at a few dollars a month with 60% off. That means you're getting a professional AI-built website for under $36/year — compared to $200–$400/year on other platforms.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-question">Why do I need hosting?</div>
+        <div class="faq-answer">Think of it this way: the AI builder creates your website's files, and hosting is the place where those files live so anyone can visit your site. It's like the difference between writing a book and putting it on a shelf in a store. Every website in the world needs hosting — we just make it easy and affordable.</div>
       </div>
       <div class="faq-item">
         <div class="faq-question">What if I want to make changes later?</div>
@@ -646,7 +686,7 @@ footer {
     <h2 class="section-title">Build Your Website Today</h2>
     <p class="section-subtitle" style="margin-left: auto; margin-right: auto;">No coding. No templates. Just tell our AI what you want.</p>
     <a href="/step1.html" class="hero-cta">Start Building My Site — Free</a>
-    <p class="hero-sub">Build your new site in as little as 15 minutes.</p>
+    <p class="hero-sub">Free AI builder. Hosting from just a few $/mo.</p>
   </div>
 </section>
 
