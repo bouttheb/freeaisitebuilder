@@ -275,6 +275,14 @@ setInterval(() => {
   }
 }, 60 * 60 * 1000);
 
+// Helper: create a magic link token and return the full URL
+function createMagicToken(email, redirectTo) {
+  const token = crypto.randomBytes(32).toString('hex');
+  magicTokens.set(token, { email: email.toLowerCase(), redirectTo, expiresAt: Date.now() + 24 * 60 * 60 * 1000 }); // 24 hour expiry for referral emails
+  const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
+  return `${baseUrl}/api/auth/verify?token=${token}`;
+}
+
 // --- Block direct access to uploads/ and generated/ directories ---
 app.use('/uploads', (req, res, next) => {
   // Only allow if the referrer is from our own site (i.e., loaded within our pages)
@@ -431,6 +439,7 @@ function getSession(id, ip, email) {
     sessions.set(id, {
       inputTokens: 0,
       outputTokens: 0,
+      bonusTokens: 0,
       step: 1,
       domain: null,
       domainVerified: false,
@@ -440,6 +449,7 @@ function getSession(id, ip, email) {
       createdAt: Date.now(),
       ip: ip || 'unknown',
       email: email || null,
+      referralTokenCredited: false,
     });
   }
   return sessions.get(id);
@@ -633,6 +643,64 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
         });
 
         console.log(`[Affiliate] Conversion logged: ref=${ref}, domain=${domain}`);
+
+        // Credit bonus tokens to referrer if this is their first referral conversion
+        const referrerEmail = affiliate.fields.Email;
+        if (referrerEmail) {
+          // Find referrer's session and credit 100k bonus tokens (first conversion only)
+          let referrerSession = null;
+          let referrerSessionId = null;
+          for (const [sid, sess] of sessions) {
+            if (sess.email && sess.email.toLowerCase() === referrerEmail.toLowerCase() && !sess.referralTokenCredited) {
+              referrerSession = sess;
+              referrerSessionId = sid;
+              break;
+            }
+          }
+
+          if (referrerSession && !referrerSession.referralTokenCredited) {
+            referrerSession.bonusTokens = (referrerSession.bonusTokens || 0) + 100000;
+            referrerSession.referralTokenCredited = true;
+            await saveSession(referrerSessionId);
+            console.log(`[Affiliate] Credited 100k bonus tokens to ${referrerEmail}`);
+          }
+
+          // Send email notification to referrer
+          const RESEND_API_KEY = process.env.RESEND_API_KEY;
+          if (RESEND_API_KEY) {
+            const baseUrl = process.env.BASE_URL || 'https://freeaisitebuilder.com';
+            // Create a magic link so they can jump back to their session
+            const magicLink = createMagicToken(referrerEmail, '/chat.html' + (referrerSessionId ? `?session=${referrerSessionId}` : ''));
+            try {
+              await fetch('https://api.resend.com/emails', {
+                method: 'POST',
+                headers: {
+                  Authorization: `Bearer ${RESEND_API_KEY}`,
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  from: 'Free AI Site Builder <noreply@freeaisitebuilder.com>',
+                  to: [referrerEmail],
+                  subject: 'Your friend signed up! You just earned 100k bonus tokens 🎉',
+                  html: `
+                    <div style="font-family:sans-serif;max-width:500px;margin:0 auto;padding:2rem;">
+                      <h2 style="color:#1a1a1a;">Great news!</h2>
+                      <p style="color:#666;line-height:1.6;">One of the friends you shared your link with just signed up and started building their website.</p>
+                      <p style="color:#666;line-height:1.6;">We've credited your account with <strong style="color:#1a1a1a;">100,000 bonus tokens</strong> so you can keep building your site.</p>
+                      <div style="text-align:center;margin:2rem 0;">
+                        <a href="${magicLink}" style="display:inline-block;background:#C8A46E;color:#0A0A0A;padding:0.8rem 2rem;border-radius:6px;text-decoration:none;font-weight:700;">Continue Building My Site</a>
+                      </div>
+                      <p style="color:#999;font-size:0.85rem;">Every additional friend who builds a site earns you $10. Keep sharing!</p>
+                    </div>
+                  `,
+                }),
+              });
+              console.log(`[Affiliate] Sent token credit email to ${referrerEmail}`);
+            } catch (emailErr) {
+              console.error('Failed to send referral token email:', emailErr.message);
+            }
+          }
+        }
       }
     } catch (err) {
       console.error('Affiliate conversion tracking error:', err.message);
@@ -641,6 +709,23 @@ app.post('/api/register-domain', requireOrigin, async (req, res) => {
   }
 
   res.json({ ok: true, domain, refCode: userRefCode });
+});
+
+// GET /api/session/token-status — check if bonus tokens were credited
+app.get('/api/session/token-status', requireAuth, (req, res) => {
+  // Find user's session
+  for (const [sid, sess] of sessions) {
+    if (sess.email && sess.email.toLowerCase() === req.userEmail.toLowerCase()) {
+      return res.json({
+        inputTokens: sess.inputTokens,
+        outputTokens: sess.outputTokens,
+        bonusTokens: sess.bonusTokens || 0,
+        tokenCap: TOKEN_CAP + (sess.bonusTokens || 0),
+        referralTokenCredited: sess.referralTokenCredited || false,
+      });
+    }
+  }
+  res.json({ bonusTokens: 0, tokenCap: TOKEN_CAP, referralTokenCredited: false });
 });
 
 // GET /api/affiliate/my-link — get current user's affiliate ref code
@@ -1213,11 +1298,13 @@ app.post('/api/chat', requireOrigin, requireAuth, chatLimiter, async (req, res) 
     return res.status(503).json({ error: 'Our AI service is at capacity for today. Please try again tomorrow.' });
   }
 
-  if (session.inputTokens >= TOKEN_CAP || session.outputTokens >= TOKEN_CAP) {
+  const effectiveCap = TOKEN_CAP + (session.bonusTokens || 0);
+  if (session.inputTokens >= effectiveCap || session.outputTokens >= effectiveCap) {
     return res.json({
-      error: 'You\'ve hit your token limit for this session. Download your site and finish building on the AI platform of your choice.',
+      error: 'You\'ve hit your token limit for this session.',
       inputTokens: session.inputTokens,
       outputTokens: session.outputTokens,
+      tokenCap: effectiveCap,
       limitReached: true,
     });
   }
@@ -1233,7 +1320,7 @@ app.post('/api/chat', requireOrigin, requireAuth, chatLimiter, async (req, res) 
   try {
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-5-20250929',
-      max_tokens: Math.min(8192, TOKEN_CAP - session.outputTokens),
+      max_tokens: Math.min(8192, effectiveCap - session.outputTokens),
       system: SYSTEM_PROMPT + fileContext,
       messages: session.history,
     });
@@ -1288,6 +1375,7 @@ app.post('/api/chat', requireOrigin, requireAuth, chatLimiter, async (req, res) 
       response: displayText,
       inputTokens: session.inputTokens,
       outputTokens: session.outputTokens,
+      tokenCap: effectiveCap,
       step,
       generatedHtml,
     });
