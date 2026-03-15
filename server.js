@@ -10,59 +10,83 @@ import { fileURLToPath } from 'url';
 import dns from 'dns/promises';
 import cookieParser from 'cookie-parser';
 import crypto from 'crypto';
+import pg from 'pg';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 
-// --- Persistent session storage ---
-const SESSION_DIR = process.env.SESSION_DIR || path.join(__dirname, 'data', 'sessions');
+// --- Postgres connection ---
+const pool = new pg.Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes('localhost') ? false : { rejectUnauthorized: false },
+});
+
+async function initDatabase() {
+  const client = await pool.connect();
+  try {
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id TEXT PRIMARY KEY,
+        data JSONB NOT NULL,
+        created_at BIGINT NOT NULL,
+        updated_at BIGINT NOT NULL DEFAULT (EXTRACT(EPOCH FROM NOW()) * 1000)
+      );
+      CREATE TABLE IF NOT EXISTS auth_sessions (
+        token TEXT PRIMARY KEY,
+        email TEXT NOT NULL,
+        expires_at BIGINT NOT NULL
+      );
+    `);
+    console.log('Database tables ready');
+  } finally {
+    client.release();
+  }
+}
+
+// --- Persistent session storage (Postgres-backed) ---
 const SESSION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
 
 async function loadSessions() {
-  if (!existsSync(SESSION_DIR)) {
-    await mkdir(SESSION_DIR, { recursive: true });
-    return;
+  try {
+    const cutoff = Date.now() - SESSION_MAX_AGE;
+    const result = await pool.query('SELECT id, data FROM sessions WHERE created_at > $1', [cutoff]);
+    for (const row of result.rows) {
+      sessions.set(row.id, row.data);
+    }
+    console.log(`Loaded ${result.rows.length} sessions from database`);
+  } catch (err) {
+    console.error('Failed to load sessions from database:', err.message);
   }
-  const files = await readdir(SESSION_DIR);
-  let loaded = 0;
-  for (const file of files) {
-    if (!file.endsWith('.json')) continue;
-    try {
-      const data = JSON.parse(await readFile(path.join(SESSION_DIR, file), 'utf8'));
-      const id = file.replace('.json', '');
-      // Skip expired sessions
-      if (Date.now() - (data.createdAt || 0) > SESSION_MAX_AGE) continue;
-      sessions.set(id, data);
-      loaded++;
-    } catch {}
-  }
-  console.log(`Loaded ${loaded} sessions from disk`);
 }
 
 async function saveSession(id) {
   const session = sessions.get(id);
   if (!session) return;
-  if (!existsSync(SESSION_DIR)) await mkdir(SESSION_DIR, { recursive: true });
-  await writeFile(
-    path.join(SESSION_DIR, `${id}.json`),
-    JSON.stringify(session),
-    'utf8'
-  );
-}
-
-async function deleteSessionFile(id) {
-  const filePath = path.join(SESSION_DIR, `${id}.json`);
-  if (existsSync(filePath)) {
-    const { unlink } = await import('fs/promises');
-    await unlink(filePath).catch(() => {});
+  try {
+    await pool.query(
+      `INSERT INTO sessions (id, data, created_at, updated_at)
+       VALUES ($1, $2, $3, $4)
+       ON CONFLICT (id) DO UPDATE SET data = $2, updated_at = $4`,
+      [id, JSON.stringify(session), session.createdAt || Date.now(), Date.now()]
+    );
+  } catch (err) {
+    console.error('Failed to save session:', err.message);
   }
 }
 
-// Trust proxy (Render uses reverse proxy)
+async function deleteSessionFile(id) {
+  try {
+    await pool.query('DELETE FROM sessions WHERE id = $1', [id]);
+  } catch (err) {
+    console.error('Failed to delete session:', err.message);
+  }
+}
+
+// Trust proxy (Heroku/Render use reverse proxy)
 app.set('trust proxy', 1);
 
-// Force HTTPS in production (Render sets X-Forwarded-Proto)
+// Force HTTPS in production
 app.use((req, res, next) => {
   if (req.headers['x-forwarded-proto'] === 'http') {
     return res.redirect(301, `https://${req.hostname}${req.url}`);
@@ -75,6 +99,7 @@ const ALLOWED_ORIGINS = [
   'https://freeaisitebuilder.com',
   'https://www.freeaisitebuilder.com',
   'https://freeaisitebuilder.onrender.com',
+  'https://freeaisitebuilder.herokuapp.com',
   'http://localhost:3000',
 ];
 
@@ -146,31 +171,56 @@ app.use(cookieParser());
 
 // --- Magic link auth system ---
 const AUTH_SECRET = process.env.AUTH_SECRET || crypto.randomBytes(32).toString('hex');
-const AUTH_DIR = process.env.AUTH_DIR || path.join(__dirname, 'data', 'auth');
 const magicTokens = new Map(); // token -> { email, expiresAt }
 const authSessions = new Map(); // authToken (cookie) -> { email, expiresAt }
 
 async function loadAuthSessions() {
-  if (!existsSync(AUTH_DIR)) {
-    await mkdir(AUTH_DIR, { recursive: true });
-    return;
-  }
   try {
-    const data = await readFile(path.join(AUTH_DIR, 'sessions.json'), 'utf8');
-    const entries = JSON.parse(data);
-    for (const [token, session] of Object.entries(entries)) {
-      if (session.expiresAt > Date.now()) {
-        authSessions.set(token, session);
-      }
+    const result = await pool.query('SELECT token, email, expires_at FROM auth_sessions WHERE expires_at > $1', [Date.now()]);
+    for (const row of result.rows) {
+      authSessions.set(row.token, { email: row.email, expiresAt: Number(row.expires_at) });
     }
-    console.log(`Loaded ${authSessions.size} auth sessions`);
-  } catch {}
+    console.log(`Loaded ${result.rows.length} auth sessions from database`);
+  } catch (err) {
+    console.error('Failed to load auth sessions:', err.message);
+  }
 }
 
 async function saveAuthSessions() {
-  if (!existsSync(AUTH_DIR)) await mkdir(AUTH_DIR, { recursive: true });
-  const obj = Object.fromEntries(authSessions);
-  await writeFile(path.join(AUTH_DIR, 'sessions.json'), JSON.stringify(obj), 'utf8');
+  try {
+    // Upsert all current auth sessions
+    for (const [token, session] of authSessions) {
+      await pool.query(
+        `INSERT INTO auth_sessions (token, email, expires_at)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (token) DO UPDATE SET email = $2, expires_at = $3`,
+        [token, session.email, session.expiresAt]
+      );
+    }
+  } catch (err) {
+    console.error('Failed to save auth sessions:', err.message);
+  }
+}
+
+async function saveOneAuthSession(token, session) {
+  try {
+    await pool.query(
+      `INSERT INTO auth_sessions (token, email, expires_at)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (token) DO UPDATE SET email = $2, expires_at = $3`,
+      [token, session.email, session.expiresAt]
+    );
+  } catch (err) {
+    console.error('Failed to save auth session:', err.message);
+  }
+}
+
+async function deleteAuthSession(token) {
+  try {
+    await pool.query('DELETE FROM auth_sessions WHERE token = $1', [token]);
+  } catch (err) {
+    console.error('Failed to delete auth session:', err.message);
+  }
 }
 
 // Rate limit for magic link requests
@@ -243,12 +293,13 @@ app.get('/api/auth/verify', async (req, res) => {
 
   // Create auth session
   const authToken = crypto.randomBytes(32).toString('hex');
-  authSessions.set(authToken, {
+  const authSession = {
     email: record.email,
     expiresAt: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days
-  });
+  };
+  authSessions.set(authToken, authSession);
   magicTokens.delete(token);
-  await saveAuthSessions();
+  await saveOneAuthSession(authToken, authSession);
 
   // Set cookie
   res.cookie('auth', authToken, {
@@ -276,11 +327,11 @@ app.get('/api/auth/me', (req, res) => {
 });
 
 // Logout
-app.post('/api/auth/logout', (req, res) => {
+app.post('/api/auth/logout', async (req, res) => {
   const authToken = req.cookies?.auth;
   if (authToken) {
     authSessions.delete(authToken);
-    saveAuthSessions();
+    await deleteAuthSession(authToken);
   }
   res.clearCookie('auth');
   res.json({ ok: true });
@@ -385,7 +436,7 @@ function canCreateSession(ip) {
 }
 
 // --- Session cleanup (delete sessions older than 7 days) ---
-setInterval(() => {
+setInterval(async () => {
   const now = Date.now();
   for (const [id, session] of sessions) {
     if (now - session.createdAt > SESSION_MAX_AGE) {
@@ -393,6 +444,10 @@ setInterval(() => {
       deleteSessionFile(id);
     }
   }
+  // Clean expired auth sessions from DB
+  try {
+    await pool.query('DELETE FROM auth_sessions WHERE expires_at < $1', [now]);
+  } catch {}
   // Also clean up old IP tracking entries
   const today = new Date().toDateString();
   for (const [ip, record] of ipSessionTracker) {
@@ -1869,9 +1924,15 @@ Please continue helping the user refine their website. The HTML should be a sing
   await archive.finalize();
 });
 
-// Load persisted sessions and auth, then start server
-Promise.all([loadSessions(), loadAuthSessions()]).then(() => {
-  app.listen(PORT, () => {
-    console.log(`Website Builder running at http://localhost:${PORT}`);
+// Initialize database, load persisted sessions and auth, then start server
+initDatabase()
+  .then(() => Promise.all([loadSessions(), loadAuthSessions()]))
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Website Builder running at http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('Failed to start server:', err.message);
+    process.exit(1);
   });
-});
